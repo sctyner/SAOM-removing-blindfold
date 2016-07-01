@@ -115,15 +115,23 @@ The lineup protocol was formally tested in a head-to-head comparison with the eq
 
 \section{The SAO model}
 
+\hh{mostly lit review plus a detailed description of the model and fitting process.}
+
+\section{SAO Diagnostics}
+
+\hh{this needs a lit review of the methods used for diagnosing SAO models: you can start with describing the goodness-of-fit stats (`sienaGOF` function) and the meta analysis described in the RSiena manual, and then work on extending the literature cited and built on this.  }
+
 \section{Visualizations}
+\hh{The visualizations should address most elements of structure described before, i.e. follow along in the setup (for descriptive and teaching purposes), the fitting (understanding the model and interpreting the results) and then diagnostics (how well does the model fit the data - where are the most differences to the actual data/what are the sensitive parameters?) }
 
 \hh{Some of the visualizations we talked about
 \begin{enumerate}
 \item visualization of the MCMC process:  movie of individual actors' step-by-step decisions; could be done with the ndtv package, as long as we can get individual steps out of RSiena
 \item global picture: 1000 simulated networks + alpha blending should give a pretty good idea of the most important edges
 \item global structure + principal components (tensor pca)
-
 \end{enumerate}}
+
+
 \bibliographystyle{asa}
 \bibliography{references}
 
