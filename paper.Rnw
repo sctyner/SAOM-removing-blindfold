@@ -1,0 +1,138 @@
+\documentclass[12pt]{article}
+% \usepackage{geometry}                % See geometry.pdf to learn the layout options. There are lots.
+% \geometry{letterpaper}                   % ... or a4paper or a5paper or ...
+%\usepackage{graphicx}
+\usepackage[font=small,skip=5pt]{caption}
+\usepackage{subcaption}
+\usepackage{afterpage}
+\usepackage{amssymb}
+\usepackage{natbib}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+% \usepackage{color}
+\usepackage{multirow}
+\usepackage{rotating}
+\usepackage[dvipsnames,svgnames,table]{xcolor}
+\usepackage{hyperref}
+\graphicspath{{figure/}}
+% \usepackage{endfloat} % Figures to the end of the document
+
+\DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
+%---------------------------------------------------
+%                 Editing Commands
+\newcommand{\hh}[1]{{\color{magenta} #1}}
+\newcommand{\sct}[1]{{\color{orange} #1}}
+
+%---------------------------------------------------
+%                 Placing Figures
+
+
+%---------------------------------------------------
+% Define new environment
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{algorithm}[theorem]{Algorithm}
+%---------------------------------------------------
+
+%\pdfminorversion=4
+% NOTE: To produce blinded version, replace "0" with "1" below.
+\newcommand{\blind}{0}
+
+% DON'T change margins - should be 1 inch all around.
+\addtolength{\oddsidemargin}{-.5in}%
+\addtolength{\evensidemargin}{-.5in}%
+\addtolength{\textwidth}{1in}%
+\addtolength{\textheight}{1.3in}%
+\addtolength{\topmargin}{-.8in}%
+
+
+\begin{document}
+
+%\bibliographystyle{natbib}
+
+\def\spacingset#1{\renewcommand{\baselinestretch}%
+{#1}\small\normalsize} \spacingset{1}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\if0\blind
+{
+  \title{\bf Visual Diagnsotics of SAO Models}
+  \author{Samantha Tyner\thanks{
+    The authors gratefully acknowledge funding from the National Science Foundation Grant \# DMS 1007697. All data collection has been conducted with approval from the Institutional Review Board IRB 10-347}\hspace{.2cm}\\
+    Department of Statistics and Statistical Laboratory, Iowa State University\\
+    and \\
+    Heike Hofmann\\
+    Department of Statistics and Statistical Laboratory, Iowa State University}
+  \maketitle
+} \fi
+
+\if1\blind
+{
+  \bigskip
+  \bigskip
+  \bigskip
+  \begin{center}
+    {\LARGE\bf Visual Diagnsotics of SAO Models}
+\end{center}
+  \medskip
+} \fi
+
+\bigskip
+\begin{abstract}
+ \hh{XXX just a placeholder}
+\end{abstract}
+
+\noindent%
+{\it Keywords:}  Visual inference, Lineup protocol, \hh{XXX Other keywords?}.
+\vfill
+
+\newpage
+\spacingset{1.45} % DON'T change the spacing!
+
+\tableofcontents
+\newpage
+
+<<setup, echo = FALSE, message = FALSE, warning = FALSE>>=
+options(replace.assign=TRUE,width=70, digits=2)
+require(knitr)
+opts_chunk$set(fig.path='figure/', cache.path='cache/', fig.align='center', fig.width=5, fig.height=5, par=TRUE, cache=TRUE, concordance=TRUE, autodep=TRUE, message=F, warning=F)
+
+library(dplyr)
+@
+
+\section{Introduction} 
+Graphics are an important component of big data analysis, providing a mechanism for discovering unexpected patterns in data. Pioneering research by \citet{gelman:2004}, \citet{buja:2009} and \citet{majumder:2011} provide methods to quantify the significance of discoveries made from visualizations. 
+\citet{buja:2009} introduced two protocols, the Rorschach and the lineup protocol, which bridge the gulf between traditional statistical inference and exploratory data analysis. The Rorschach protocol consists of a set of $m$ (usually, $m=20$) plots (called the {\it null plots}) rendered from data that is consistent with a given null model. That way, the Rorschach protocol helps to understand the extent of randomness in the null model. Under the lineup protocol, a plot of the observed data is placed randomly among a set of $m-1$ null plots.
+Human observers are then asked to  examine the lineup and to identify the most different plot. If observers identify the data plot, this is quantifiable evidence against the null hypothesis. 
+The lineup protocol places a statistical plot firmly in the framework of hypothesis tests: a plot of the data is considered to be the test statistic, which is compared against the sampling distribution under the null hypothesis represented by the null plots. 
+Obviously, the null generating mechanism, i.e.\ the method of obtaining the data for null plots, is crucial for both the lineup and the Rorschach protocol. 
+The null hypothesis directly affects the choice of null generating method. 
+Null generating methods are typically based on (a) simulation, if the null hypothesis allows us to directly specify a parametric model, (b) sampling, as for example in the case of large data sets, or (c) permutation of the original data \citep[see e.g.\ ][]{Good05}, which allows for non-parametric testing  that preserves marginal distributions  while ensuring independence in higher dimensions. 
+%In the experimental data that we analyzed the null generating methods used were permutation methods and direct simulation from a null model.
+
+The lineup protocol was formally tested in a head-to-head comparison with the equivalent conventional test in \citet{majumder:2011}. The experiment utilized human subjects from Amazon's Mechanical Turk \citep{turk} and used simulation to control conditions. The results suggest that  visual inference is comparable to conventional tests in a controlled conventional setting. This provides support for its appropriateness for testing in real exploratory situations where no conventional test exists. Interestingly, the power of a visual test increases with the number of observers engaged to evaluate lineups, and the pattern in results suggests that the power will provide results consistent with practical significance \citep{kirk:1996}.
+
+\section{The SAO model}
+
+\hh{mostly lit review plus a detailed description of the model and fitting process.}
+
+\section{SAO Diagnostics}
+
+\hh{this needs a lit review of the methods used for diagnosing SAO models: you can start with describing the goodness-of-fit stats (`sienaGOF` function) and the meta analysis described in the RSiena manual, and then work on extending the literature cited and built on this.  }
+
+\section{Visualizations}
+\hh{The visualizations should address most elements of structure described before, i.e. follow along in the setup (for descriptive and teaching purposes), the fitting (understanding the model and interpreting the results) and then diagnostics (how well does the model fit the data - where are the most differences to the actual data/what are the sensitive parameters?) }
+
+\hh{Some of the visualizations we talked about
+\begin{enumerate}
+\item visualization of the MCMC process:  movie of individual actors' step-by-step decisions; could be done with the ndtv package, as long as we can get individual steps out of RSiena
+\item global picture: 1000 simulated networks + alpha blending should give a pretty good idea of the most important edges
+\item global structure + principal components (tensor pca)
+\end{enumerate}}
+
+
+\bibliographystyle{asa}
+\bibliography{references}
+
+\end{document}
