@@ -1,0 +1,17 @@
+Visualizing the CTMC and SAOM fitting process
+================
+
+This outline exists to help me get my thoughts straight with respect to my process of visualizing the SAOM fitting process and the underlying CTMC for network change. Why am I doing this? What am I going to do? What have I already done? What do I want to accomplish?
+
+Outline
+=======
+
+1.  Visualize the CTMC
+    1.  Why? - to better understand the model. to see what's going on underneath. to see how the objective function affects tie changes.
+    2.  How? - write a function to simulate from time 1 to time 2 given parameter values that stores the network at each step, the time between each step, and any covariate values. visualize the one-tie-at-a-time changes in a movie, facets, any other way. use color or shape changes to see how the covariate levels affect the changes.
+    3.  What? - this will become part of the "removing the blindfold" chapter. introduction and first sections
+
+2.  Visualize the fitting process
+    1.  Why? - to better understand the updating process. to see what's influencing the parameter estimates most.
+    2.  How? - write a function that mimics the `RSiena` fitting process for Method of Moments OR figure out how to extract the parameter updates from the `sienafit` object. visualize the chains of parameter changes. look at how different parameter values for starting values affect the estimations.
+    3.  What? - this will become part of the "removing the blindfold" chapter. Maybe model-in-data-space section.

@@ -2,14 +2,14 @@
 title: "The Big Outline"
 author: "Sam Tyner"
 date: "June 19, 2016"
-output: html_document
+output: github_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Social Network Analysis
+# SAOMs for Social Network Analysis
 
 ## "Removing the blindfold"
 
@@ -18,6 +18,6 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Lineups
 ## How changes in coefficient values change the appearance of the network
 
-# geomnet
+# `geomnet` for network visualization with `ggplot2`
 
 
