@@ -1,0 +1,344 @@
+---
+title: "Attempting to pull iterations out of RSiena"
+author: "Sam Tyner"
+date: "1/23/2017"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+First I set up some simple examples from the `RSiena` website. 
+
+```{r examplecode}
+library(RSiena)
+# ---- A. ----------------------------------------------------------------------
+# First we have to create objects for the dependent variables.
+
+# sienaDependent creates a sienaDependent object, here a network,
+# from a matrix or array or list of sparse matrix of triples.
+# The name of this network object (here: friendship) will be used
+# in the output file.
+ setwd("data/s50_data")
+  friend.data.w1 <- as.matrix(read.table("s50-network1.dat"))
+  friend.data.w2 <- as.matrix(read.table("s50-network2.dat"))
+  friend.data.w3 <- as.matrix(read.table("s50-network3.dat"))
+  drink <- as.matrix(read.table("s50-alcohol.dat"))
+  smoke <- as.matrix(read.table("s50-smoke.dat"))
+
+ friendship <- sienaDependent(
+                     array( c( friend.data.w1, friend.data.w2, friend.data.w3 ),
+                     dim = c( 50, 50, 3 ) ) )
+
+# The integers in the dim() here refer to the number of nodes (senders,
+# receivers) and the number of waves.
+# This object is an array of dimension 50 x 50 x 3, representing
+# three adjacency matrices, with a number of attributes.
+# Note that this is an object of class
+
+        class(friendship)
+
+# with specific attributes and methods associated with it.
+# You can get the detailed information by requesting
+
+        dim( friendship )
+        attributes( friendship )
+
+# If you only are interested in the value of one particular attribute,
+# you can request this by, e.g.,
+
+        attributes( friendship )$type
+
+# A very concise description of the friendship data is obtained by typing
+
+        friendship
+
+# The function sienaDependent can also be used to create a behavior variable object
+# with the extra argument type = "behavior".
+# (Non-mentioned attributes get the default value, and in this case
+# oneMode is the default; see below.)
+# (Note: only use the variable in ONE role in a given model:
+#  behavior variable or changing covariate!)
+
+# ---- B. ----------------------------------------------------------------------
+# Second we construct objects for the explanatory (independent) variables.
+# From the help request
+#       ?sienaDataCreate
+# we see that these can be of five kinds:
+    # coCovar            Constant actor covariates
+    # varCovar           Time-varying actor covariates
+    # coDyadCovar        Constant dyadic covariates
+    # varDyadCovar       Time-varying dyadic covariates
+    # compositionChange  Composition change indicators
+
+# You can get help about this by the following requests:
+#       ?coCovar
+#       ?varCovar
+#       ?coDyadCovar
+#       ?varDyadCovar
+#       ?sienaCompositionChange
+
+# The variables available for this data set all are changing actor covariates.
+# For illustrative purposes, we use smoking as observed at the first wave
+# as a constant covariate:
+
+        smoke1 <- coCovar( smoke[ , 1 ] )
+
+# We use the drinking data as a changing covariate.
+# the name comes from 'varying covariate'.
+
+        alcohol <- varCovar( drink )
+
+# You need at least three waves in the data set to define a varying covariate
+# by the function varCovar as the previous wave is used
+# as a predictor of the next wave.
+
+# The command
+
+        attributes( alcohol )
+
+# will tell you the information that RSiena now has added to the drink data.
+
+# ---- C. ----------------------------------------------------------------------
+# We now combine the dependent and independent variables.
+# The function sienaDataCreate creates a Siena data object from input networks,
+# covariates and composition change objects;
+# the objects that earlier were created by sienaDependent will have the role
+# of dependent variables, and similarly the other roles are predetermined
+# by creation by the functions coCovar, varCovar,
+# coDyadCovar, varDyadCovar, and sienaCompositionChange.
+
+        mydata <- sienaDataCreate( friendship, smoke1, alcohol)
+# You may check the result by requesting
+
+        mydata
+# ---- D. ----------------------------------------------------------------------
+########################################################################## ---- DEFINING EFFECTS 
+# The data set as combined in mydata implies a certain set of effects
+# that can be included in the specification of the model.
+# The function getEffects creates a dataframe of effects with a number of extra
+# properties for use in RSiena:
+
+        myeffnull <- getEffects( mydata )
+
+# Let us now consider the myeff object, which is used to specify the model.
+# add the transitive triples and 3-cycles effects
+
+        myeff1addl <- includeEffects( myeffnull, transTrip )
+        myeff2addl <- includeEffects( myeffnull, transTrip, cycle3 )
+        
+# fit the models to the data. 
+  myalgorithm <- sienaAlgorithmCreate(projname = 's50_3')
+  
+	ansnull <- siena07( myalgorithm, data = mydata, effects = myeffnull,
+	                    returnChains = TRUE, returnDataFrame = TRUE,
+	                    returnDeps = TRUE, silent = TRUE, verbose = FALSE)
+  ans1addl <- siena07( myalgorithm, data = mydata, effects = myeff1addl,
+                       returnChains = TRUE, returnDataFrame = TRUE,
+                       returnDeps = TRUE,silent = TRUE, verbose = FALSE)
+  ans2addl <- siena07( myalgorithm, data = mydata, effects = myeff2addl,
+                       returnChains = TRUE, returnDataFrame = TRUE,
+                       returnDeps = TRUE,silent = TRUE, verbose = FALSE)
+
+# Function siena07 produces a so-called sienaFit object, here called ans;
+# and it fills in a few things in the sienaEffects object myeff,
+```
+Print out the results from these models for future reference: 
+```{r printres}
+ansnull
+ans1addl
+ans2addl
+```
+
+Okay, now let's look at the chains. These (supposedly) contain the microsteps from the simulation process. 
+
+```{r chains}
+class(ansnull$chain)
+length(ansnull$chain)
+# first question: why is the length of ansnull$chain 1000? 
+class(ansnull$chain[[1]])
+length(ansnull$chain[[1]])
+length(ansnull$chain[[1]][[1]])
+length(ansnull$chain[[1]][[1]][[1]])
+length(ansnull$chain[[1]][[1]][[2]])
+# second question: why do these have different lengths? 
+# hypothesis: these are the steps of the CTMC (microsteps), so each sim will have a different number of steps. 
+class(ansnull$chain[[1]][[1]][[1]])
+length(ansnull$chain[[1]][[1]][[1]][[1]])
+# ok. this is the lowest level. is it the same length for the others?
+length(ans1addl$chain[[1]][[1]][[1]][[1]])
+length(ans2addl$chain[[1]][[1]][[1]][[1]])
+# yes. Crap. so it probably doesn't contain any parameter information...
+```
+
+For the ans object, the length of `ans$chain[[1]][[1]][[m]][[n]]` is always 13 for any value of `m` and `n`. What are in these fields? Class and value are printed below.
+
+```{r fields}
+for (i in 1:13){
+  print(paste(class(ansnull$chain[[1]][[1]][[1]][[1]][[i]]),
+              ansnull$chain[[1]][[1]][[1]][[1]][[i]]))
+}
+```
+
+My current guesses for the fields: 
+
+1. The class of the dependent variable (?)
+2. No idea
+3. The name of the dependent variable
+4. "from" node id of microstep
+5. "to" node id of microstep
+6. No idea
+7. $a_n$ value at parameter update (??)
+
+for 8 - 13 I also have no idea. 
+
+When I was printing out the chains in the console, I noticed some attributes printing off. Let's see those in action.
+
+```{r getattrs}
+attributes(ansnull$chain[[1]][[1]][[1]])
+```
+
+Okay, we've got a mean (`mu`), a variance (`sigma2`), a final rate of some kind (`finalReciprocalRate`) and two empy fields, `initialStateDifferences` and `endStateDifferences`. Recall length of `ansnull$chain[[1]][[1]][[1]]` is `r length(ansnull$chain[[1]][[1]][[1]])` so these attributes exist for all microsteps in the process. That's informative-ish. Here's another set of attributes. 
+
+```{r more attrs}
+attributes(ansnull$chain[[1]][[1]][[2]])
+```
+
+Only the first two attributes changed. Update guesses about what the 13 entries are: 
+
+1. The class of the dependent variable (?)
+2. No idea
+3. The name of the dependent variable
+4. "from" node id of microstep
+5. "to" node id of microstep
+6. No idea
+7. ~~$a_n$ value at parameter update (??)~~ `finalReciprocalRate` attribute, whatever that is.
+8. No idea
+9. No idea
+10. The `initialStateDifferences` attribute value (?)
+11. The `endStateDifferences` attribute value (?)
+12. No idea
+13. No idea
+
+I'll come back to the attributes later. Next, get all of the microstep data together.
+```{r collectsteps, cache=TRUE}
+get_chain_info <- function(ans){
+  
+  L <- length(ans$chain)
+  M <- length(ans$chain[[1]][[1]])
+  bigres <- NULL
+  res <- data.frame()
+  for (l in 1:L){
+    res <- data.frame()
+    for (m in 1:M){
+      sub <- data.frame(plyr::ldply(
+          lapply(ansnull$chain[[l]][[1]][[m]], unlist),
+        rbind), stringsAsFactors = FALSE)
+      sub$rep <- l
+      sub$period <- m
+      res <- rbind(res, sub)
+    }
+    bigres[[l]] <- res  
+  }
+  ret <- plyr::rbind.fill(bigres)
+  return(ret)
+}
+
+ansnullchains <- get_chain_info(ansnull)
+```
+
+Now that we have all these chains together, let's look at them: 
+
+```{r exploredf}
+head(ansnullchains)
+
+for (i in 1:ncol(ansnullchains)){
+  print(paste(i, length(unique(ansnullchains[,i]))))
+}
+```
+
+Okay, 7 of 13 columns have only 1 value. That sucks. What are they? 
+
+```{r uniques}
+unique(ansnullchains[,1])
+unique(ansnullchains[,2])
+unique(ansnullchains[,3])
+unique(ansnullchains[,6])
+unique(ansnullchains[,7])
+unique(ansnullchains[,8])
+unique(ansnullchains[,10])
+```
+
+This has been exceedingly unhelpful. Remove the columns that only have1 value to save memory. 
+
+```{r delete}
+ansnullchains <- ansnullchains[,-c(1:3, 6:8, 10)]
+str(ansnullchains)
+# annoyingly, a lot are factors... fix it real quick.
+for (i in 1:3){
+  ansnullchains[,i] <- as.numeric(as.character(ansnullchains[,i]))
+}
+ansnullchains[,4] <- as.logical(as.character(ansnullchains[,4]))
+```
+
+Look at the distributions of these things. 
+```{r plots}
+library(ggplot2)
+ggplot(data = ansnullchains) + 
+  geom_histogram(aes(x = X9), binwidth = .25) + 
+  facet_wrap(~period) + 
+  labs(title = "Period doesn't appear to make a difference in this value")
+```
+```{r plots2}
+ggplot(data = ansnullchains) + 
+  geom_histogram(aes(x = X9), binwidth = .25) + 
+  facet_wrap(~X11) + 
+  labs(title = "X11 makes a big difference in this value")
+```
+Is there a relationship between `X4`, `X5`, `X9`?
+```{r plots3}
+ggplot(data = ansnullchains) + 
+  geom_boxplot(aes(x = X4, y = X9, group = X4)) + 
+  labs(title = "Some variation in median across X4")
+```
+```{r plots4}
+ggplot(data = ansnullchains) + 
+  geom_boxplot(aes(x = X5, y = X9, group = X5)) + 
+  labs(title = "Some variation in median across X5")
+```
+This next plot might be interesting?? There seem to me to be WAY too many on the diagonal. These are definitely the nodes in the microstep. I'm like 99% sure.  
+```{r plots5}
+ggplot(data = ansnullchains) + 
+  geom_raster(aes(x = X4, y = X5, fill = log(..count..)), stat = "bin2d") + 
+  facet_wrap(~period, labeller = 'label_both') + 
+  scale_fill_continuous(low = 'white', high = 'blue') + 
+  theme(aspect.ratio = 1)
+```
+
+Okay, going back to the attributes: 
+
+```{r attrs}
+get_attr_info <- function(ans){ 
+  
+  L <- length(ans$chain)
+  M <- length(ans$chain[[1]][[1]])
+  bigres <- NULL
+  res <- data.frame(stringsAsFactors = FALSE)
+  for (l in 1:L){
+    res <- data.frame(stringsAsFactors = FALSE)
+    for (m in 1:M){
+      sub <- data.frame(t(unlist(attributes(ans$chain[[l]][[1]][[m]]))), stringsAsFactors = FALSE)
+      sub$rep <- l 
+      sub$period <- m 
+      res <- rbind(res, sub)
+    } 
+    bigres[[l]] <- res  
+  }
+  ret <- plyr::rbind.fill(bigres)
+  return(ret)
+}
+
+ansnullattrs <- get_attr_info(ansnull) 
+summary(ansnullattrs)
+```
