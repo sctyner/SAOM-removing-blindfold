@@ -342,3 +342,32 @@ get_attr_info <- function(ans){
 ansnullattrs <- get_attr_info(ansnull) 
 summary(ansnullattrs)
 ```
+
+Plots of the attribute data: 
+
+```{r plotsattr}
+ggplot(ansnullattrs) + 
+  geom_histogram(aes(x = mu), binwidth = .25)
+ggplot(ansnullattrs) + 
+  geom_histogram(aes(x = sigma2))
+ggplot(ansnullattrs) + 
+  geom_point(aes(x= mu, y = sigma2))
+cor(ansnullattrs$mu, ansnullattrs$sigma2)
+```
+
+Okay, `mu` and `sigma2` are perfectly correlated. Does this make sense??? Are they monotonic maybe? Check:
+
+```{r plotattrs2}
+ggplot(ansnullattrs) + 
+  geom_line(aes(x= rep, y = mu, color = as.factor(period)))
+ggplot(ansnullattrs) + 
+  geom_line(aes(x= rep, y = mu)) + 
+  facet_wrap(~period, nrow = 2, labeller = "label_both")
+```
+
+Okay, couple things:
+
+1. period 2 values of `mu` are pretty consistently lower than period 1 values of `mu`
+2. they're definitely no monotonic with rep, and they look like typical chains from an MCMC. 
+
+I assume the `sigma2` plots have the same appearance since `mu` and `sigma` are perfectly correlated. 
