@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 First I set up some simple examples from the `RSiena` website. 
 
-```{r examplecode}
+```{r examplecode, cache=TRUE}
 library(RSiena)
 # ---- A. ----------------------------------------------------------------------
 # First we have to create objects for the dependent variables.
@@ -272,7 +272,7 @@ unique(ansnullchains[,10])
 
 This has been exceedingly unhelpful. Remove the columns that only have1 value to save memory. 
 
-```{r delete}
+```{r delete, cache=TRUE}
 ansnullchains <- ansnullchains[,-c(1:3, 6:8, 10)]
 str(ansnullchains)
 # annoyingly, a lot are factors... fix it real quick.
@@ -318,7 +318,7 @@ ggplot(data = ansnullchains) +
 
 Okay, going back to the attributes: 
 
-```{r attrs}
+```{r attrs, cache=TRUE}
 get_attr_info <- function(ans){ 
   
   L <- length(ans$chain)
@@ -371,3 +371,47 @@ Okay, couple things:
 2. they're definitely no monotonic with rep, and they look like typical chains from an MCMC. 
 
 I assume the `sigma2` plots have the same appearance since `mu` and `sigma` are perfectly correlated. 
+
+What are you, `mu` and `sigma2`? Look at the [Siena Algorithms](http://www.stats.ox.ac.uk/~snijders/siena/Siena_algorithms.pdf)!  
+
+On p. 32 of this manual, there is a defining list of variables that might be our mysterious 13 list elements!!!!
+
+1. "Aspect": 'network' or 'behavior' 
+2. No idea
+3. The name of the dependent variable
+4. "Actor i": sending actor
+5. "Actor j": receiving actor
+6. "Difference": meaningless 0 when aspect is 'network'
+7. ~~$a_n$ value at parameter update (??)~~ `finalReciprocalRate` attribute, whatever that is.
+8. "log OptionSet probability": log probability of making a ministep of this OptionSet. Okay. This value is `r ansnull$chain[[1]][[1]][[1]][[1]][[8]]` always. Now we know it's been $\log$'d. So I'll $\exp$ it: `r exp(ansnull$chain[[1]][[1]][[1]][[1]][[8]])`. This is the probabililty of randomly selecting one node out of the 50 to be changed. CRUSHED IT.
+9. "log choice probability": log probability of making a ministep of this choice. So, if we $\exp$ it, that's the probability of changing the tie from node $i$ to node $j$ given the current network stats. 
+10. The `initialStateDifferences` attribute value (?)
+11. The `endStateDifferences` attribute value (?)
+12. No idea
+13. No idea
+
+Okay, now that I know that the `X9` variable is the log of the probability of making the tie, let's look at some plots of it when it's been exponentiated to get the probability back out. 
+
+```{r newplots}
+names(ansnullchains)[1:3] <- c("actori", "actorj", "logchoiceprob")
+ggplot(data= ansnullchains) + 
+  geom_histogram(aes(x = exp(logchoiceprob)), binwidth = 0.025)
+```
+
+Now, let's color our tile plot from before by the mean probability of that tie (first requires some data manipulation): 
+
+```{r newplots2}
+library(dplyr)
+ansnullchains %>% 
+  group_by(actori, actorj) %>% 
+  summarize(meanprob = mean(exp(logchoiceprob))) %>% 
+  arrange(actori, actorj, meanprob) -> ansnull_probs
+  
+ggplot(data = ansnull_probs) + 
+  geom_raster(aes(x = actori, y = actorj, fill = meanprob)) + 
+  #facet_wrap(~period, labeller = 'label_both') + 
+  scale_fill_continuous(low = 'white', high = 'blue') + 
+  theme(aspect.ratio = 1)
+```
+
+Cool. That's much more informative and logical. 

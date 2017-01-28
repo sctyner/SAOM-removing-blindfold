@@ -24,7 +24,7 @@ This outline exists to help me get my thoughts straight with respect to my proce
     a. Model family - the SAOM is the model family
     b. Model form - which $\beta$ effects get included
     c. Fitted model - estimates of rate parameters and $\beta$s resulting from `RSiena` fit
-    d. Question: Can we find a direct interpretation of the SAOM $\beta$ parameters? 
+    d. Question: Can we find a direct interpretation of the SAOM $\beta$ parameters? The $\beta$s are in the model space. How can we take them from the model space to the data space? 
     e. Question: How can we visualize these networks interactively?? 
 3. Display the Model in Data-Space
     a. What does visualizing the model in the data space mean for SAOMs? 
