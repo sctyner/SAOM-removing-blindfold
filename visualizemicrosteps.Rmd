@@ -1,0 +1,202 @@
+---
+title: "Visualizing `RSiena`'s Microsteps"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
+```
+
+## Fit a model to data
+
+I'll start like I always do: with the friends data. This code is directly from the [`RSiena` webpage](https://www.stats.ox.ac.uk/~snijders/siena/Rscript02SienaVariableFormat.R). 
+
+```{r get_data, cache=TRUE}
+library(RSiena)
+setwd("data/s50_data")
+friend.data.w1 <- as.matrix(read.table("s50-network1.dat"))
+friend.data.w2 <- as.matrix(read.table("s50-network2.dat"))
+friend.data.w3 <- as.matrix(read.table("s50-network3.dat"))
+drink <- as.matrix(read.table("s50-alcohol.dat"))
+smoke <- as.matrix(read.table("s50-smoke.dat"))
+friendship <- sienaDependent(
+                     array(c(friend.data.w1, friend.data.w2,
+                             friend.data.w3),
+                     dim = c(50, 50, 3)))
+smoke1 <- coCovar(smoke[ , 1 ])
+alcohol <- varCovar(drink)
+mydata <- sienaDataCreate(friendship, smoke1, alcohol)
+myeffnull <- getEffects(mydata)
+myeffalt1 <- includeEffects(myeffnull, transTrip)
+myalgorithm <- sienaAlgorithmCreate(projname = 's50_3')
+set.seed(823746)
+ansnull <- siena07(myalgorithm, data = mydata, effects = myeffnull,
+	                 returnChains = TRUE, returnDataFrame = TRUE,
+	                 returnDeps = TRUE, silent = TRUE, verbose = FALSE,
+	                 batch = TRUE)
+ansalt1 <- siena07(myalgorithm, data = mydata, effects = myeffalt1,
+                    returnChains = TRUE, returnDataFrame = TRUE,
+                    returnDeps = TRUE,silent = TRUE, verbose = FALSE,
+                    batch = TRUE)
+```
+
+Look at a plot of the data: 
+
+```{r plot}
+library(geomnet)
+w1 <- fortify(as.adjmat(friend.data.w1))
+w2 <- fortify(as.adjmat(friend.data.w2))
+w3 <- fortify(as.adjmat(friend.data.w3))
+id <- na.omit(unique(c(w1$from, w1$to, w2$from, w2$to, w3$from, w3$to)))
+nodes <- data.frame(id = rep(id[order(parse_number(id))], 3),
+                    wave = rep(1:3, each = length(id)),
+                    drink = c(drink[-c(13,20),1],drink[-c(13,20),2],
+                              drink[-c(13,20),3]), 
+                    smoke = rep(smoke[-c(13,20),1],3),
+                    stringsAsFactors = F)
+w1$wave <- 1
+w2$wave <- 2
+w3$wave <- 3
+fnet <- rbind(w1,w2,w3)
+fnet <- merge(fnet, nodes, by.x = c('from', 'wave'),
+              by.y = c('id',"wave"), all = T)
+# need to change the id to be 0-49 to match the chains coding
+# library(dplyr)
+# fnet %>% 
+ # mutate(from = parse_number(from) - 1, 
+  #       to = parse_number(to) - 1) -> fnet
+library(readr)
+
+ggplot(data = fnet) + 
+  geom_net(aes(from_id = from, to_id = to), fiteach = T) + 
+  facet_wrap(~wave, labeller = 'label_both', nrow = 1)
+```
+
+What do the fitted models look like?
+
+```{r fits}
+summary(ansnull)
+summary(ansalt1)
+```
+
+Convergence looks good in both cases! 
+
+Now, I want to visualize the individual changes, starting with wave 1 to wave 2 from the null model.
+
+```{r getchains, cache=TRUE}
+get_chain_info <- function(ans){
+  L <- length(ans$chain)
+  M <- length(ans$chain[[1]][[1]])
+  bigres <- NULL
+  res <- data.frame()
+  for (l in 1:L){
+    res <- data.frame()
+    for (m in 1:M){
+      sub <- data.frame(plyr::ldply(
+          lapply(ansnull$chain[[l]][[1]][[m]], unlist),
+        rbind), stringsAsFactors = FALSE)
+      sub$rep <- l
+      sub$period <- m
+      res <- rbind(res, sub)
+    }
+    bigres[[l]] <- res  
+  }
+  ret <- plyr::rbind.fill(bigres)
+  return(ret)
+}
+ansnullchains <- get_chain_info(ansnull)
+```
+
+```{r firstwave}
+library(dplyr)
+library(readr)
+ansnullchains %>% 
+  filter(period == 1) %>% 
+  group_by(rep) %>%
+  select(rep, from = X4, to = X5) %>% 
+  mutate(val = as.numeric(!from == to),
+         from = paste0("V", parse_number(from)+1), # make the chains
+         to = paste0("V", parse_number(to)+1) # match the data vars 
+         ) -> ansnullchainsw1w2
+
+addMicrostep <- function(dat, newedge){
+  N <- nrow(dat)
+  selfie <- newedge$from == newedge$to
+  check <- dplyr::filter(dat, from == newedge$from & to == newedge$to)
+  if (nrow(check) == 0 && !selfie){
+    dat2 <- tibble::add_row(dat, from = newedge$from, to = newedge$to)
+    dat2$col <- FALSE
+    dat2$col[N+1] <- TRUE # color the new edge. 
+  } else if (nrow(check) == 1 && !selfie){
+    dat2 <- dplyr::filter(dat, !(from == newedge$from & to == newedge$to))
+    dat2$col <- FALSE
+  } else{
+    dat2 <- dat
+    dat2$col <- FALSE
+  }
+  return(dat2)
+}
+
+listMicrosteps <- function(dat, microsteps){
+  iters <- NULL
+  iters[[1]] <- dat
+  B <- nrow(microsteps)
+  for (i in 2:(B+1)){
+    iters[[i]] <- addMicrostep(iters[[(i-1)]], microsteps[(i-1),])
+  }
+  return(iters)
+}
+
+# test it on one of the reps from the null model
+
+ms1 <- listMicrosteps(dat = w1, 
+                      microsteps = filter(ansnullchainsw1w2, rep == 1))
+ms1[[200]]
+# looks legit
+```
+
+Now, I want to plot all of them! Make a movie! 
+
+```{r movie}
+# layout the original wave
+# get (x,y) coordinates to add to the edge lists
+# merge nodes and microsteps before plotting. 
+
+library(sna)
+w1.net <- as.network(friend.data.w1)
+layoutxy <- gplot.layout.fruchtermanreingold(friend.data.w1, layout.par = NULL)
+layoutxy <- data.frame(layoutxy)
+names(layoutxy) <- c("x", "y")
+layoutxy$id <- get.vertex.attribute(w1.net, "vertex.names")
+
+w1_nodes_xy <- merge(nodes %>% filter(wave == 1), layoutxy, by = "id", all = T)
+
+plotms <- function(dat, nodes){
+  dat2 <- merge(dat, nodes, by.x = "from", by.y= "id", all=T)
+  p <- ggplot(data = dat2) + 
+    geom_net(aes(from_id = from, to_id = to, x = x, y = y),
+             layout.alg = NULL, size = 1.5, directed = T, linewidth = .5,
+             arrow = arrow(angle = 20, 
+                           length = unit(5, "pt"), type = "open"),
+             arrowgap = .02) + #, ecolour = c("grey40", "red")[as.factor(dat2$col)]) + 
+    theme_net()
+  return(p)
+}
+
+setwd("plots")
+for (i in 2:length(ms1)) {
+  # creating a name for each plot file with leading zeros
+  print(i)
+  if (i < 10) {name = paste('plots/000',i,'plot.png',sep='')}
+  if (i < 100 && i >= 10) {name = paste('plots/00',i,'plot.png', sep='')}
+  if (i >= 100) {name = paste('plots/0', i,'plot.png', sep='')}
+  png(name)
+  print(plotms(ms1[[i]], nodes = w1_nodes_xy))
+  dev.off()
+} 
+make.mov <- function(){
+     unlink("plot.mpg")
+     system("convert -delay 0.5 plot*.jpg plot.mpg")
+}
+make.mov()
+```
