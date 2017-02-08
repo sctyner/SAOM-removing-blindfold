@@ -26,7 +26,7 @@ Ideas from "Visualizing Statistical Models: Removing the Blindfold"
     1.  Model family - the SAOM is the model family
     2.  Model form - which *β* effects get included
     3.  Fitted model - estimates of rate parameters and *β*s resulting from `RSiena` fit
-    4.  Question: Can we find a direct interpretation of the SAOM *β* parameters?
+    4.  Question: Can we find a direct interpretation of the SAOM *β* parameters? The *β*s are in the model space. How can we take them from the model space to the data space?
     5.  Question: How can we visualize these networks interactively??
 
 3.  Display the Model in Data-Space

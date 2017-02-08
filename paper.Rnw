@@ -102,24 +102,12 @@ library(dplyr)
 @
 
 \section{Introduction} 
-Graphics are an important component of big data analysis, providing a mechanism for discovering unexpected patterns in data. Pioneering research by \citet{gelman:2004}, \citet{buja:2009} and \citet{majumder:2011} provide methods to quantify the significance of discoveries made from visualizations. 
-\citet{buja:2009} introduced two protocols, the Rorschach and the lineup protocol, which bridge the gulf between traditional statistical inference and exploratory data analysis. The Rorschach protocol consists of a set of $m$ (usually, $m=20$) plots (called the {\it null plots}) rendered from data that is consistent with a given null model. That way, the Rorschach protocol helps to understand the extent of randomness in the null model. Under the lineup protocol, a plot of the observed data is placed randomly among a set of $m-1$ null plots.
-Human observers are then asked to  examine the lineup and to identify the most different plot. If observers identify the data plot, this is quantifiable evidence against the null hypothesis. 
-The lineup protocol places a statistical plot firmly in the framework of hypothesis tests: a plot of the data is considered to be the test statistic, which is compared against the sampling distribution under the null hypothesis represented by the null plots. 
-Obviously, the null generating mechanism, i.e.\ the method of obtaining the data for null plots, is crucial for both the lineup and the Rorschach protocol. 
-The null hypothesis directly affects the choice of null generating method. 
-Null generating methods are typically based on (a) simulation, if the null hypothesis allows us to directly specify a parametric model, (b) sampling, as for example in the case of large data sets, or (c) permutation of the original data \citep[see e.g.\ ][]{Good05}, which allows for non-parametric testing  that preserves marginal distributions  while ensuring independence in higher dimensions. 
-%In the experimental data that we analyzed the null generating methods used were permutation methods and direct simulation from a null model.
 
-The lineup protocol was formally tested in a head-to-head comparison with the equivalent conventional test in \citet{majumder:2011}. The experiment utilized human subjects from Amazon's Mechanical Turk \citep{turk} and used simulation to control conditions. The results suggest that  visual inference is comparable to conventional tests in a controlled conventional setting. This provides support for its appropriateness for testing in real exploratory situations where no conventional test exists. Interestingly, the power of a visual test increases with the number of observers engaged to evaluate lineups, and the pattern in results suggests that the power will provide results consistent with practical significance \citep{kirk:1996}.
+The guiding principles of model visualization are (1) display the model in the data space, (2) collections of models are more informative than singletons, and (3) explore how algorithms work, instead of just looking at the final result. Stochastic actor-oriented models are a prime example of a set of models that could benefit greatly from application of model visualization. First, the models themselves include a continuous-time Markov chain (CTMC) that is completely hidden in the model fitting process. Bringing the CTMC out from behind-the-scenes and into the light of visualization will provide researchers with insights into the underlying features of the model. Secondly, SAOMs allow for a great deal of parameters that can be added to the objective function, each of which are attached to a network statistic. These statistics are often somewhat, if not highly, correlated, and so are the associated parameters. By visualizing collections of SAOMs, we can gain a better understanding of these correlations and find ways to deal with them and rectify their effects.   
 
 \section{The SAO model}
 
 \hh{mostly lit review plus a detailed description of the model and fitting process.}
-
-\section{SAO Diagnostics}
-
-\hh{this needs a lit review of the methods used for diagnosing SAO models: you can start with describing the goodness-of-fit stats (`sienaGOF` function) and the meta analysis described in the RSiena manual, and then work on extending the literature cited and built on this.  }
 
 \section{Visualizations}
 \hh{The visualizations should address most elements of structure described before, i.e. follow along in the setup (for descriptive and teaching purposes), the fitting (understanding the model and interpreting the results) and then diagnostics (how well does the model fit the data - where are the most differences to the actual data/what are the sensitive parameters?) }

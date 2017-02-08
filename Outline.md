@@ -3,8 +3,8 @@ The Big Outline
 Sam Tyner
 June 19, 2016
 
-Social Network Analysis
-=======================
+SAOMs for Social Network Analysis
+=================================
 
 "Removing the blindfold"
 ------------------------
@@ -18,5 +18,5 @@ Lineups
 How changes in coefficient values change the appearance of the network
 ----------------------------------------------------------------------
 
-geomnet
-=======
+`geomnet` for network visualization with `ggplot2`
+==================================================

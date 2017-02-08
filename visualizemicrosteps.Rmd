@@ -171,11 +171,20 @@ layoutxy$id <- get.vertex.attribute(w1.net, "vertex.names")
 
 w1_nodes_xy <- merge(nodes %>% filter(wave == 1), layoutxy, by = "id", all = T)
 
-plotms <- function(dat, nodes){
+plotms <- function(dat, nodes, same.layout){
   dat2 <- merge(dat, nodes, by.x = "from", by.y= "id", all=T)
+  if (same.layout){
   p <- ggplot(data = dat2) + 
     geom_net(aes(from_id = from, to_id = to, x = x, y = y),
              layout.alg = NULL, size = 1.5, directed = T, linewidth = .5,
+             arrow = arrow(angle = 20, 
+                           length = unit(5, "pt"), type = "open"),
+             arrowgap = .02) + #, ecolour = c("grey40", "red")[as.factor(dat2$col)]) + 
+    theme_net() 
+  } else 
+  p <- ggplot(data = dat2) + 
+    geom_net(aes(from_id = from, to_id = to),
+            size = 1.5, directed = T, linewidth = .5,
              arrow = arrow(angle = 20, 
                            length = unit(5, "pt"), type = "open"),
              arrowgap = .02) + #, ecolour = c("grey40", "red")[as.factor(dat2$col)]) + 
@@ -183,20 +192,32 @@ plotms <- function(dat, nodes){
   return(p)
 }
 
-setwd("plots")
-for (i in 2:length(ms1)) {
+make_msplots <- function(ms, nodes, same.layout, dir, filename){
+  N <- length(ms)
+  for (i in 1:length(ms1)) {
   # creating a name for each plot file with leading zeros
   print(i)
-  if (i < 10) {name = paste('plots/000',i,'plot.png',sep='')}
-  if (i < 100 && i >= 10) {name = paste('plots/00',i,'plot.png', sep='')}
-  if (i >= 100) {name = paste('plots/0', i,'plot.png', sep='')}
+  if (i < 10) {name = paste(dir,'/000',i,filename,'.png',sep='')}
+  if (i < 100 && i >= 10) {name = paste(dir,'/00',i,filename,'.png', sep='')}
+  if (i >= 100) {name = paste(dir,'/0', i,filename, '.png', sep='')}
   png(name)
-  print(plotms(ms1[[i]], nodes = w1_nodes_xy))
+  print(plotms(ms[[i]], nodes = nodes, same.layout = same.layout) + 
+          labs(title = paste("Microstep:", i-1)))
   dev.off()
-} 
-make.mov <- function(){
-     unlink("plot.mpg")
-     system("convert -delay 0.5 plot*.jpg plot.mpg")
+  } 
 }
-make.mov()
+
+make.gif <- function(dir, filename, out.name){
+    # unlink("plot.mpg")
+    command <- paste0("convert -delay 50 ", dir, "/*", filename, ".png ", dir, "/", out.name, ".gif")
+     system(command = command)
+}
+```
+
+Now, allow the layout to change. 
+
+```{r makedifflayout}
+make_msplots(ms = ms1, nodes = w1_nodes_xy, dir = "plots", filename = "w1difflayout", same.layout = FALSE)
+make.gif(dir = "plots", filename = "w1difflayout", out.name = "microsteps_difflo")
+
 ```

@@ -1578,3 +1578,970 @@ covariance/correlation matrix of X can be found using
 summary(ans) within R, or by using the 'verbose' option in Siena07.
  
 Total computation time 27.41 seconds.
+
+
+-----------------------------------
+New Analysis started.
+Date and time: 25/01/2017 16:39:35
+New results follow.
+-----------------------------------
+
+RSiena version 1.1-304 (14 Oct 16) R-forge revision: 304 
+
+
+@1
+Estimation by stochastic approximation algorithm.
+=================================================
+
+Random initialization of random number stream.
+Current random number seed is 87801.
+Effects object used: myeffnull 
+Model Type 1: Standard actor-oriented model
+Estimation method: conditional moment estimation
+Conditioning variable is the total number of observed changes ("distance") 
+in the network variable.
+Distances for simulations are
+period   :   1   2
+distance :  115 106.
+Standard errors are estimated with the likelihood ratio method.
+Dolby method (regression on scores) is used.
+Initial value of gain parameter is  0.2000000.
+Reduction factor for gain parameter is  0.5000000.
+Number of subphases in Phase 2 is 4.
+
+Initial parameter values are 
+  0.1  Rate parameter                         4.6960
+  0.2  Rate parameter                         4.3288
+  1. eval:  outdegree (density)                            -1.4677
+  2. eval:  reciprocity                                     0.0000
+
+
+Observed values of target statistics are
+  1. Number of ties                                                     238.0000
+  2. Number of reciprocated ties                                        160.0000
+
+ 2 parameters, 2 statistics
+
+Estimation of derivatives by the LR method (type 1).
+
+
+@2
+End of stochastic approximation algorithm, phase 3.
+---------------------------------------------------
+
+Total of 2083 iterations.
+Parameter estimates based on 1083 iterations,
+basic rate parameters as well as 
+convergence diagnostics, covariance and derivative matrices based on 1000 iterations.
+
+Information for convergence diagnosis.
+Averages, standard deviations, and t-ratios for deviations from targets:
+  1.   0.1120  14.4368   0.0078 
+  2.   0.1600  13.8786   0.0115 
+
+Good convergence is indicated by the t-ratios being close to zero.
+
+Overall maximum convergence ratio =  0.0121 .
+
+
+
+@2
+Estimation Results.
+-------------------
+
+Regular end of estimation algorithm.
+Total of 2083 iteration steps.
+
+
+@3
+Estimates and standard errors
+                             
+Rate parameters:
+ 0.1  Rate parameter period 1     5.8088  (   0.8701)
+ 0.2  Rate parameter period 2     4.4989  (   0.6645)
+
+Other parameters:
+ 1. eval:  outdegree (density)                                    -2.3825  (   0.1055)
+ 2. eval:  reciprocity                                             2.8622  (   0.1809)
+
+
+@3
+Covariance matrices
+                   
+Covariance matrix of estimates (correlations below diagonal):
+     0.011     -0.014
+    -0.740      0.033
+
+Derivative matrix of expected statistics X by parameters and
+covariance/correlation matrix of X can be found using
+summary(ans) within R, or by using the 'verbose' option in Siena07.
+ 
+Total computation time 20.92 seconds.
+
+
+-----------------------------------
+New Analysis started.
+Date and time: 25/01/2017 16:39:55
+New results follow.
+-----------------------------------
+
+RSiena version 1.1-304 (14 Oct 16) R-forge revision: 304 
+
+
+@1
+Estimation by stochastic approximation algorithm.
+=================================================
+
+Random initialization of random number stream.
+Current random number seed is 573015.
+Effects object used: myeff1addl 
+Model Type 1: Standard actor-oriented model
+Estimation method: conditional moment estimation
+Conditioning variable is the total number of observed changes ("distance") 
+in the network variable.
+Distances for simulations are
+period   :   1   2
+distance :  115 106.
+Standard errors are estimated with the likelihood ratio method.
+Dolby method (regression on scores) is used.
+Initial value of gain parameter is  0.2000000.
+Reduction factor for gain parameter is  0.5000000.
+Number of subphases in Phase 2 is 4.
+
+Initial parameter values are 
+  0.1  Rate parameter                         4.6960
+  0.2  Rate parameter                         4.3288
+  1. eval:  outdegree (density)                            -1.4677
+  2. eval:  reciprocity                                     0.0000
+  3. eval:  transitive triplets                             0.0000
+
+
+Observed values of target statistics are
+  1. Number of ties                                                     238.0000
+  2. Number of reciprocated ties                                        160.0000
+  3. Number of transitive triplets                                      225.0000
+
+ 3 parameters, 3 statistics
+
+
+
+-----------------------------------
+New Analysis started.
+Date and time: 25/01/2017 16:40:03
+New results follow.
+-----------------------------------
+
+RSiena version 1.1-304 (14 Oct 16) R-forge revision: 304 
+
+
+@1
+Estimation by stochastic approximation algorithm.
+=================================================
+
+Random initialization of random number stream.
+Current random number seed is 978622.
+Effects object used: myeffnull 
+Model Type 1: Standard actor-oriented model
+Estimation method: conditional moment estimation
+Conditioning variable is the total number of observed changes ("distance") 
+in the network variable.
+Distances for simulations are
+period   :   1   2
+distance :  115 106.
+Standard errors are estimated with the likelihood ratio method.
+Dolby method (regression on scores) is used.
+Initial value of gain parameter is  0.2000000.
+Reduction factor for gain parameter is  0.5000000.
+Number of subphases in Phase 2 is 4.
+
+Initial parameter values are 
+  0.1  Rate parameter                         4.6960
+  0.2  Rate parameter                         4.3288
+  1. eval:  outdegree (density)                            -1.4677
+  2. eval:  reciprocity                                     0.0000
+
+
+Observed values of target statistics are
+  1. Number of ties                                                     238.0000
+  2. Number of reciprocated ties                                        160.0000
+
+ 2 parameters, 2 statistics
+
+Estimation of derivatives by the LR method (type 1).
+
+
+@2
+End of stochastic approximation algorithm, phase 3.
+---------------------------------------------------
+
+Total of 2012 iterations.
+Parameter estimates based on 1012 iterations,
+basic rate parameters as well as 
+convergence diagnostics, covariance and derivative matrices based on 1000 iterations.
+
+Information for convergence diagnosis.
+Averages, standard deviations, and t-ratios for deviations from targets:
+  1.  -0.6700  14.1821  -0.0472 
+  2.  -0.3580  13.7002  -0.0261 
+
+Good convergence is indicated by the t-ratios being close to zero.
+
+Overall maximum convergence ratio =  0.0533 .
+
+
+
+@2
+Estimation Results.
+-------------------
+
+Regular end of estimation algorithm.
+Total of 2012 iteration steps.
+
+
+@3
+Estimates and standard errors
+                             
+Rate parameters:
+ 0.1  Rate parameter period 1     5.7767  (   0.8871)
+ 0.2  Rate parameter period 2     4.4953  (   0.6711)
+
+Other parameters:
+ 1. eval:  outdegree (density)                                    -2.3806  (   0.1061)
+ 2. eval:  reciprocity                                             2.8552  (   0.1892)
+
+
+@3
+Covariance matrices
+                   
+Covariance matrix of estimates (correlations below diagonal):
+     0.011     -0.015
+    -0.757      0.036
+
+Derivative matrix of expected statistics X by parameters and
+covariance/correlation matrix of X can be found using
+summary(ans) within R, or by using the 'verbose' option in Siena07.
+ 
+Total computation time 15.74 seconds.
+
+
+-----------------------------------
+New Analysis started.
+Date and time: 25/01/2017 16:40:19
+New results follow.
+-----------------------------------
+
+RSiena version 1.1-304 (14 Oct 16) R-forge revision: 304 
+
+
+@1
+Estimation by stochastic approximation algorithm.
+=================================================
+
+Random initialization of random number stream.
+Current random number seed is 180277.
+Effects object used: myeff1addl 
+Model Type 1: Standard actor-oriented model
+Estimation method: conditional moment estimation
+Conditioning variable is the total number of observed changes ("distance") 
+in the network variable.
+Distances for simulations are
+period   :   1   2
+distance :  115 106.
+Standard errors are estimated with the likelihood ratio method.
+Dolby method (regression on scores) is used.
+Initial value of gain parameter is  0.2000000.
+Reduction factor for gain parameter is  0.5000000.
+Number of subphases in Phase 2 is 4.
+
+Initial parameter values are 
+  0.1  Rate parameter                         4.6960
+  0.2  Rate parameter                         4.3288
+  1. eval:  outdegree (density)                            -1.4677
+  2. eval:  reciprocity                                     0.0000
+  3. eval:  transitive triplets                             0.0000
+
+
+Observed values of target statistics are
+  1. Number of ties                                                     238.0000
+  2. Number of reciprocated ties                                        160.0000
+  3. Number of transitive triplets                                      225.0000
+
+ 3 parameters, 3 statistics
+
+Estimation of derivatives by the LR method (type 1).
+
+
+@2
+End of stochastic approximation algorithm, phase 3.
+---------------------------------------------------
+
+Total of 1713 iterations.
+Parameter estimates based on 713 iterations,
+basic rate parameters as well as 
+convergence diagnostics, covariance and derivative matrices based on 1000 iterations.
+
+Information for convergence diagnosis.
+Averages, standard deviations, and t-ratios for deviations from targets:
+  1.   1.3140  21.8239   0.0602 
+  2.   0.5140  20.4757   0.0251 
+  3.   5.5820  69.5239   0.0803 
+
+Good convergence is indicated by the t-ratios being close to zero.
+
+Overall maximum convergence ratio =  0.1409 .
+
+
+
+@2
+Estimation Results.
+-------------------
+
+Regular end of estimation algorithm.
+Total of 1713 iteration steps.
+
+
+@3
+Estimates and standard errors
+                             
+Rate parameters:
+ 0.1  Rate parameter period 1     6.4524  (   1.1558)
+ 0.2  Rate parameter period 2     5.2533  (   0.9123)
+
+Other parameters:
+ 1. eval:  outdegree (density)                                    -2.6796  (   0.1223)
+ 2. eval:  reciprocity                                             2.4490  (   0.2084)
+ 3. eval:  transitive triplets                                     0.6259  (   0.0778)
+
+
+@3
+Covariance matrices
+                   
+Covariance matrix of estimates (correlations below diagonal):
+     0.015     -0.015     -0.005
+    -0.605      0.043     -0.002
+    -0.494     -0.110      0.006
+
+Derivative matrix of expected statistics X by parameters and
+covariance/correlation matrix of X can be found using
+summary(ans) within R, or by using the 'verbose' option in Siena07.
+ 
+Total computation time 21.67 seconds.
+
+
+-----------------------------------
+New Analysis started.
+Date and time: 25/01/2017 16:40:41
+New results follow.
+-----------------------------------
+
+RSiena version 1.1-304 (14 Oct 16) R-forge revision: 304 
+
+
+@1
+Estimation by stochastic approximation algorithm.
+=================================================
+
+Random initialization of random number stream.
+Current random number seed is 694585.
+Effects object used: myeff2addl 
+Model Type 1: Standard actor-oriented model
+Estimation method: conditional moment estimation
+Conditioning variable is the total number of observed changes ("distance") 
+in the network variable.
+Distances for simulations are
+period   :   1   2
+distance :  115 106.
+Standard errors are estimated with the likelihood ratio method.
+Dolby method (regression on scores) is used.
+Initial value of gain parameter is  0.2000000.
+Reduction factor for gain parameter is  0.5000000.
+Number of subphases in Phase 2 is 4.
+
+Initial parameter values are 
+  0.1  Rate parameter                         4.6960
+  0.2  Rate parameter                         4.3288
+  1. eval:  outdegree (density)                            -1.4677
+  2. eval:  reciprocity                                     0.0000
+  3. eval:  transitive triplets                             0.0000
+  4. eval:  3-cycles                                        0.0000
+
+
+Observed values of target statistics are
+  1. Number of ties                                                     238.0000
+  2. Number of reciprocated ties                                        160.0000
+  3. Number of transitive triplets                                      225.0000
+  4. 3-cycles                                                            72.0000
+
+ 4 parameters, 4 statistics
+
+Estimation of derivatives by the LR method (type 1).
+
+
+@2
+End of stochastic approximation algorithm, phase 3.
+---------------------------------------------------
+
+Total of 1767 iterations.
+Parameter estimates based on 767 iterations,
+basic rate parameters as well as 
+convergence diagnostics, covariance and derivative matrices based on 1000 iterations.
+
+Information for convergence diagnosis.
+Averages, standard deviations, and t-ratios for deviations from targets:
+  1.   0.2980  22.0124   0.0135 
+  2.   0.3560  20.3570   0.0175 
+  3.   0.5150  65.2771   0.0079 
+  4.   0.0790  21.2513   0.0037 
+
+Good convergence is indicated by the t-ratios being close to zero.
+
+Overall maximum convergence ratio =  0.0458 .
+
+
+
+@2
+Estimation Results.
+-------------------
+
+Regular end of estimation algorithm.
+Total of 1767 iteration steps.
+
+
+@3
+Estimates and standard errors
+                             
+Rate parameters:
+ 0.1  Rate parameter period 1     6.4495  (   1.0844)
+ 0.2  Rate parameter period 2     5.2647  (   0.8888)
+
+Other parameters:
+ 1. eval:  outdegree (density)                                    -2.6989  (   0.1143)
+ 2. eval:  reciprocity                                             2.5030  (   0.2072)
+ 3. eval:  transitive triplets                                     0.6813  (   0.1302)
+ 4. eval:  3-cycles                                               -0.1287  (   0.2665)
+
+
+@3
+Covariance matrices
+                   
+Covariance matrix of estimates (correlations below diagonal):
+     0.013     -0.015     -0.007      0.008
+    -0.614      0.043      0.009     -0.027
+    -0.449      0.344      0.017     -0.029
+     0.260     -0.489     -0.828      0.071
+
+Derivative matrix of expected statistics X by parameters and
+covariance/correlation matrix of X can be found using
+summary(ans) within R, or by using the 'verbose' option in Siena07.
+ 
+Total computation time 22.62 seconds.
+
+
+-----------------------------------
+New Analysis started.
+Date and time: 26/01/2017 14:33:42
+New results follow.
+-----------------------------------
+
+RSiena version 1.1-304 (14 Oct 16) R-forge revision: 304 
+
+
+@1
+Estimation by stochastic approximation algorithm.
+=================================================
+
+Random initialization of random number stream.
+Current random number seed is 938271.
+Effects object used: myeffnull 
+Model Type 1: Standard actor-oriented model
+Estimation method: conditional moment estimation
+Conditioning variable is the total number of observed changes ("distance") 
+in the network variable.
+Distances for simulations are
+period   :   1   2
+distance :  115 106.
+Standard errors are estimated with the likelihood ratio method.
+Dolby method (regression on scores) is used.
+Initial value of gain parameter is  0.2000000.
+Reduction factor for gain parameter is  0.5000000.
+Number of subphases in Phase 2 is 4.
+
+Initial parameter values are 
+  0.1  Rate parameter                         4.6960
+  0.2  Rate parameter                         4.3288
+  1. eval:  outdegree (density)                            -1.4677
+  2. eval:  reciprocity                                     0.0000
+
+
+Observed values of target statistics are
+  1. Number of ties                                                     238.0000
+  2. Number of reciprocated ties                                        160.0000
+
+ 2 parameters, 2 statistics
+
+Estimation of derivatives by the LR method (type 1).
+
+
+@2
+End of stochastic approximation algorithm, phase 3.
+---------------------------------------------------
+
+Total of 2012 iterations.
+Parameter estimates based on 1012 iterations,
+basic rate parameters as well as 
+convergence diagnostics, covariance and derivative matrices based on 1000 iterations.
+
+Information for convergence diagnosis.
+Averages, standard deviations, and t-ratios for deviations from targets:
+  1.  -0.3100  14.1674  -0.0219 
+  2.  -0.1820  13.4530  -0.0135 
+
+Good convergence is indicated by the t-ratios being close to zero.
+
+Overall maximum convergence ratio =  0.0239 .
+
+
+
+@2
+Estimation Results.
+-------------------
+
+Regular end of estimation algorithm.
+Total of 2012 iteration steps.
+
+
+@3
+Estimates and standard errors
+                             
+Rate parameters:
+ 0.1  Rate parameter period 1     5.7891  (   0.9117)
+ 0.2  Rate parameter period 2     4.4718  (   0.6688)
+
+Other parameters:
+ 1. eval:  outdegree (density)                                    -2.3825  (   0.1102)
+ 2. eval:  reciprocity                                             2.8613  (   0.1977)
+
+
+@3
+Covariance matrices
+                   
+Covariance matrix of estimates (correlations below diagonal):
+     0.012     -0.017
+    -0.779      0.039
+
+Derivative matrix of expected statistics X by parameters and
+covariance/correlation matrix of X can be found using
+summary(ans) within R, or by using the 'verbose' option in Siena07.
+ 
+Total computation time 15.94 seconds.
+
+
+-----------------------------------
+New Analysis started.
+Date and time: 26/01/2017 14:33:59
+New results follow.
+-----------------------------------
+
+RSiena version 1.1-304 (14 Oct 16) R-forge revision: 304 
+
+
+@1
+Estimation by stochastic approximation algorithm.
+=================================================
+
+Random initialization of random number stream.
+Current random number seed is 64762.
+Effects object used: myeffalt1 
+Model Type 1: Standard actor-oriented model
+Estimation method: conditional moment estimation
+Conditioning variable is the total number of observed changes ("distance") 
+in the network variable.
+Distances for simulations are
+period   :   1   2
+distance :  115 106.
+Standard errors are estimated with the likelihood ratio method.
+Dolby method (regression on scores) is used.
+Initial value of gain parameter is  0.2000000.
+Reduction factor for gain parameter is  0.5000000.
+Number of subphases in Phase 2 is 4.
+
+Initial parameter values are 
+  0.1  Rate parameter                         4.6960
+  0.2  Rate parameter                         4.3288
+  1. eval:  outdegree (density)                            -1.4677
+  2. eval:  reciprocity                                     0.0000
+  3. eval:  transitive triplets                             0.0000
+
+
+Observed values of target statistics are
+  1. Number of ties                                                     238.0000
+  2. Number of reciprocated ties                                        160.0000
+  3. Number of transitive triplets                                      225.0000
+
+ 3 parameters, 3 statistics
+
+Estimation of derivatives by the LR method (type 1).
+
+
+@2
+End of stochastic approximation algorithm, phase 3.
+---------------------------------------------------
+
+Total of 1719 iterations.
+Parameter estimates based on 719 iterations,
+basic rate parameters as well as 
+convergence diagnostics, covariance and derivative matrices based on 1000 iterations.
+
+Information for convergence diagnosis.
+Averages, standard deviations, and t-ratios for deviations from targets:
+  1.   0.3480  21.6988   0.0160 
+  2.   0.3300  20.1839   0.0163 
+  3.   2.3990  66.5241   0.0361 
+
+Good convergence is indicated by the t-ratios being close to zero.
+
+Overall maximum convergence ratio =  0.0425 .
+
+
+
+@2
+Estimation Results.
+-------------------
+
+Regular end of estimation algorithm.
+Total of 1719 iteration steps.
+
+
+@3
+Estimates and standard errors
+                             
+Rate parameters:
+ 0.1  Rate parameter period 1     6.4335  (   1.1361)
+ 0.2  Rate parameter period 2     5.2666  (   0.9358)
+
+Other parameters:
+ 1. eval:  outdegree (density)                                    -2.6849  (   0.1148)
+ 2. eval:  reciprocity                                             2.4554  (   0.1875)
+ 3. eval:  transitive triplets                                     0.6270  (   0.0783)
+
+
+@3
+Covariance matrices
+                   
+Covariance matrix of estimates (correlations below diagonal):
+     0.013     -0.013     -0.005
+    -0.623      0.035     -0.001
+    -0.521     -0.053      0.006
+
+Derivative matrix of expected statistics X by parameters and
+covariance/correlation matrix of X can be found using
+summary(ans) within R, or by using the 'verbose' option in Siena07.
+ 
+Total computation time 17.28 seconds.
+
+
+-----------------------------------
+New Analysis started.
+Date and time: 26/01/2017 14:36:18
+New results follow.
+-----------------------------------
+
+RSiena version 1.1-304 (14 Oct 16) R-forge revision: 304 
+
+
+@1
+Estimation by stochastic approximation algorithm.
+=================================================
+
+Random initialization of random number stream.
+Current random number seed is 649381.
+Effects object used: myeffalt1 
+Model Type 1: Standard actor-oriented model
+Estimation method: conditional moment estimation
+Conditioning variable is the total number of observed changes ("distance") 
+in the network variable.
+Distances for simulations are
+period   :   1   2
+distance :  115 106.
+Standard errors are estimated with the likelihood ratio method.
+Dolby method (regression on scores) is used.
+Initial value of gain parameter is  0.2000000.
+Reduction factor for gain parameter is  0.5000000.
+Number of subphases in Phase 2 is 4.
+
+Initial parameter values are 
+  0.1  Rate parameter                         4.6960
+  0.2  Rate parameter                         4.3288
+  1. eval:  outdegree (density)                            -1.4677
+  2. eval:  reciprocity                                     0.0000
+  3. eval:  transitive triplets                             0.0000
+
+
+Observed values of target statistics are
+  1. Number of ties                                                     238.0000
+  2. Number of reciprocated ties                                        160.0000
+  3. Number of transitive triplets                                      225.0000
+
+ 3 parameters, 3 statistics
+
+Estimation of derivatives by the LR method (type 1).
+
+
+@2
+End of stochastic approximation algorithm, phase 3.
+---------------------------------------------------
+
+Total of 1735 iterations.
+Parameter estimates based on 735 iterations,
+basic rate parameters as well as 
+convergence diagnostics, covariance and derivative matrices based on 1000 iterations.
+
+Information for convergence diagnosis.
+Averages, standard deviations, and t-ratios for deviations from targets:
+  1.   0.3920  22.1316   0.0177 
+  2.  -0.4340  20.6297  -0.0210 
+  3.  -0.7330  65.0179  -0.0113 
+
+Good convergence is indicated by the t-ratios being close to zero.
+
+Overall maximum convergence ratio =  0.1045 .
+
+
+
+@2
+Estimation Results.
+-------------------
+
+Regular end of estimation algorithm.
+Total of 1735 iteration steps.
+
+
+@3
+Estimates and standard errors
+                             
+Rate parameters:
+ 0.1  Rate parameter period 1     6.4476  (   1.0735)
+ 0.2  Rate parameter period 2     5.2414  (   0.8622)
+
+Other parameters:
+ 1. eval:  outdegree (density)                                    -2.6771  (   0.1097)
+ 2. eval:  reciprocity                                             2.4505  (   0.1941)
+ 3. eval:  transitive triplets                                     0.6214  (   0.0782)
+
+
+@3
+Covariance matrices
+                   
+Covariance matrix of estimates (correlations below diagonal):
+     0.012     -0.011     -0.004
+    -0.519      0.038     -0.004
+    -0.467     -0.237      0.006
+
+Derivative matrix of expected statistics X by parameters and
+covariance/correlation matrix of X can be found using
+summary(ans) within R, or by using the 'verbose' option in Siena07.
+ 
+Total computation time 17.06 seconds.
+
+
+-----------------------------------
+New Analysis started.
+Date and time: 27/01/2017 13:51:12
+New results follow.
+-----------------------------------
+
+RSiena version 1.1-304 (14 Oct 16) R-forge revision: 304 
+
+
+@1
+Estimation by stochastic approximation algorithm.
+=================================================
+
+Random initialization of random number stream.
+Current random number seed is 904268.
+Effects object used: myeffnull 
+Model Type 1: Standard actor-oriented model
+Estimation method: conditional moment estimation
+Conditioning variable is the total number of observed changes ("distance") 
+in the network variable.
+Distances for simulations are
+period   :   1   2
+distance :  115 106.
+Standard errors are estimated with the likelihood ratio method.
+Dolby method (regression on scores) is used.
+Initial value of gain parameter is  0.2000000.
+Reduction factor for gain parameter is  0.5000000.
+Number of subphases in Phase 2 is 4.
+
+Initial parameter values are 
+  0.1  Rate parameter                         4.6960
+  0.2  Rate parameter                         4.3288
+  1. eval:  outdegree (density)                            -1.4677
+  2. eval:  reciprocity                                     0.0000
+
+
+Observed values of target statistics are
+  1. Number of ties                                                     238.0000
+  2. Number of reciprocated ties                                        160.0000
+
+ 2 parameters, 2 statistics
+
+Estimation of derivatives by the LR method (type 1).
+
+
+@2
+End of stochastic approximation algorithm, phase 3.
+---------------------------------------------------
+
+Total of 1853 iterations.
+Parameter estimates based on 853 iterations,
+basic rate parameters as well as 
+convergence diagnostics, covariance and derivative matrices based on 1000 iterations.
+
+Information for convergence diagnosis.
+Averages, standard deviations, and t-ratios for deviations from targets:
+  1.  -0.8180  14.4277  -0.0567 
+  2.   0.1740  14.0828   0.0124 
+
+Good convergence is indicated by the t-ratios being close to zero.
+
+Overall maximum convergence ratio =  0.1246 .
+
+
+
+@2
+Estimation Results.
+-------------------
+
+Regular end of estimation algorithm.
+Total of 1853 iteration steps.
+
+
+@3
+Estimates and standard errors
+                             
+Rate parameters:
+ 0.1  Rate parameter period 1     5.8394  (   0.9089)
+ 0.2  Rate parameter period 2     4.5201  (   0.6719)
+
+Other parameters:
+ 1. eval:  outdegree (density)                                    -2.3923  (   0.1043)
+ 2. eval:  reciprocity                                             2.8765  (   0.2009)
+
+
+@3
+Covariance matrices
+                   
+Covariance matrix of estimates (correlations below diagonal):
+     0.011     -0.016
+    -0.784      0.040
+
+Derivative matrix of expected statistics X by parameters and
+covariance/correlation matrix of X can be found using
+summary(ans) within R, or by using the 'verbose' option in Siena07.
+ 
+Total computation time 14.5 seconds.
+
+
+-----------------------------------
+New Analysis started.
+Date and time: 27/01/2017 13:51:27
+New results follow.
+-----------------------------------
+
+RSiena version 1.1-304 (14 Oct 16) R-forge revision: 304 
+
+
+@1
+Estimation by stochastic approximation algorithm.
+=================================================
+
+Random initialization of random number stream.
+Current random number seed is 330486.
+Effects object used: myeffalt1 
+Model Type 1: Standard actor-oriented model
+Estimation method: conditional moment estimation
+Conditioning variable is the total number of observed changes ("distance") 
+in the network variable.
+Distances for simulations are
+period   :   1   2
+distance :  115 106.
+Standard errors are estimated with the likelihood ratio method.
+Dolby method (regression on scores) is used.
+Initial value of gain parameter is  0.2000000.
+Reduction factor for gain parameter is  0.5000000.
+Number of subphases in Phase 2 is 4.
+
+Initial parameter values are 
+  0.1  Rate parameter                         4.6960
+  0.2  Rate parameter                         4.3288
+  1. eval:  outdegree (density)                            -1.4677
+  2. eval:  reciprocity                                     0.0000
+  3. eval:  transitive triplets                             0.0000
+
+
+Observed values of target statistics are
+  1. Number of ties                                                     238.0000
+  2. Number of reciprocated ties                                        160.0000
+  3. Number of transitive triplets                                      225.0000
+
+ 3 parameters, 3 statistics
+
+Estimation of derivatives by the LR method (type 1).
+
+
+@2
+End of stochastic approximation algorithm, phase 3.
+---------------------------------------------------
+
+Total of 1737 iterations.
+Parameter estimates based on 737 iterations,
+basic rate parameters as well as 
+convergence diagnostics, covariance and derivative matrices based on 1000 iterations.
+
+Information for convergence diagnosis.
+Averages, standard deviations, and t-ratios for deviations from targets:
+  1.  -0.7560  22.7257  -0.0333 
+  2.  -0.2080  20.8956  -0.0100 
+  3.  -0.9310  64.8309  -0.0144 
+
+Good convergence is indicated by the t-ratios being close to zero.
+
+Overall maximum convergence ratio =  0.0689 .
+
+
+
+@2
+Estimation Results.
+-------------------
+
+Regular end of estimation algorithm.
+Total of 1737 iteration steps.
+
+
+@3
+Estimates and standard errors
+                             
+Rate parameters:
+ 0.1  Rate parameter period 1     6.4624  (   1.0690)
+ 0.2  Rate parameter period 2     5.2978  (   0.8851)
+
+Other parameters:
+ 1. eval:  outdegree (density)                                    -2.6879  (   0.1167)
+ 2. eval:  reciprocity                                             2.4679  (   0.2014)
+ 3. eval:  transitive triplets                                     0.6244  (   0.0752)
+
+
+@3
+Covariance matrices
+                   
+Covariance matrix of estimates (correlations below diagonal):
+     0.014     -0.014     -0.004
+    -0.605      0.041     -0.003
+    -0.399     -0.190      0.006
+
+Derivative matrix of expected statistics X by parameters and
+covariance/correlation matrix of X can be found using
+summary(ans) within R, or by using the 'verbose' option in Siena07.
+ 
+Total computation time 17.2 seconds.
