@@ -57,7 +57,7 @@
 
 \if0\blind
 {
-  \title{\bf Visual Diagnsotics of SAO Models}
+  \title{\bf Model Visualization Techniques for a Social Network Model}
   \author{Samantha Tyner\thanks{
     The authors gratefully acknowledge funding from the National Science Foundation Grant \# DMS 1007697. All data collection has been conducted with approval from the Institutional Review Board IRB 10-347}\hspace{.2cm}\\
     Department of Statistics and Statistical Laboratory, Iowa State University\\
@@ -73,7 +73,7 @@
   \bigskip
   \bigskip
   \begin{center}
-    {\LARGE\bf Visual Diagnsotics of SAO Models}
+    {\LARGE\bf Model Visualization Techniques for a Social Network Model}
 \end{center}
   \medskip
 } \fi
