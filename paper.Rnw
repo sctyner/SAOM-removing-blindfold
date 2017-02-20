@@ -21,7 +21,7 @@
 %---------------------------------------------------
 %                 Editing Commands
 \newcommand{\hh}[1]{{\color{magenta} #1}}
-\newcommand{\sct}[1]{{\color{orange} #1}}
+\newcommand{\st}[1]{{\color{orange} #1}}
 
 %---------------------------------------------------
 %                 Placing Figures
@@ -103,11 +103,25 @@ library(dplyr)
 
 \section{Introduction} 
 
-
+\st{
+\begin{itemize}
+\item What? - model visualization and SAOMs. briefly dsecribe what these things are
+\item Why? - bring light to the RSiena blackbox. Need ways to visualize network models, collections of networks. 
+\item How?
+\end{itemize}
+also talk about other dynamic network models briefly to put SAOMs in context.}
 
 The guiding principles of model visualization are (1) display the model in the data space, (2) collections of models are more informative than singletons, and (3) explore how algorithms work, instead of just looking at the final result. Stochastic actor-oriented models are a prime example of a set of models that could benefit greatly from application of model visualization. First, the models themselves include a continuous-time Markov chain (CTMC) that is completely hidden in the model fitting process. Bringing the CTMC out from behind-the-scenes and into the light of visualization will provide researchers with insights into the underlying features of the model. Secondly, SAOMs allow for a great deal of parameters that can be added to the objective function, each of which are attached to a network statistic. These statistics are often somewhat, if not highly, correlated, and so are the associated parameters. By visualizing collections of SAOMs, we can gain a better understanding of these correlations and find ways to deal with them and rectify their effects. Finally, estimation of the parameters in a SAOM relies on a Robins-Monro algorithm, and convergence checks rely on simulations from the fitted model. Again, in these steps are largely hidden from the researcher computing them with software. We hope that by bringing these background elements and others into the foreground, stochastic actor-oriented models will be better understood and more accessible to social network analysts.
 
 \section{The SAO model}
+
+\st{What do I need to communicate in this section? 
+\begin{itemize}
+\item What the models are for: dynamic social networks with actor-level covariates
+\item What are the model components? rate function, objective function (network statistics, actor covariates, interactions between covariates and network statistics), time points ($t_m = 1, \dots, M$)
+\item What is RSiena? What methods of estimation, convergence checks does it use? What are the algorithms? What kinds of models can it fit? 
+\end{itemize}}
+
 
 The stochastic actor-oriented models are very aptly named: they model dynamic networks that can account for the individual node characteristics when making the edge changes. The object of analysis is a social network that has been observed at several discrete time points. The nodes in the network can have associated covariate variables that may be incorporated into modeling the tie changes in the network. The model itself has two primary pieces: the rate of change of ties, and the objective function of the nodes, which determines the exact change that gets made. 
 
@@ -117,9 +131,41 @@ We start with a set of network observations at $M$ discrete time points: $x(t_1)
 
 \section{Model Visualizations}
 
+\st{Introduce the concepts from Wickham et al. }
+
 \subsection{View the model in the data space}
+
+\st{
+\begin{itemize}
+\item WHat is the model? the network model (SAOM model is just one of many)
+\item What is the data? Edge data, node data, observed time points, unobserved timepoints (CTMC)
+\item Note: specifically dealing with dynamic networks observed at discrete time points. 
+\end{itemize}
+What are some things that could go in here? need more data examples; not just the friends data.
+Harry Potter data??? I want to find my own data, too.}
+
 \subsection{Collections are more informative than singletons}
+
+The second principle of Wickham et al states that ``collections are more informative than singletons" (p. 210). They describe several different methods for producing such collections, but we focus on only a few here. We look at collections produced ``from exploring the space of all possible models," ``by varying model settings", ``by fitting the same model to different datasets", and ``by treating each iteration as a model." (p. 210-11) We also fit the same model many times, resulting in distributions of fitted parameters for one data set. 
+
+\st{What are some things that could go in here?:
+\begin{itemize}
+\item "average" networks -- you've already done this! Write it up, make several examples. How does the procedure for averaging generalize? What is it good for? 
+\item distributions of fitted parameters. again, you've already done this!!! just write it up and put it in here. 
+\item view correlations between model parameters under different model sets. eg 2 betas, 3 betas, 4 betas, etc.
+\end{itemize}
+ }
+
 \subsection{Explore algorithms, not just end result}
+\st{The algorithms here are many!
+\begin{enumerate}
+\item First, the microsteps / CTMC between each time point (gifs, other animations)
+\item Phases of RSiena: phase 1 = initial parameter estimate
+\item phase 2 = iterative update of parameters - trace plots
+\item phase 3 = simulations for convergence diagnostics
+\end{enumerate}
+ } 
+
 \hh{The visualizations should address most elements of structure described before, i.e. follow along in the setup (for descriptive and teaching purposes), the fitting (understanding the model and interpreting the results) and then diagnostics (how well does the model fit the data - where are the most differences to the actual data/what are the sensitive parameters?) }
 
 \hh{Some of the visualizations we talked about
@@ -129,6 +175,7 @@ We start with a set of network observations at $M$ discrete time points: $x(t_1)
 \item global structure + principal components (tensor pca)
 \end{enumerate}}
 
+\section{}
 
 \bibliographystyle{asa}
 \bibliography{references}
