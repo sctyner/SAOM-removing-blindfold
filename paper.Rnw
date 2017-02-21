@@ -94,9 +94,9 @@
 \newpage
 
 <<setup, echo = FALSE, message = FALSE, warning = FALSE>>=
-options(replace.assign=TRUE,width=70, digits=2)
+options(replace.assign=TRUE,width=70, digits=3)
 require(knitr)
-opts_chunk$set(fig.path='figure/', cache.path='cache/', fig.align='center', fig.width=5, fig.height=5, par=TRUE, cache=TRUE, concordance=TRUE, autodep=TRUE, message=F, warning=F)
+opts_chunk$set(fig.path='figure/', cache.path='cache/', fig.align='center', fig.width=5, fig.height=5, par=TRUE, cache=TRUE, concordance=TRUE, autodep=TRUE, message=F, warning=F, echo = FALSE)
 
 library(dplyr)
 @
@@ -146,7 +146,39 @@ Harry Potter data??? I want to find my own data, too.}
 
 \subsection{Collections are more informative than singletons}
 
-The second principle of Wickham et al states that ``collections are more informative than singletons" (p. 210). They describe several different methods for producing such collections, but we focus on only a few here. We look at collections produced ``from exploring the space of all possible models," ``by varying model settings", ``by fitting the same model to different datasets", and ``by treating each iteration as a model." (p. 210-11) We also fit the same model many times, resulting in distributions of fitted parameters for one data set. 
+The second principle of Wickham et al states that ``collections are more informative than singletons" (p. 210). They describe several different methods for producing such collections, but we focus on only a few here. We look at collections produced ``from exploring the space of all possible models," ``by varying model settings", ``by fitting the same model to different datasets", and ``by treating each iteration as a model." (p. 210-11) We also fit the same model many times, resulting in distributions of fitted parameters for one data set.
+
+A classical problem with statistical network models generally is the lack of an ``average network" measure. Statisticians frequently rely on averages and expected values, but statistical network models, especially those as complex as SAOMs, lack an intuitive expected value measure. How then, can we arrive at an ``average" network? We propose to answer this question through visualization.
+
+We first consider the 50 actor subset of the teenage friends and lifestyle data available on the \texttt{RSiena} website \citep{RSiena}. To this data, we fit a SAOM with a simple rate function and an objective function with two parameters, $f_i(x) = \beta_1s_{i1} + \beta_2s_{i2}$, where $s_{i1}$ is the density network statistic and $s_{i2}$ is the reciprocity network statistic for actor $i$. We fit this model using \texttt{RSiena} 1,000 times, then averaged the resulting parameter estimates to obtain mean estimates to use in the simulation of networks from this model. These values are shown in Table~\ref{tab:M1ests}
+
+<<getdata, results='asis'>>=
+library(netvizinf)
+data("M1ests_bigfriends")
+params <- data.frame(t(colMeans(M1ests_bigfriends)))
+names(params) <- c("Rate1", "Rate2", "beta1", "beta2")
+knitr::kable(params, digits = 3, align = 'c',caption = "\\label{tab:M1ests} Estimates of the four parameters from the simple SAOM fit to the 50 actor subset of the teenage friends and lifestyle data.", format = "latex")
+@
+
+To create a visualization that represents an ``average" network, we count occurences of each possible edge in the simulations, resulting in a summary network of simulations. Next, we subset the network to include 
+
+<<averagenet>>=
+library(RSiena)
+library(dplyr)
+friend.data.w1 <- as.matrix(read.table("data/s50_data/s50-network1.dat"))
+friend.data.w2 <- as.matrix(read.table("data/s50_data/s50-network2.dat"))
+friend.data.w3 <- as.matrix(read.table("data/s50_data/s50-network3.dat"))
+drink <- as.matrix(read.table("data/s50_data/s50-alcohol.dat"))
+friendshipData <- array(c(friend.data.w1, friend.data.w2, friend.data.w3), dim = c(50, 50, 3))
+friendship <- sienaDependent(friendshipData)
+alcohol <- varCovar(drink)
+mydata <- sienaDataCreate(friendship, alcohol)
+M1eff <- getEffects(mydata)
+M1sims1000 <- saom_simulate(dat = mydata, struct = M1eff,
+                       parms = as.numeric(params), N = 1000)
+M1avg <- net_avg(M1sims1000, 1)
+@
+
 
 \st{What are some things that could go in here?:
 \begin{itemize}
