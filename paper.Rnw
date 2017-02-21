@@ -177,6 +177,27 @@ M1eff <- getEffects(mydata)
 M1sims1000 <- saom_simulate(dat = mydata, struct = M1eff,
                        parms = as.numeric(params), N = 1000)
 M1avg <- net_avg(M1sims1000, 1)
+library(geomnet)
+M1avg$from <- paste0("n", M1avg$from)
+M1avg$to <- paste0("n", M1avg$to)
+
+library(tidyr)
+M1avg[,-3] %>% spread(to, weight) %>% data.frame-> distmat
+rownames(distmat) <- distmat$from
+distmat <- distmat[,-1]
+distmat <- as.matrix(1/distmat)
+distmat[is.na(distmat)] <- 0
+ggplot(data = M1avg %>% filter(weight >= 51)) + 
+  geom_net(aes(from_id = from, to_id = to, linewidth = weight/500), 
+           #directed = TRUE,
+           layout.alg = "kamadakawai", 
+           layout.par = list(elen = distmat))
+ggplot(data = M1avg %>% filter(weight >= 51)) + 
+  geom_net(aes(from_id = from, to_id = to, linewidth = weight/500), 
+           #directed = TRUE,
+           layout.alg = "mds", 
+           layout.par = list(var = 'user', dist = 'none', exp = 3,vm = distmat))
+
 @
 
 
