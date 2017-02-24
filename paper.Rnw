@@ -160,7 +160,7 @@ names(params) <- c("Rate1", "Rate2", "beta1", "beta2")
 knitr::kable(params, digits = 3, align = 'c',caption = "\\label{tab:M1ests} Estimates of the four parameters from the simple SAOM fit to the 50 actor subset of the teenage friends and lifestyle data.", format = "latex")
 @
 
-To create a visualization that represents an ``average" network, we count occurences of each possible edge in the simulations, resulting in a summary network of simulations. Next, we subset the network to include 
+To create a visualization that represents an ``average" network, we count occurences of each possible edge in the simulations, resulting in a summary network of simulations. Next, we subset the network to include only those edges which appear in greater than 50\% of all 
 
 <<averagenet>>=
 library(RSiena)
@@ -174,12 +174,24 @@ friendship <- sienaDependent(friendshipData)
 alcohol <- varCovar(drink)
 mydata <- sienaDataCreate(friendship, alcohol)
 M1eff <- getEffects(mydata)
+library(netvizinf)
 M1sims1000 <- saom_simulate(dat = mydata, struct = M1eff,
                        parms = as.numeric(params), N = 1000)
-M1avg <- net_avg(M1sims1000, 1)
+M1simsdf <- sims_to_df(M1sims1000)
+M1avg <- M1simsdf %>% filter(!is.na(to) & wave == 1) %>%
+  group_by(from, to) %>% 
+  summarise(count = n()) %>% 
+  mutate(weight = ifelse(from == to, 0, count))
+M1avg2 <- M1simsdf %>% filter(!is.na(to)) %>%
+  group_by(from, to, wave) %>% 
+  summarise(count = n()) %>% 
+  mutate(weight = ifelse(from == to, 0, count))
+
 library(geomnet)
 M1avg$from <- paste0("n", M1avg$from)
 M1avg$to <- paste0("n", M1avg$to)
+M1avg2$from <- paste0("n", M1avg2$from)
+M1avg2$to <- paste0("n", M1avg2$to)
 
 library(tidyr)
 M1avg[,-3] %>% spread(to, weight) %>% data.frame-> distmat
@@ -187,11 +199,21 @@ rownames(distmat) <- distmat$from
 distmat <- distmat[,-1]
 distmat <- as.matrix(1/distmat)
 distmat[is.na(distmat)] <- 0
-ggplot(data = M1avg %>% filter(weight >= 51)) + 
-  geom_net(aes(from_id = from, to_id = to, linewidth = weight/500), 
-           #directed = TRUE,
-           layout.alg = "kamadakawai", 
-           layout.par = list(elen = distmat))
+ggplot(data = M1avg %>% filter(weight/1000 > .5)) + # edge appears > 50% of the time. (is this actually what that is????) 
+  geom_net(aes(from_id = from, to_id = to, linewidth = weight/1000), 
+           directed = TRUE, curvature = .2,
+           layout.alg = "fruchtermanreingold"
+           #layout.alg = "kamadakawai",
+           #layout.par = list(elen = distmat)
+           )
+ggplot(data = M1avg2 %>% filter(weight/1000 > .5)) + # edge appears > 50% of the time. (is this actually what that is????) 
+  geom_net(aes(from_id = from, to_id = to, linewidth = weight/1000), 
+           directed = TRUE, curvature = .2, labelon = T, labelgeom = 'label', labelcolour = 'white',
+           layout.alg = "fruchtermanreingold"
+           #layout.alg = "kamadakawai",
+           #layout.par = list(elen = distmat)
+           ) + 
+  facet_wrap(~wave) + theme_net()
 ggplot(data = M1avg %>% filter(weight >= 51)) + 
   geom_net(aes(from_id = from, to_id = to, linewidth = weight/500), 
            #directed = TRUE,
