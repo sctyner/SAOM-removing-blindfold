@@ -113,7 +113,7 @@ also talk about other dynamic network models briefly to put SAOMs in context.}
 
 The guiding principles XXX cite XXX of model visualization are (1) display the model in the data space, (2) collections of models are more informative than singletons, and (3) explore how algorithms work, instead of just looking at the final result. Stochastic actor-oriented models are a prime example of a set of models that  benefit greatly from application of model visualization. First, the models themselves include a continuous-time Markov chain (CTMC) that is completely hidden in the model fitting process. Bringing the CTMC out from behind-the-scenes and into the light of visualization  provides researchers with insights into the underlying features of the model. Secondly, SAOMs allow for a great deal of parameters that can be added to the objective function, each of which are attached to a network statistic. These statistics are often somewhat, if not highly, correlated, and so are the associated parameters. By visualizing collections of SAOMs, we can gain a better understanding of these correlations and find ways to deal with them and rectify their effects. Finally, estimation of the parameters in a SAOM relies on a Robbins-Monro algorithm, and convergence checks rely on simulations from the fitted model. Again, in these steps are largely hidden from the researcher computing them with software. We hope that by bringing these background elements and others into the foreground, stochastic actor-oriented models will be better understood and more accessible to social network analysts.
 
-\section{The SAO model}
+\section{Stochastic Actor-Oriented Models for Longitudinal Social Networks}
 
 \st{What do I need to communicate in this section? 
 \begin{itemize}
@@ -123,11 +123,68 @@ The guiding principles XXX cite XXX of model visualization are (1) display the m
 \end{itemize}}
 
 
-The stochastic actor-oriented models are very aptly named: they model dynamic networks that can account for the individual node characteristics when making the edge changes. The object of analysis is a social network that has been observed at several discrete time points. The nodes in the network can have associated covariate variables that may be incorporated into modeling the tie changes in the network. The model itself has two primary pieces: the rate of change of ties, and the objective function of the nodes, which determines the exact change that gets made. 
+%The stochastic actor-oriented models are very aptly named: they model dynamic networks that can account for the individual node characteristics when making the edge changes. The object of analysis is a social network that has been observed at several discrete time points. The nodes in the network can have associated covariate variables that may be incorporated into modeling the tie changes in the network. The model itself has two primary pieces: the rate of change of ties, and the objective function of the nodes, which determines the exact change that gets made. 
 
-We start with a set of network observations at $M$ discrete time points: $x(t_1), x(t_2) \dots, x(t_M)$. The first observation, $x(t_1)$ is always conditioned on. The number of nodes / actors / vertices is constant in all time points and is denoted $n$.  The tie variables are directed and  binary, and are denoted at $x_{ij}(t_m)$ for time point $m$, and this is sometimes abbreviated to $x_{ij}$ in notation. If there is a tie from node $i$ to node $j$, then $x_{ij}=1$, and $x_{ij}=0$ otherwise. 
+%We start with a set of network observations at $M$ discrete time points: $x(t_1), x(t_2) \dots, x(t_M)$. The first observation, $x(t_1)$ is always conditioned on. The number of nodes / actors / vertices is constant in all time points and is denoted $n$.  The tie variables are directed and  binary, and are denoted at $x_{ij}(t_m)$ for time point $m$, and this is sometimes abbreviated to $x_{ij}$ in notation. If there is a tie from node $i$ to node $j$, then $x_{ij}=1$, and $x_{ij}=0$ otherwise. 
 
 \hh{mostly lit review plus a detailed description of the model and fitting process.}
+
+A Stochastic Actor-Oriented Model (SAOM) is a model that is changing in time in order to accomodate for observations from the same network made at different points in time and that allows for changes in network structure due to actor-level covariates. This model was first introduced by Snijders in 1996 \citep{saompaper}. The two main properties of SAOMs, modelling the changes in time and using actor covariates, are crucial to understanding networks as they exist naturally. Most social networks, even holding constant the set of actors over time, are ever-changing as relationships decay or grow, and most actors (or nodes) in social networks have inherent properties that could affect how they change their place within the network. 
+
+\subsection{Definitions, Terminology, and Notation}
+
+In this paper, the term \textit{dynamic network} refers to a network consisting of the same set of $n$ nodes that is changing over time, and is observed at $M$ discrete time points, $t_1, \dots, t_M$. We denote these network observations $x(t_1), \dots, x(t_M)$, and in modelling we condition on the first observation, $x(t_1)$. The SAOM assumes that this longitudinal network is embedded within a continuous time Markov process (CTMP), call it $X(T)$. This process is almost entirely unobserved: assume that the beginning of the process, $X(0)$ is equivalent to the first network observation $x(t_1)$, while the end of the process $X(\infty)$ is equivalent to the last observation $x(t_M)$. All other parts of the process are unseen. The process $X(T)$ is a series of single tie (or edge) changes, in which one actor at a time is given the opportunity to add or remove one outgoing tie. Once an actor is given the chance to change a tie, it tries to maximize a sort of utility function based on the current and potential future states of the network. 
+
+\subsubsection{The Rate Function}
+
+For the network $x$ and each actor $i$ in the network, the rate function dictates how often the actor $i$ gets to change its ties, $x_{ij}$, to other nodes $j \neq i$ in the network. For this paper, we assume a simple rate function, $\alpha_m$ that is constant for all actors between observations at time $t_m$ to $t_{m+1}$. In other modelling scenarios, this rate can be a function that depends on the time period of observation, some actor-level covariates or some actor-level network statistics. The rate parameter determines how quickly actor $i$ gets an opportunity to change one of its ties, $x_{ij}$ in the time period $t_{m} \leq T < t_{m+1}$. We assume that the actors $i$ are conditionally independent given their current ties, $x_{i1}, \dots, x_{in}$. This assumption leads to the rate for the whole network, $n\alpha$. In order to achieve the memorylessness property of a Markov process, for any time point, $T$, where $t_{m} \leq T < t_{m+1}$, the waiting time to the next change opportunity by actor $i$ is exponentially distributed with expected value $\frac{1}{\alpha_m}$. Thus, the waiting time to the next change opportunity by \textit{any} actor in the network is also exponentially distributed with expected value $\frac{1}{n\alpha_m}$
+ 
+\subsubsection{The Objective Function} 
+
+Thanks to the conditional dependence assumptions in the model, we can consider the objective function for each node separately, since only one tie from one node is changing at a time. The objective function is written as $$f_i(\boldsymbol{\beta}, x) = \sum_k \beta_k s_{ik}(x, \mathbf{Z}),$$
+for $x \in \mathcal{X}$, the space of all possible directed networks with the $n$ nodes, and $\mathbf{Z}$ matrix of covariates. The vector $\boldsymbol{\beta}$ are the parameters of the model with corresponding network and covariate statistics, $s_{ik}(x, \mathbf{Z})$, for $k = 1,\dots, K$. Given the ego node, $i$, there are $n$ possible steps for the actor $i$ to take: either one of all current ties $x_{ij} = 1$ will be destroyed, a new tie will be created, or no change will occur. 
+
+The parameters, $\boldsymbol{\beta}$, are attached to various actor-level network statistics, $s_{ik}(x)$. There are always at least two parameters, $\beta_1$ for the outdegree of a node, and $\beta_2$ for the number of reciprocal ties held by a node \citep[p. 371]{snijders01}. There are many possible parameters $\beta_i$ to add to the model. They can be split up into two groups: first, the structural effects, which only depend on the structure of the network. The inclusion of these effects has origin in the classical exponential random graph model (ERGM) for networks. These effects are written in terms of the edge variables $x_{ij}$, for $i \neq j$. The second set of effects are the actor-level or covariate effects. These effects also depend on the structure of the network. They are written in terms of $x_{ij}$ but also in terms of the covariates, $\mathbf{Z}$. A table of some possible structural and covariate effects is given in Table~\ref{tab:effects}. For a complete list of the network and covariate statistics that can be included in the objective function, see \citet{RSiena}.
+
+\begin{table}
+\caption{\label{tab:effects} Some of the possible effects to be included in the stochastic actor-oriented models in RSiena. There are many more possible effects, but we only consider a select few here. For a complete list, see the RSiena manual \citep{RSiena}.}
+\centering
+\begin{tabular}{ll}
+\textbf{Structural Effects} \\
+outdegree  & $s_{i1}(x) = \sum_j x_{ij}$ \\
+reciprocity  & $s_{i2}(x) = \sum_j x_{ij}x_{ji}$ \\
+transitive triplets  & $s_{i3}(x) = \sum_{j,h} x_{ij}x_{jh}x_{ih}$ \\
+\textbf{Covariate Effects}\\
+covariate-alter  & $s_{i4}(x) = \sum_j x_{ij}z_j$ \\
+covariate-ego  & $s_{i5}(x) = z_i\sum_j x_{ij}$ \\
+same covariate & $s_{i6}(x) = \sum_j x_{ij} \mathbb{I}(z_i = z_j)$ \\
+jumping transitive triplets  & $s_{i7}(x) = \sum_{j \neq h} x_{ij}x_{ih}x_{hj} \mathbb{I}(z_i = z_h \neq z_j)$
+\end{tabular}
+\end{table}
+
+When node $i$ is given the chance to change a node, we assume that they wish to maximize the value of their objective function $f_i(\boldsymbol{\beta}, x)$ plus a random element, $U_i(x)$, where the $U_i(x)$ are from "the type 1 extreme value distribution (or Gumbel distribution) with mean 0 and scale parameter 1" \citep[p. 368]{snijders01}. This distribution, which is also known as the log-Weibull distribution, has probability distribution function, using $\mu$ for the mean parameter and $\sigma$ for the scale parameter, of
+
+$$f(u|\mu, \sigma) = \frac{1}{\sigma}\exp\left\{-\left(\frac{u-\mu}{\sigma} + e^{-\frac{u-\mu}{\sigma}}\right)\right\}.$$
+
+Using this distribution is convenient because it allows the probablity the actor $i$ chooses to change its tie to actor $j$ in terms of the objective function alone. Let $p_{ij}(\boldsymbol{\beta}, x)$ be this probability. Next, write the network $x$ in its potential future state, where the tie $x_{ij}$ has changed to $1-x_{ij}$, as $x(i \leadsto j)$. Then, the probility that the tie $x_{ij}$ changes is 
+
+$$p_{ij}(\boldsymbol{\beta}, x) = \dfrac{\exp\left\{f_i(\boldsymbol{\beta}, x(i\leadsto j))\right\}}{\sum_{h \neq i} \exp\left\{f_i(\boldsymbol{\beta}, x(i \leadsto h))\right\}}$$
+
+%### A SAOM as a CTMC {#saomctmc}
+
+%In order to fit this model definition back into the original context of the CTMC described in Section \@ref(dynamicnets), it must be written in terms of its intensity matrix, $\mathbf{Q}$.  This matrix describes the rate of change between states of the process. For networks, there are a very large number of possible states, $2^{n(n-1)}$, so the intensity matrix is a square matrix of that dimension. But, thanks to the property of SAOMs that the states are allowed to change only one tie at a time, there are only $n$ possible states given the current state, $n-1$ of which are uniquely determined by the node $i$ that is given the opportunity to change. Thus, the intensity matrix $\mathbf{Q}$ is very sparse, with only $n(n-1) + 1$ non-zero entries in each row. Note that $n(n-1)$ of these represent the possible states that are one edge different from a given state, and the additional non-zero entry is for the state to remain the same. All other entries in a row are zero because those column states cannot be reached from the row state by just one change as dictated by the SAOM. The entries of $\mathbf{Q}$ are defined as follows: let $b \neq c \in \{1, 2, \dots, 2^{n(n-1)} \}$ be indices of two different possible states of the network, $x^b, x^c \in \mathcal{X}$.  Then the $bc^{th}$ entry of $Q$ is:
+% \[ q(x^b, x^c) = \begin{cases} 
+%       q_{ij}(\alpha, \rho, \boldsymbol{\beta}, x^b) = \lambda_i(\alpha, \rho, x^b, m)p_{ij}(\boldsymbol{\beta}, x^b) & \text{if } x^c \in \{x^b(i \leadsto j) | \text{ any } i \neq j \in \mathcal{N}\} \\
+%       0 & \text{if } x^c \text{ differs from } x^b \text{ by more than 1 tie} \\
+%       -\sum_{i\neq j} q_{ij}(\alpha, \rho, \boldsymbol{\beta}, x^b)  & \text{if } x^b = x^c 
+%    \end{cases}
+% \]
+% 
+% Thus, the rate of change between any two states that differ by only one tie, $x_{ij}$, is the product of the rate at which actor $i$ gets to change a tie and the probability that the tie that will change is the tie to node $j$.^[Just to be clear, the change is from $x^b_{ij}$ to $x^c_{ij} = 1 - x^b_{ij}$.] Furthermore, the theory of continuous time Markov chains gives that the matrix of transition probabilities between observation times $t_{m-1}$ and $t_{m}$ is dependent only on the difference between timepoints, $t_m - t_{m-1}$. Following the same definition for transition probabilities in Section \@ref(dynamicnets), the matrix of transition probabilities is 
+% $$e^{(t_m - t_{m-1})\mathbf{Q}},$$ 
+% where $\mathbf{Q}$ is the matrix defined above and $e^X$ for a real or complex square matrix $X$ is equal to $\sum_{k=0}^{\infty} \frac{1}{k!} X^k$.
+
+\subsection{Fitting Models to Data}
 
 \section{Model Visualizations}
 
@@ -202,23 +259,23 @@ distmat[is.na(distmat)] <- 0
 ggplot(data = M1avg %>% filter(weight/1000 > .5)) + # edge appears > 50% of the time. (is this actually what that is????) 
   geom_net(aes(from_id = from, to_id = to, linewidth = weight/1000), 
            directed = TRUE, curvature = .2,
-           layout.alg = "fruchtermanreingold"
-           #layout.alg = "kamadakawai",
-           #layout.par = list(elen = distmat)
+           #layout.alg = "fruchtermanreingold"
+           layout.alg = "kamadakawai",
+           layout.par = list(elen = distmat)
            )
 ggplot(data = M1avg2 %>% filter(weight/1000 > .5)) + # edge appears > 50% of the time. (is this actually what that is????) 
   geom_net(aes(from_id = from, to_id = to, linewidth = weight/1000), 
-           directed = TRUE, curvature = .2, labelon = T, labelgeom = 'label', labelcolour = 'white',
-           layout.alg = "fruchtermanreingold"
-           #layout.alg = "kamadakawai",
-           #layout.par = list(elen = distmat)
+           directed = TRUE, curvature = .2, labelon = T,
+           #layout.alg = "fruchtermanreingold"
+           layout.alg = "kamadakawai",
+           layout.par = list(elen = distmat)
            ) + 
   facet_wrap(~wave) + theme_net()
-ggplot(data = M1avg %>% filter(weight >= 51)) + 
-  geom_net(aes(from_id = from, to_id = to, linewidth = weight/500), 
-           #directed = TRUE,
-           layout.alg = "mds", 
-           layout.par = list(var = 'user', dist = 'none', exp = 3,vm = distmat))
+# ggplot(data = M1avg %>% filter(weight >= 51)) + 
+#   geom_net(aes(from_id = from, to_id = to, linewidth = weight/500), 
+#            #directed = TRUE,
+#            layout.alg = "mds", 
+#            layout.par = list(var = 'user', dist = 'none', exp = 3,vm = distmat))
 
 @
 
