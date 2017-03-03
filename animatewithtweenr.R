@@ -134,25 +134,25 @@ netwave1ms1 <- merge(merge(wave1friendsms1, data2, by.x = 'from', by.y = 'id'), 
 
 library(tweenr)
 # TWEEN EM
-data <- tween_states(data = list(data1, data2), tweenlength = 3, 1, "linear", 100)
-fulldata <- tween_states(data = list(netwave1, netwave1ms1), 3, 1, 'linear', 50)
-# doesn't work, need same # of rows. Need to deal with to NAs somehow. 
-netwave1 <- arrange(netwave1, to,from)
-netwave1ms1 <- arrange(netwave1ms1, to, from)
-head(netwave1ms1)
-n1 <- nrow(netwave1)
-n2 <- nrow(netwave1ms1)
+# data <- tween_states(data = list(data1, data2), tweenlength = 3, 1, "linear", 100)
+# fulldata <- tween_states(data = list(netwave1, netwave1ms1), 3, 1, 'linear', 50)
+# # doesn't work, need same # of rows. Need to deal with to NAs somehow. 
+# netwave1 <- arrange(netwave1, to,from)
+# netwave1ms1 <- arrange(netwave1ms1, to, from)
+# head(netwave1ms1)
+# n1 <- nrow(netwave1)
+# n2 <- nrow(netwave1ms1)
 library(ggplot2)
 library(gganimate)
 
 #animate em
-p <- ggplot(data=data, aes(x=x, y=y)) + 
-  geom_point(aes(frame = .frame, colour = colour), size=5) + 
-  geom_text(aes(frame = .frame, label=id), alpha = .6) + 
-  scale_colour_identity() + 
-  theme_bw()
-animation::ani.options(interval = 1/15)
-gganimate(p, "dancing ball.gif", title_frame = F)
+# p <- ggplot(data=data, aes(x=x, y=y)) + 
+#   geom_point(aes(frame = .frame, colour = colour), size=5) + 
+#   geom_text(aes(frame = .frame, label=id), alpha = .6) + 
+#   scale_colour_identity() + 
+#   theme_bw()
+# animation::ani.options(interval = 1/15)
+# gganimate(p, "dancing ball.gif", title_frame = F)
 
 # okay - here's what we need:
   # a data frame of every possible edge
@@ -205,15 +205,44 @@ big1$from <- as.factor(big1$from)
 big1$to<- as.factor(big1$to)
 big2$from <- as.factor(big2$from)
 big2$to<- as.factor(big2$to)
-big <- tween_states(data = list(big1, big2), 3,1,"linear", nframes = 20)
+# compare the differences. the one that isn't identical moving from big1 to big2 is the different edge and needs a different color in big2 
+which(!((big1$x.from == big1$x.to) == (big2$x.from == big2$x.to))) 
+# 1503
+# below is false, meaning the edge disappears, not arrives. => alpha blend
+big1$x.from[1503] == big1$x.to[1503]
+# if it were true, the edge appears, so it needs a different color. 
 
-p <- ggplot() + 
-  geom_point(data = unique(big[, c("from", "x.from", "y.from", "color", ".frame")]), 
-             aes(x=x.from, y = y.from, frame = .frame, colour = color), size=5) + 
-  geom_text(data = unique(big[, c("from", "x.from", "y.from", "color", ".frame")]),
-            aes(x=x.from, y = y.from, frame = .frame, label=from), alpha = .5) + 
-  geom_segment(data = big, aes(x = x.from, y = y.from, xend = x.to, yend = y.to, frame = .frame)) + 
+big <- tween_states(data = list(big1, big2), 25,1,"linear", nframes = 20)
+
+big$addedge <- FALSE
+big$rmvedge <- FALSE
+big$rmvedge[which(big$from == big1$from[1503] & big$to == big1$to[1503])] <- TRUE
+big$.alpha <- 1-((big$rmvedge*big$.frame)/21)
+
+p <- ggplot(data = unique(big[, c("from", "x.from", "y.from", "color", ".frame")]), 
+                          aes(x=x.from, y = y.from, frame = .frame)) +
+  geom_segment(data = big, aes(x = x.from, y = y.from, xend = x.to, yend = y.to, frame = .frame, alpha = .alpha), color = 'black') + 
+  geom_point(size=5, color = 'blue') + 
+  geom_text(aes(label=from), size = 3, alpha = .5, color = 'white') + 
   scale_colour_identity() + 
-  theme_bw()
+  scale_alpha_identity() + 
+  theme_bw() 
 animation::ani.options(interval = 1/15)
-gganimate(p, "networkanimation.gif", title_frame = F)
+gganimate(p, "networkanimation3.gif", title_frame = F)
+
+
+big[which(big$from == big1$from[1503] & big$to == big1$to[1503]),] -> weirdness
+# something weird is happening
+
+library(gridExtra)
+ggplot(data = weirdness, aes(color = color)) +
+  geom_segment(aes(x=x.from, y=y.from, xend =x.to, yend = y.to, alpha = .alpha)) +
+  # geom_point(aes(x = x.from, y = y.from), size = 4) + 
+  # geom_text(aes(x = x.from, y = y.from, label = .frame), size = 2, color = 'black') + 
+  # geom_point(aes(x = x.to, y = y.to), size = 4) + 
+  # geom_text(aes(x = x.to, y = y.to, label = .frame), size = 2, color = 'white') + 
+  # geom_point(data = NULL, x = weirdness[1503,"x.from"], y = weirdness[1503,"y.from"], size = 6, shape = 21, inherit.aes = FALSE) + 
+   scale_color_grey() + 
+  scale_alpha_identity() +
+  theme_bw()
+
