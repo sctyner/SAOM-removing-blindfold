@@ -107,6 +107,10 @@ names(layout_init) <- c("x", "y")
 layout_init$colour <- 'red'
 layout_init$id <- as.factor(get.vertex.attribute(w1.net, "vertex.names"))
 data1 <- layout_init
+library(geomnet)
+wave1friends <- fortify(as.adjmat(friend.data.w1))
+netwave1 <- merge(merge(wave1friends, data1, by.x = 'from', by.y = 'id'), data1, by.x = 'to', by.y = 'id', suffixes = c(".from", ".to"))
+head(netwave1)
 # Step 2: get next network data observation
 # Microstep friend data wave 1 , step 1
 ms_fdw1.1 <- ms1[[2]]
@@ -124,10 +128,20 @@ layout_ms_fdw1.1$colour <- 'grey40'
 # as.factor() gets rid of that dumb color error. there's an internal function col_classes that makes to big of an assumption about character class columns
 layout_ms_fdw1.1$id <- as.factor(get.vertex.attribute(net_ms_fdw1.1, "vertex.names"))
 data2 <- layout_ms_fdw1.1
+
+wave1friendsms1 <- fortify(as.adjmat(ms_fdw1.1))
+netwave1ms1 <- merge(merge(wave1friendsms1, data2, by.x = 'from', by.y = 'id'), data2, by.x = 'to', by.y = 'id', suffixes = c(".from", ".to"))
+
 library(tweenr)
 # TWEEN EM
 data <- tween_states(data = list(data1, data2), tweenlength = 3, 1, "linear", 100)
-head(data)
+fulldata <- tween_states(data = list(netwave1, netwave1ms1), 3, 1, 'linear', 50)
+# doesn't work, need same # of rows. Need to deal with to NAs somehow. 
+netwave1 <- arrange(netwave1, to,from)
+netwave1ms1 <- arrange(netwave1ms1, to, from)
+head(netwave1ms1)
+n1 <- nrow(netwave1)
+n2 <- nrow(netwave1ms1)
 library(ggplot2)
 library(gganimate)
 
@@ -140,4 +154,66 @@ p <- ggplot(data=data, aes(x=x, y=y)) +
 animation::ani.options(interval = 1/15)
 gganimate(p, "dancing ball.gif", title_frame = F)
 
+# okay - here's what we need:
+  # a data frame of every possible edge
+  # from.x and from.y and to.x, to.y
+  # rules: from.x and from.y is always the point corresponding to the from node. 
+  # if (from,to) is in the network, to.x and to.y is the point corresponding to the to node. 
+  # if not, it's from.x and from.y
 
+alledges <- expand.grid(from = paste0("V", 1:50), to = paste0("V", 1:50))
+  # get rid of selfies
+library(dplyr)
+alledges %>% filter(from!=to) -> alledges 
+
+# edges df for initial network state
+
+#big1 <- left_join(alledges, netwave1, by = c("from" = "from", "to" = "to"))
+big1 <- left_join(alledges, data1[,-3], by = c("from" = "id"))
+head(big1)
+names(big1)[3:4] <- c("x.from", "y.from")
+big1 <- left_join(big1, data1[,-3], by = c("to"="id")) 
+names(big1)[5:6] <- c("x.to", "y.to")
+head(big1)
+
+for(i in 1:nrow(big1)){
+  edge <- big1[i,c("from","to")]
+  dat <- filter(netwave1, from == edge$from & to == edge$to )
+  if(nrow(dat) == 0){
+    big1[i, c("x.to", "y.to")] <- big1[i, c("x.from", "y.from")]
+  }
+}
+
+big2 <- left_join(alledges, data2[,-3], by = c("from" = "id"))
+head(big2)
+names(big2)[3:4] <- c("x.from", "y.from")
+big2 <- left_join(big2, data2[,-3], by = c("to"="id")) 
+names(big2)[5:6] <- c("x.to", "y.to")
+head(big2)
+
+for(i in 1:nrow(big2)){
+  edge <- big2[i,c("from","to")]
+  dat <- filter(netwave1ms1, from == edge$from & to == edge$to )
+  if(nrow(dat) == 0){
+    big2[i, c("x.to", "y.to")] <- big2[i, c("x.from", "y.from")]
+  }
+}
+big1$color = "blue"
+big2$color = "red"
+library(tweenr)
+big1$from <- as.factor(big1$from)
+big1$to<- as.factor(big1$to)
+big2$from <- as.factor(big2$from)
+big2$to<- as.factor(big2$to)
+big <- tween_states(data = list(big1, big2), 3,1,"linear", nframes = 20)
+
+p <- ggplot() + 
+  geom_point(data = unique(big[, c("from", "x.from", "y.from", "color", ".frame")]), 
+             aes(x=x.from, y = y.from, frame = .frame, colour = color), size=5) + 
+  geom_text(data = unique(big[, c("from", "x.from", "y.from", "color", ".frame")]),
+            aes(x=x.from, y = y.from, frame = .frame, label=from), alpha = .5) + 
+  geom_segment(data = big, aes(x = x.from, y = y.from, xend = x.to, yend = y.to, frame = .frame)) + 
+  scale_colour_identity() + 
+  theme_bw()
+animation::ani.options(interval = 1/15)
+gganimate(p, "networkanimation.gif", title_frame = F)
