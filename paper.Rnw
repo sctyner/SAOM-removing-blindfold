@@ -138,7 +138,7 @@ A Stochastic Actor-Oriented Model (SAOM) is a model that is changing in time in 
 
 \subsection{Definitions, Terminology, and Notation}
 
-In this paper, the term \textit{dynamic network} refers to a network consisting of the same set of $n$ nodes that is changing over time, and is observed at $M$ discrete time points, $t_1, \dots, t_M$. We denote these network observations $x(t_1), \dots, x(t_M)$, and in modelling we condition on the first observation, $x(t_1)$. The SAOM assumes that this longitudinal network is embedded within a continuous time Markov process (CTMP), call it $X(T)$. This process is almost entirely unobserved: assume that the beginning of the process, $X(0)$ is equivalent to the first network observation $x(t_1)$, while the end of the process $X(\infty)$ is equivalent to the last observation $x(t_M)$. All other parts of the process are unseen. The process $X(T)$ is a series of single tie (or edge) changes, in which one actor at a time is given the opportunity to add or remove one outgoing tie. Once an actor is given the chance to change a tie, it tries to maximize a sort of utility function based on the current and potential future states of the network. 
+In this paper, the term \textit{dynamic network} refers to a network consisting of the same set of $n$ nodes that is changing over time, and is observed at $M$ discrete time points, $t_1, \dots, t_M$. We denote these network observations $x(t_1), \dots, x(t_M)$, and in modelling we condition on the first observation, $x(t_1)$. The SAOM assumes that this longitudinal network is embedded within a continuous time Markov chain (CTMC), call it $X(T)$. This process is almost entirely unobserved: assume that the beginning of the process, $X(0)$ is equivalent to the first network observation $x(t_1)$, while the end of the process $X(\infty)$ is equivalent to the last observation $x(t_M)$. All other parts of the process are unseen. The process $X(T)$ is a series of single tie (or edge) changes, in which one actor at a time is given the opportunity to add or remove one outgoing tie. Once an actor is given the chance to change a tie, it tries to maximize a sort of utility function based on the current and potential future states of the network. 
 
 \subsubsection{The Rate Function}
 
@@ -152,7 +152,6 @@ for $x \in \mathcal{X}$, the space of all possible directed networks with the $n
 The parameters, $\boldsymbol{\beta}$, are attached to various actor-level network statistics, $s_{ik}(x)$. There are always at least two parameters, $\beta_1$ for the outdegree of a node, and $\beta_2$ for the number of reciprocal ties held by a node \citep[p. 371]{snijders01}. There are many possible parameters $\beta_i$ to add to the model. They can be split up into two groups: first, the structural effects, which only depend on the structure of the network. The inclusion of these effects has origin in the classical exponential random graph model (ERGM) for networks. These effects are written in terms of the edge variables $x_{ij}$, for $i \neq j$. The second set of effects are the actor-level or covariate effects. These effects also depend on the structure of the network. They are written in terms of $x_{ij}$ but also in terms of the covariates, $\mathbf{Z}$. A table of some possible structural and covariate effects is given in Table~\ref{tab:effects}. For a complete list of the network and covariate statistics that can be included in the objective function, see \citet{RSiena}.
 
 \begin{table}
-\caption{\label{tab:effects} Some of the possible effects to be included in the stochastic actor-oriented models in RSiena. There are many more possible effects, but we only consider a select few here. For a complete list, see the RSiena manual \citep{RSiena}.}
 \centering
 \begin{tabular}{ll}
 \textbf{Structural Effects} \\
@@ -165,6 +164,7 @@ covariate-ego  & $s_{i5}(x) = z_i\sum_j x_{ij}$ \\
 same covariate & $s_{i6}(x) = \sum_j x_{ij} \mathbb{I}(z_i = z_j)$ \\
 jumping transitive triplets  & $s_{i7}(x) = \sum_{j \neq h} x_{ij}x_{ih}x_{hj} \mathbb{I}(z_i = z_h \neq z_j)$
 \end{tabular}
+\caption{\label{tab:effects} Some of the possible effects to be included in the stochastic actor-oriented models in RSiena. There are many more possible effects, but we only consider a select few here. For a complete list, see the RSiena manual \citep{RSiena}.}
 \end{table}
 
 When node $i$ is given the chance to change a tie, we assume that they wish to maximize the value of their objective function $f_i(\boldsymbol{\beta}, x)$ plus a random element, $U_i(x)$, where the $U_i(x)$ are from "the type 1 extreme value distribution (or Gumbel distribution) with mean 0 and scale parameter 1" \citep[p. 368]{snijders01}. This distribution, which is also known as the log-Weibull distribution, has probability distribution function, using $\mu$ for the mean parameter and $\sigma$ for the scale parameter, of
@@ -195,7 +195,54 @@ To fit a SAOM to longitudinal network data, we use the package \texttt{RSiena} \
 
 \par For the score function method, the SIENA software uses a Robbins-Monro algorithm (see \citet{robbinsmonro}) to estimate the solution of the moment equation
 $$ E_{\theta}S = s_{obs}$$
-where \theta is the vector of rate and objective function parameters, and $s_{obs}$ is the observed vector of model statistics, $S$. The entire algorithm is provided in \citet{SienaAlgs}. \par There are three phases in the the SIENA algorithm, as described in \citet{RSienamanual, SienaAlgs}. The first phase performs initial estimation of the score functions used in the Robbins-Monro procedure. The second phase carries out the Robbins-Monro algorithm and obtains iterative estimates of the parameter values. The third phase uses the parameter vector estimated in phase two to estimate the score functions and the covariance matrix of the parameters, as well as performs convergence checks. In each of the the first two phases, the estimation procedure also relies on ``microsteps" that simulate from the model as it exists in its current state in order to update either the score functions or the parameter estimates. These microsteps become observed instances of the continuous-time Markov chain that is the backbone of the stochastic actor-oriented model. In Section~\ref{sec:ModelVis}, we visualize the parts of the SIENA method-of-moments algorithm, bringing them out of the ``black-box" and into the light. 
+where $\theta$ is the vector of rate and objective function parameters, and $s_{obs}$ is the observed vector of model statistics, $S$. The entire algorithm is provided in \citet{SienaAlgs}. \par There are three phases in the the SIENA algorithm, as described in \citet{RSienamanual, SienaAlgs}. The first phase performs initial estimation of the score functions used in the Robbins-Monro procedure. The second phase carries out the Robbins-Monro algorithm and obtains iterative estimates of the parameter values. The third phase uses the parameter vector estimated in phase two to estimate the score functions and the covariance matrix of the parameters, as well as performs convergence checks. In each of the the first two phases, the estimation procedure also relies on ``microsteps" that simulate from the model as it exists in its current state in order to update either the score functions or the parameter estimates. These microsteps become observed instances of the continuous-time Markov chain that is the backbone of the stochastic actor-oriented model. In Section~\ref{sec:ModelVis}, we visualize the parts of the SIENA method-of-moments algorithm, bringing them out of the ``black-box" and into the light. 
+
+\subsection{Example Data}
+
+To guide our visual exploration of stochastic actor-oriented models, we used a subset of the 50 actor dataset from the ``Teenage Friends and Lifestyle Study" that is provided on the \texttt{RSiena} webpage. These data come from \citet{friendsdata}, and we chose to only work with a subset of the data to make network visualizations less busy, with changes that are more noticeable. The subset contained actors 20 through 35 and the ties between them, as well as the drinking behavior of each actor at each of the three waves. This specific subset was chosen because it showed somewhat higher connectivity than other subsets, as we've emphasized in the visualizations of the three network adjacency matrices in Figure~\ref{fig:adjmatviz}. For model fitting, we condition on wave 1 and estimate the parameters of the models from the second and third waves. We will also be working with one actor level categorical covariate, drinking behavior. This variable has five values in the original data: (1) does not drink, (2) drinks once or twice a year, (3) drinks once a month, (4) drinks once a week, and (5) drinks more than once a week. The actor covariates adn networks are visualized in Figure~\ref{fig:alldataviz}. 
+<<adjmatviz, fig.align='center', fig.cap="A visualization of the adjacency matrices of the three waves of network observations in the ``Teenage Friends and Lifestyle Study'' data. The subset we will be using is outlined in red.", fig.width=8>>=
+library(network)
+library(sna)
+library(geomnet)
+setwd("code")
+source("00e_small_friends.R")
+view_rs2$wave <- factor(view_rs2$wave)
+levels(view_rs2$wave) <- c("Wave 1", "Wave 2", "Wave 3")
+ggplot(data= view_rs2, aes(x = x, y=y)) + 
+  geom_tile(aes(fill = as.factor(value))) + 
+  scale_fill_manual("i likes j", labels=c("no", "yes"), 
+                    values = c('white', 'black')) +
+  geom_rect(data= NULL, inherit.aes = FALSE, color = 'red',
+            aes(xmin = 19.5, xmax = 35.5, ymin = 19.5, ymax = 35.5, fill =NA)) + 
+  facet_wrap(~wave) + theme_bw() +
+  labs(x = "i", y = "j") + 
+  theme(aspect.ratio=1, axis.text = element_blank(), axis.ticks = element_blank()) 
+@
+
+<<alldataviz, fig.cap="The smaller friendship network data we will be modelling throughout the paper.", fig.width=8>>=
+actual1 <- merge(data.frame(as.edgelist(as.network(fd2.w1))), 
+                 data.frame(id = 1:16, drink = drink2[,1]),
+                 by.x = "X1", by.y = "id", all = T)
+actual1$Wave <- 1 
+actual2 <- merge(data.frame(as.edgelist(as.network(fd2.w2))),
+                 data.frame(id = 1:16,drink = drink2[,2]),
+                 by.x = "X1", by.y = "id", all = T)
+actual2$Wave <- 2
+actual3 <- merge(data.frame(as.edgelist(as.network(fd2.w3))),
+                 data.frame(id = 1:16,drink = drink2[,3]),
+                 by.x = "X1", by.y = "id", all = T)
+actual3$Wave <- 3
+alldat <- rbind(actual1, actual2, actual3)
+alldat$X1 <- paste0("V", alldat$X1)
+alldat$X2 <- ifelse(!is.na(alldat$X2), paste0("V", alldat$X2), NA)
+ggplot(data = alldat, 
+       aes(from_id = X1, to_id = X2, color = as.ordered(drink), group = as.ordered(drink))) +
+  geom_net(fiteach = FALSE, directed=TRUE, layout.alg = 'fruchtermanreingold', size = 3, arrowsize = .5, arrowgap = .03) +
+  scale_color_brewer(palette = "YlOrRd", name = "Drinking\nBehavior") + 
+  theme_net() +
+  facet_wrap(~Wave, labeller = "label_both") + 
+  theme(legend.position = 'bottom', panel.background = element_rect(fill = NA, color = "grey30"))
+@
 
 \section{Model Visualizations} \label{sec:ModelVis}
 
@@ -207,12 +254,14 @@ The concept of model visualization was developed to complement traditional model
 
 The model fitting process in \texttt{RSiena} involves several simulation steps that are hidden from the user. This is practical and efficient if a researcher is primarily interested in fitting one model to a set of longitudinal network data and obtaining parameter estimates. We are more interested in how the models are fit, so we extracted and explored the different steps of that process. 
 
-A key component of each step of the SIENA method of moments algorithm is the ``microstep." This step simulates from the model in its current state, $x(t_m)$ with current parameter values $\theta_{0}$, to the next state, $x(t_{m+1})$, or as close as it can get to that state. This simulation process follows the steps of the continuous-time Markov chain. First, an ``ego node'' is selected to make a change, and then it randomly makes one change in its ties according to the probability, $p_{ij}$, determined by its objective function. The options for change are (1) removing a current tie, (2) adding a new tie, or (3) making no change at all. Saving all of these steps is not efficient if you're only interested in parameter values, but they can be saved and extracted using options in \texttt{RSiena}, which is exactly what we did to create our visualizations. Between two network observations $x(t_m)$ and $x(t_{m+1})$, there can be hundreds or even thousands of microsteps. We wanted to see these in-between steps. 
+A key component of each step of the SIENA method of moments algorithm is the ``microstep." This step simulates from the model in its current state, $x(t_m)$ with current parameter values $\theta_{0}$, to the next state, $x(t_{m+1})$, or as close as it can get to that state. This simulation process follows the steps of the continuous-time Markov chain. First, an ``ego node'' is selected to make a change, and then it randomly makes one change in its ties according to the probability, $p_{ij}$, determined by its objective function. The options for change are (1) removing a current tie, (2) adding a new tie, or (3) making no change at all. Saving all of these steps is not efficient if you're only interested in parameter values, but they can be saved and extracted using options in \texttt{RSiena}, which is exactly what we did to create our visualizations. Between two network observations $x(t_m)$ and $x(t_{m+1})$, there can be hundreds or even thousands of microsteps. We wanted to see these in-between steps in order to better understand the behavior of the underlying continuous-time Markov chain. 
+
+The first vizualization we present here is an animation of microsteps simulated to emulate the transition steps from wave 1 to wave 2 the subset of the friends data shown in Figure ~\ref{fig:alldataviz}. When each ego node is selected in a microstep, it is emphasized in the animation, then the associated edge either appears or disappears. If there are no changes at a particular microstep, no changes are seen. Some frames of the animations are shown in INSERT STATIC FIGURE, and the full movie can be viewed at INSERT LINK TO GIF. 
 
 
 \st{The algorithms here are many!
 \begin{enumerate}
-\item First, the microsteps / CTMC between each time point (gifs, other animations)
+%\item First, the microsteps / CTMC between each time point (gifs, other animations)
 \item Phases of RSiena: phase 1 = initial parameter estimate
 \item phase 2 = iterative update of parameters - trace plots
 \item phase 3 = simulations for convergence diagnostics
@@ -244,16 +293,67 @@ Harry Potter data??? I want to find my own data, too.}
 
 The second principle of Wickham et al states that ``collections are more informative than singletons" \citep[p.~210]{modelvis}. They describe several different methods for producing such collections, but we focus on only a few here. We look at collections produced ``from exploring the space of all possible models," ``by varying model settings", ``by fitting the same model to different datasets", and ``by treating each iteration as a model" \citep[p.~210-11]{modelvis}. We also fit the same model many times, resulting in distributions of fitted parameters for one data set.
 
-A classical problem with statistical network models generally is the lack of an ``average network" measure. Statisticians frequently rely on averages and expected values, but statistical network models, especially those as complex as SAOMs, lack an intuitive expected value measure. How then, can we arrive at an ``average" network? We propose to answer this question through visualization.
+A classical problem with statistical network models generally is the lack of an ``average network" measure. Statisticians frequently rely on averages and expected values, but statistical network models, especially those as complex as SAOMs, lack an intuitive expected value measure. We could talk about expected values of parameters, but there is no way to talk about the expected value of the network based on the model. How then, can we arrive at an ``average" network? We propose to answer this question through visualization.
 
-We first consider the 50 actor subset of the teenage friends and lifestyle data available on the \texttt{RSiena} website \citep{RSiena}. To this data, we fit a SAOM with a simple rate function and an objective function with two parameters, $f_i(x) = \beta_1s_{i1} + \beta_2s_{i2}$, where $s_{i1}$ is the density network statistic and $s_{i2}$ is the reciprocity network statistic for actor $i$. We fit this model using \texttt{RSiena} 1,000 times, then averaged the resulting parameter estimates to obtain mean estimates to use in the simulation of networks from this model. These values are shown in Table~\ref{tab:M1ests}
+We first consider the 16 actor subset of the teenage friends and lifestyle data available on the \texttt{RSiena} website \citep{RSiena}. To this data, we fit three different SAOMs. Each SAOM used a simple rate function, $\alpha_m$, and an objective function with two or three parameters. The first model, $M1$, contains the absolute minimum number of parameters in the objective function $f_i(x)$:  $$f_i(x)^{M1} = \beta_1s_{i1} + \beta_2s_{i2}$$, where $s_{i1}$ is the density network statistic and $s_{i2}$ is the reciprocity network statistic for actor $i$. The second and third models, $M2$ and $M3$, contain a third parameter in the objective function that was determined in the\texttt{RSienaTest} software to be significant, with $p$-values less than 0.05 \citep{RSienaTest}. The $M2$ model contains an actor-level covariate parameter, and the $M3$ model contains an additional strutural effect in the objective function.
+\begin{align*}
+f_i(x)^{M2} & = \beta_1s_{i1} + \beta_2s_{i2} + \beta_3s_{i3} \\
+f_i(x)^{M3} & = \beta_1s_{i1} + \beta_2s_{i2} + \beta_4s_{i4} 
+\end{align*}, where $s_{i3} = \sum_{j \neq h} x_{ij}x_{ih}x_{hj} \mathbb{I}(z_i = z_h \neq z_j)$, and $s_{i4} =  |\{j : x_{ij} = 0, \sum\limits_h x_{ih}x_{hj} \geq 2\}|$. These statistics are known as the number of jumping transitive triplets and the number of doubly achieved distances two effect, respectively. The first statistic emphasizes triad relationships that are formed between actors from different covariate groups, while the other emphasizes indirect ties between actors. These two effects are visually represented in Figure~\ref{fig:jtt} and ~\ref{fig:dad}, respectively. 
+
+\begin{figure}\label{fig:structures}
+\begin{subfigure}[t]{.45\textwidth}
+\caption{\label{fig:jtt}Realization of a jumping transitive triplet, where $i$ is the focal actor, $j$ is the target actor, and $h$ is the intermediary. The group of the actors is represented by the shape of the node.}
+<<jtt, echo=FALSE, fig.width=2, fig.height=2, message = FALSE, warning = FALSE, fig.align='center'>>=
+jTTe <- data.frame(from = c('i', 'i', 'h'), to = c('h', 'j', 'j'))
+jTTn <- data.frame(id = letters[8:10], group = c(1,1,2))
+
+jTT <- merge(jTTe, jTTn, by.x = 'from', by.y = "id", all = T)
+
+set.seed(12345) 
+ggplot(data = jTT, aes(from_id = from, to_id = to)) + 
+  geom_net(aes(shape = as.factor(group)), directed = T, labelon = T, 
+           labelcolour='grey80',vjust = 0.5, hjust =0.5, arrowgap = .15, 
+           colour = 'black', size=10, 
+           ecolour = c("red", "grey40", "grey40", "grey40")) + 
+  expand_limits(x=c(-0.1,1.1), y=c(-0.1,1.1)) +
+  theme_net() +
+  theme(legend.position = "none")
+@
+\end{subfigure}\hfill
+\begin{subfigure}[t]{.45\textwidth}
+\caption{\label{fig:dad}Doubly achieved distance between actors $i$ and $k$.}
+<<dab, echo=FALSE, fig.width=2, fig.height=2, message = FALSE, warning = FALSE, fig.align='center'>>=
+dade <- data.frame(from = c('i', 'i', 'h', 'j'), to = c('h', 'j', 'k', 'k'))
+dadn <- data.frame(id = letters[8:11], group = c(1,1,1,1))
+
+dad <- merge(dade, dadn, by.x = 'from', by.y = "id", all = T)
+
+set.seed(12345) 
+ggplot(data = dad, aes(from_id = from, to_id = to)) + 
+  geom_net(aes(shape = as.factor(group)), directed = T, labelon = T, labelcolour='grey80',vjust = 0.5, hjust =0.5, arrowgap = .15, colour = 'black', size=10) + 
+  expand_limits(x=c(-0.1,1.1), y=c(-0.1,1.1)) +
+  theme_net() +
+  theme(legend.position = "none")
+@
+\end{subfigure}
+\caption{Structural newtwork effects. On the left, a jumping transitive triplet (JTT). On the right, a doubly achieved distance between $i$ and $k$.}
+\end{figure}
+We fit this model using \texttt{RSiena} 1,000 times, then averaged the resulting parameter estimates to obtain mean estimates to use in the simulation of networks from this model. These values are shown in Table~\ref{tab:M1ests}
 
 <<getdata, results='asis'>>=
-library(netvizinf)
-data("M1ests_bigfriends")
-params <- data.frame(t(colMeans(M1ests_bigfriends)))
-names(params) <- c("Rate1", "Rate2", "beta1", "beta2")
-knitr::kable(params, digits = 3, align = 'c',caption = "\\label{tab:M1ests} Estimates of the four parameters from the simple SAOM fit to the 50 actor subset of the teenage friends and lifestyle data.", format = "latex")
+setwd("data")
+nulls <- read.csv("distribution_null_model.csv")
+alt <- read.csv("distribution_jumpTT_model.csv")
+alt2nd <- read.csv("distribution_dblpairs_model.csv")
+simu2 <- read.csv("simulation-1000-M1-M2-M3.csv")
+means <- simu2 %>% group_by(Model, parameter) %>% summarize(
+  mean = mean(estimate)
+)
+library(dplyr)
+null_mod_sv <- as.numeric(nulls[,-c(1,6,7)] %>% summarise_each(funs(mean)))
+alt_mod_sv <- as.numeric(alt[,-c(1, 7,8)] %>% summarise_each(funs(mean)))
+alt_mod2_sv <- as.numeric(alt2nd[,-c(1,7,8)] %>% summarise_each(funs(mean)))
 @
 
 To create a visualization that represents an ``average" network, we count occurences of each possible edge in the simulations, resulting in a summary network of simulations. Next, we subset the network to include only those edges which appear in greater than 50\% of all 
@@ -261,18 +361,20 @@ To create a visualization that represents an ``average" network, we count occure
 <<averagenet>>=
 library(RSiena)
 library(dplyr)
-friend.data.w1 <- as.matrix(read.table("data/s50_data/s50-network1.dat"))
-friend.data.w2 <- as.matrix(read.table("data/s50_data/s50-network2.dat"))
-friend.data.w3 <- as.matrix(read.table("data/s50_data/s50-network3.dat"))
-drink <- as.matrix(read.table("data/s50_data/s50-alcohol.dat"))
+#friend.data.w1 <- as.matrix(read.table("s50_data/s50-network1.dat"))
+#friend.data.w2 <- as.matrix(read.table("s50_data/s50-network2.dat"))
+#friend.data.w3 <- as.matrix(read.table("s50_data/s50-network3.dat"))
+#drink <- as.matrix(read.table("s50_data/s50-alcohol.dat"))
 friendshipData <- array(c(friend.data.w1, friend.data.w2, friend.data.w3), dim = c(50, 50, 3))
 friendship <- sienaDependent(friendshipData)
 alcohol <- varCovar(drink)
 mydata <- sienaDataCreate(friendship, alcohol)
 M1eff <- getEffects(mydata)
 library(netvizinf)
+data(M1ests_bigfriends)
+M1parms <- colMeans(M1ests_bigfriends)
 M1sims1000 <- saom_simulate(dat = mydata, struct = M1eff,
-                       parms = as.numeric(params), N = 1000)
+                       parms = as.numeric(M1parms), N = 1000)
 M1simsdf <- sims_to_df(M1sims1000)
 M1avg <- M1simsdf %>% filter(!is.na(to) & wave == 1) %>%
   group_by(from, to) %>% 
