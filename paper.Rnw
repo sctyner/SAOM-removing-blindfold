@@ -191,13 +191,42 @@ $$p_{ij}(\boldsymbol{\beta}, x) = \dfrac{\exp\left\{f_i(\boldsymbol{\beta}, x(i\
 
 \subsection{Fitting Models to Data}
 
-To fit a SAOM to longitudinal network data, we use the package \texttt{RSiena} \citep{RSiena}. This package uses simulation methods to estimate parameter values using either the method of moments or maximum likelihood estimation. In this paper, we focus of the method of moments estimation because the theory behind it was established in \citep{saompaper}, while the maximum likelihood estimation methods were not fully established until \citet{saomsml2010}. 
+To fit a SAOM to longitudinal network data, we use the package \texttt{RSiena} \citep{RSiena}. This package uses simulation methods to estimate parameter values using either the method of moments or maximum likelihood estimation. In this paper, we focus of the method of moments estimation because the theory behind it was established in \citet{saompaper}, while the maximum likelihood estimation methods were not fully established until \citet{saomsml2010}. We also focus on the score function method for estimating the derivatives of the expected values, as opposed to the finite differences method, both of which are outlined in detail in \citet{SienaAlgs}.
 
-\section{Model Visualizations}
+\par For the score function method, the SIENA software uses a Robbins-Monro algorithm (see \citet{robbinsmonro}) to estimate the solution of the moment equation
+$$ E_{\theta}S = s_{obs}$$
+where \theta is the vector of rate and objective function parameters, and $s_{obs}$ is the observed vector of model statistics, $S$. The entire algorithm is provided in \citet{SienaAlgs}. \par There are three phases in the the SIENA algorithm, as described in \citet{RSienamanual, SienaAlgs}. The first phase performs initial estimation of the score functions used in the Robbins-Monro procedure. The second phase carries out the Robbins-Monro algorithm and obtains iterative estimates of the parameter values. The third phase uses the parameter vector estimated in phase two to estimate the score functions and the covariance matrix of the parameters, as well as performs convergence checks. In each of the the first two phases, the estimation procedure also relies on ``microsteps" that simulate from the model as it exists in its current state in order to update either the score functions or the parameter estimates. These microsteps become observed instances of the continuous-time Markov chain that is the backbone of the stochastic actor-oriented model. In Section~\ref{sec:ModelVis}, we visualize the parts of the SIENA method-of-moments algorithm, bringing them out of the ``black-box" and into the light. 
+
+\section{Model Visualizations} \label{sec:ModelVis}
 
 \st{Introduce the concepts from Wickham et al. }
 
 The concept of model visualization was developed to complement traditional model diagnostic tools. Typically, numerical summaries such as $R^2$ are used to assess model fit, and visualizations, like residual plots, are restricted to the data. Every good data analysis includes both numerical and visual summaries of the data, so why should model description be restricted to numerical summaries? \citeauthor{modelvis} outline the three different parts of a model: the model family, the model form, and the fitted model. The latter is primarily what one thinks of first when considering a model in a data analysis, where a model is fit to the data, and parameter estimates reported. In the context of SAOMs, the fitted model contains the estimated rate parameters and the estimated objective function parameters. The model form describes the the model before the fitting process and how variables describe the data in the model. In SAOMs, the model form includes description of the rate and objective functions and the variables therein that describe how the network evolves over time. Finally, the model family is the most broad description of the model. This is the type of model that you wish to fit to the data, and is chosen based on the problem and knowledge at had. For example, we chose to use a SAOM to model network data over an exponential random graph model (ERGM) because we believe that actor-level variables effect network dynamics. These three parts of a "model" are should be visualized according to the three principals of model visualization: display the model in the data space, look at a collection of models, and explore the process of fitting the model, not just the end result. 
+
+\subsection{Explore algorithms, not just end result}
+
+The model fitting process in \texttt{RSiena} involves several simulation steps that are hidden from the user. This is practical and efficient if a researcher is primarily interested in fitting one model to a set of longitudinal network data and obtaining parameter estimates. We are more interested in how the models are fit, so we extracted and explored the different steps of that process. 
+
+A key component of each step of the SIENA method of moments algorithm is the ``microstep." This step simulates from the model in its current state, $x(t_m)$ with current parameter values $\theta_{0}$, to the next state, $x(t_{m+1})$, or as close as it can get to that state. This simulation process follows the steps of the continuous-time Markov chain. First, an ``ego node'' is selected to make a change, and then it randomly makes one change in its ties according to the probability, $p_{ij}$, determined by its objective function. The options for change are (1) removing a current tie, (2) adding a new tie, or (3) making no change at all. Saving all of these steps is not efficient if you're only interested in parameter values, but they can be saved and extracted using options in \texttt{RSiena}, which is exactly what we did to create our visualizations. Between two network observations $x(t_m)$ and $x(t_{m+1})$, there can be hundreds or even thousands of microsteps. We wanted to see these in-between steps. 
+
+
+\st{The algorithms here are many!
+\begin{enumerate}
+\item First, the microsteps / CTMC between each time point (gifs, other animations)
+\item Phases of RSiena: phase 1 = initial parameter estimate
+\item phase 2 = iterative update of parameters - trace plots
+\item phase 3 = simulations for convergence diagnostics
+\end{enumerate}
+ } 
+
+\hh{The visualizations should address most elements of structure described before, i.e. follow along in the setup (for descriptive and teaching purposes), the fitting (understanding the model and interpreting the results) and then diagnostics (how well does the model fit the data - where are the most differences to the actual data/what are the sensitive parameters?) }
+
+\hh{Some of the visualizations we talked about
+\begin{enumerate}
+\item visualization of the MCMC process:  movie of individual actors' step-by-step decisions; could be done with the ndtv package, as long as we can get individual steps out of RSiena
+\item global picture: 1000 simulated networks + alpha blending should give a pretty good idea of the most important edges
+%\item global structure + principal components (tensor pca)
+\end{enumerate}}
 
 \subsection{View the model in the data space}
 
@@ -298,26 +327,9 @@ ggplot(data = M1avg2 %>% filter(weight/1000 > .5)) + # edge appears > 50% of the
 \end{itemize}
  }
 
-\subsection{Explore algorithms, not just end result}
-\st{The algorithms here are many!
-\begin{enumerate}
-\item First, the microsteps / CTMC between each time point (gifs, other animations)
-\item Phases of RSiena: phase 1 = initial parameter estimate
-\item phase 2 = iterative update of parameters - trace plots
-\item phase 3 = simulations for convergence diagnostics
-\end{enumerate}
- } 
 
-\hh{The visualizations should address most elements of structure described before, i.e. follow along in the setup (for descriptive and teaching purposes), the fitting (understanding the model and interpreting the results) and then diagnostics (how well does the model fit the data - where are the most differences to the actual data/what are the sensitive parameters?) }
 
-\hh{Some of the visualizations we talked about
-\begin{enumerate}
-\item visualization of the MCMC process:  movie of individual actors' step-by-step decisions; could be done with the ndtv package, as long as we can get individual steps out of RSiena
-\item global picture: 1000 simulated networks + alpha blending should give a pretty good idea of the most important edges
-\item global structure + principal components (tensor pca)
-\end{enumerate}}
-
-\section{}
+\section{Discussion}
 
 \bibliographystyle{asa}
 \bibliography{references}
