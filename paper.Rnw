@@ -96,7 +96,7 @@
 <<setup, echo = FALSE, message = FALSE, warning = FALSE>>=
 options(replace.assign=TRUE,width=70, digits=3)
 require(knitr)
-opts_chunk$set(fig.path='figure/', cache.path='cache/', fig.align='center', fig.width=5, fig.height=5, par=TRUE, cache=TRUE, concordance=TRUE, autodep=TRUE, message=F, warning=F, echo = FALSE)
+opts_chunk$set(fig.path='figure/', cache.path='cache/', fig.align='center', fig.width=5, fig.height=5, par=TRUE, cache=TRUE, concordance=TRUE, autodep=TRUE, message=F, warning=F, echo = FALSE, root.dir = "~/Desktop/Dissertation - LETS GO/SAOM-removing-blindfold/")
 
 library(dplyr)
 @
@@ -205,8 +205,7 @@ To guide our visual exploration of stochastic actor-oriented models, we used a s
 library(network)
 library(sna)
 library(geomnet)
-setwd("code")
-source("00e_small_friends.R")
+source("code/00e_small_friends.R")
 view_rs2$wave <- factor(view_rs2$wave)
 levels(view_rs2$wave) <- c("Wave 1", "Wave 2", "Wave 3")
 ggplot(data= view_rs2, aes(x = x, y=y)) + 
@@ -299,8 +298,8 @@ A classical problem with statistical network models generally is the lack of an 
 We first consider the 16 actor subset of the teenage friends and lifestyle data available on the \texttt{RSiena} website \citep{RSiena}. To this data, we fit three different SAOMs. Each SAOM used a simple rate function, $\alpha_m$, and an objective function with two or three parameters. The first model, $M1$, contains the absolute minimum number of parameters in the objective function $f_i(x)$:  $$f_i(x)^{M1} = \beta_1s_{i1} + \beta_2s_{i2}$$, where $s_{i1}$ is the density network statistic and $s_{i2}$ is the reciprocity network statistic for actor $i$. The second and third models, $M2$ and $M3$, contain a third parameter in the objective function that was determined in the\texttt{RSienaTest} software to be significant, with $p$-values less than 0.05 \citep{RSienaTest}. The $M2$ model contains an actor-level covariate parameter, and the $M3$ model contains an additional strutural effect in the objective function.
 \begin{align*}
 f_i(x)^{M2} & = \beta_1s_{i1} + \beta_2s_{i2} + \beta_3s_{i3} \\
-f_i(x)^{M3} & = \beta_1s_{i1} + \beta_2s_{i2} + \beta_4s_{i4} 
-\end{align*}, where $s_{i3} = \sum_{j \neq h} x_{ij}x_{ih}x_{hj} \mathbb{I}(z_i = z_h \neq z_j)$, and $s_{i4} =  |\{j : x_{ij} = 0, \sum\limits_h x_{ih}x_{hj} \geq 2\}|$. These statistics are known as the number of jumping transitive triplets and the number of doubly achieved distances two effect, respectively. The first statistic emphasizes triad relationships that are formed between actors from different covariate groups, while the other emphasizes indirect ties between actors. These two effects are visually represented in Figure~\ref{fig:jtt} and ~\ref{fig:dad}, respectively. 
+f_i(x)^{M3} & = \beta_1s_{i1} + \beta_2s_{i2} + \beta_4s_{i4}, 
+\end{align*} where $s_{i3} = \sum_{j \neq h} x_{ij}x_{ih}x_{hj} \mathbb{I}(z_i = z_h \neq z_j)$, and $s_{i4} =  |\{j : x_{ij} = 0, \sum\limits_h x_{ih}x_{hj} \geq 2\}|$. These statistics are known as the number of jumping transitive triplets and the number of doubly achieved distances two effect, respectively. The first statistic emphasizes triad relationships that are formed between actors from different covariate groups, while the other emphasizes indirect ties between actors. These two effects are visually represented in Figure~\ref{fig:jtt} and ~\ref{fig:dad}, respectively. 
 
 \begin{figure}\label{fig:structures}
 \begin{subfigure}[t]{.45\textwidth}
@@ -340,16 +339,18 @@ ggplot(data = dad, aes(from_id = from, to_id = to)) +
 \end{subfigure}
 \caption{Structural newtwork effects. On the left, a jumping transitive triplet (JTT). On the right, a doubly achieved distance between $i$ and $k$.}
 \end{figure}
-We fit this model using \texttt{RSiena} 1,000 times, then averaged the resulting parameter estimates to obtain mean estimates to use in the simulation of networks from this model. These values are shown in Table~\ref{tab:M1ests}
+We these three models using \texttt{RSiena} 1,000 times each. We then looked at the distribution of the fitted values, which are shown in Figure~\ref{fig:distests}. We can see from these distributions that the inclusion of the jumping transitive triplet parameter, $\beta_3$ is obviously affecting the distributions of the other four parameters included in all models, $\alpha_1$, $\alpha_2$, $\beta_1$, and $\beta2$. In comparison with models M1 and M3, model M2 typically has higher estimates of the rate parameter, meaning that the inclusion of the covariate statistic in the model leads to higher estimates of the number of times, on average, a node gets to change its ties. This seems problematic: it is not clear that the addition of a parameter to the objective function \textit{should} effect the estimation of the rate parameters. 
+
+To further investigate this relationship between the parameter values, we look at correlations between each of the parameter estimates in each model. In Figure~\ref{fig:corplots}, we examine correlations between each of pair of parameters within each model and overall.\nocite{ggally} The strongest correlation within each model is between $\beta_1$ and $\beta_2$, with absolute value of correlation between those two parameter values greater than 0.90 in all three models. The $\beta_1$ parameter is also highly correlated with the $\beta_3$ parameter within model M2, but it is not as highly correlated with the $\beta_4$ parameter in model M3. 
 
 <<getdata, results='asis'>>=
-setwd("data")
-nulls <- read.csv("distribution_null_model.csv")
-alt <- read.csv("distribution_jumpTT_model.csv")
-alt2nd <- read.csv("distribution_dblpairs_model.csv")
-simu2 <- read.csv("simulation-1000-M1-M2-M3.csv")
+
+nulls <- read.csv("data/distribution_null_model.csv")
+alt <- read.csv("data/distribution_jumpTT_model.csv")
+alt2nd <- read.csv("data/distribution_dblpairs_model.csv")
+simu2 <- read.csv("data/simulation-1000-M1-M2-M3.csv")
 means <- simu2 %>% group_by(Model, parameter) %>% summarize(
-  mean = mean(estimate)
+  means = mean(estimate)
 )
 library(dplyr)
 null_mod_sv <- as.numeric(nulls[,-c(1,6,7)] %>% summarise_each(funs(mean)))
@@ -357,23 +358,43 @@ alt_mod_sv <- as.numeric(alt[,-c(1, 7,8)] %>% summarise_each(funs(mean)))
 alt_mod2_sv <- as.numeric(alt2nd[,-c(1,7,8)] %>% summarise_each(funs(mean)))
 @
 
-To create a visualization that represents an ``average" network, we count occurences of each possible edge in the simulations, resulting in a summary network of simulations. Next, we subset the network to include only those edges which appear in greater than 50\% of all 
+<<distests, fig.cap="Distribution of fitted parameter values for our three SAOMs. The inclusion of $\\beta_3$ or $\\beta_4$ clearly has an effect on the distribution of the rate parameters, $\\alpha_1$ and $\\alpha_2$.", fig.width=8>>=
+
+#simu2 <- read.csv("data/simulation-1000-M1-M2-M3.csv")
+
+ggplot(data = simu2) + 
+  geom_density(aes(x = estimate, fill = Model), alpha = .5) + 
+  facet_wrap(~parameter, scales = 'free') + 
+  theme_bw()
+@
+
+
+<<corplots, fig.cap="A matrix of plots demonstrating the strong correlations between parameter estimate in our SAOMs. The strongest correlation within each model is between $\\beta_1$ and $\\beta_2$.", fig.width=8>>=
+library(GGally)
+library(tidyr)
+simu2 <- read.csv("data/simulation-1000-M1-M2-M3.csv")
+
+simu_spread <- simu2 %>% spread(parameter, estimate)
+ggpairs(simu_spread, columns = 3:8, ggplot2::aes(colour=Model, alpha = .5)) + theme_bw()
+@
+
+We also explore simulations from these different models given parameter values. Using the means from the 1,000 fitted parameter values, we simulated 1,000 observations from each of our three models. We condition on the first friendship network observation, and the second and third observations are simulated from the SAOM models estimated previously. From these simulations, we first create a visualization that represents an ``average" network, we count occurences of each possible edge in the simulations, resulting in a summary network of simulations. 
 
 <<averagenet>>=
 library(RSiena)
-library(dplyr)
+library(tidyverse)
 #friend.data.w1 <- as.matrix(read.table("s50_data/s50-network1.dat"))
 #friend.data.w2 <- as.matrix(read.table("s50_data/s50-network2.dat"))
 #friend.data.w3 <- as.matrix(read.table("s50_data/s50-network3.dat"))
 #drink <- as.matrix(read.table("s50_data/s50-alcohol.dat"))
-friendshipData <- array(c(friend.data.w1, friend.data.w2, friend.data.w3), dim = c(50, 50, 3))
+friendshipData <- array(c(fd2.w1, fd2.w2, fd2.w3), dim = c(16, 16, 3))
 friendship <- sienaDependent(friendshipData)
-alcohol <- varCovar(drink)
+alcohol <- varCovar(drink[20:35,])
 mydata <- sienaDataCreate(friendship, alcohol)
 M1eff <- getEffects(mydata)
 library(netvizinf)
 data(M1ests_bigfriends)
-M1parms <- colMeans(M1ests_bigfriends)
+M1parms <- (means %>% filter(Model == "M1"))$means
 M1sims1000 <- saom_simulate(dat = mydata, struct = M1eff,
                        parms = as.numeric(M1parms), N = 1000)
 M1simsdf <- sims_to_df(M1sims1000)
@@ -382,9 +403,9 @@ M1avg <- M1simsdf %>% filter(!is.na(to) & wave == 1) %>%
   summarise(count = n()) %>% 
   mutate(weight = ifelse(from == to, 0, count))
 M1avg2 <- M1simsdf %>% filter(!is.na(to)) %>%
-  group_by(from, to, wave) %>% 
-  summarise(count = n()) %>% 
-  mutate(weight = ifelse(from == to, 0, count))
+ group_by(from, to, wave) %>%
+ summarise(count = n()) %>%
+ mutate(weight = ifelse(from == to, 0, count))
 
 library(geomnet)
 M1avg$from <- paste0("V", M1avg$from)
@@ -392,27 +413,41 @@ M1avg$to <- paste0("V", M1avg$to)
 M1avg2$from <- paste0("V", M1avg2$from)
 M1avg2$to <- paste0("V", M1avg2$to)
 
+wave2drink <- drink2[,2]
+wave2drink <- as.data.frame(wave2drink)
+wave2drink$id <- paste0("V", 1:16)
+names(wave2drink)[1] <- "drink"
+M1avgcov <- merge(M1avg, wave2drink, by.x = "from", by.y = "id", all = T)
 library(tidyr)
 M1avg[,-3] %>% spread(to, weight) %>% data.frame-> distmat
 rownames(distmat) <- distmat$from
 distmat <- distmat[,-1]
-distmat <- as.matrix(1/distmat)
+distmat <- as.matrix(sqrt(1/distmat))
 distmat[is.na(distmat)] <- 0
-ggplot(data = M1avg %>% filter(weight/1000 > .5)) + # edge appears > 50% of the time. (is this actually what that is????) 
-  geom_net(aes(from_id = from, to_id = to, linewidth = weight/1000), 
+ggplot(data = M1avgcov) + # edge appears > 50% of the time. (is this actually what that is????) 
+  geom_net(aes(from_id = from, to_id = to, linewidth = weight/251, color = as.factor(drink)), 
            directed = TRUE, curvature = .2,
            #layout.alg = "fruchtermanreingold"
            layout.alg = "kamadakawai",
            layout.par = list(elen = distmat)
-           )
-ggplot(data = M1avg2 %>% filter(weight/1000 > .5)) + # edge appears > 50% of the time. (is this actually what that is????) 
-  geom_net(aes(from_id = from, to_id = to, linewidth = weight/1000), 
-           directed = TRUE, curvature = .2, labelon = T,
+           ) + 
+  scale_color_brewer(palette = "YlOrRd", name = "Drinking\nBehavior") + 
+  scale_size_continuous(name = "Weight") + 
+  theme_net()
+M1avg2$wave <- M1avg2$wave + 1
+alldrink <- data.frame(drink2[,2:3])
+alldrink <- gather(alldrink, wave,drink) %>% mutate(wave = parse_number(wave), id = rep(paste0("V",1:16),2))
+
+M1avg2cov <- merge(M1avg2, alldrink, by.x = c("from", "wave"), by.y = c("id", "wave"), all = T)
+ggplot(data = M1avg2cov) + # edge appears > 50% of the time. (is this actually what that is????) 
+  geom_net(aes(from_id = from, to_id = to, linewidth = weight/388, color = as.factor(drink)), 
+           directed = TRUE, curvature = .2, labelon = F,
            #layout.alg = "fruchtermanreingold"
-           layout.alg = "kamadakawai",
+           layout.alg = "kamadakawai", fiteach = T,
            layout.par = list(elen = distmat)
            ) + 
-  facet_wrap(~wave) + theme_net()
+  scale_color_brewer(palette = "YlOrRd", name = "Drinking\nBehavior") + 
+  facet_wrap(~wave, labeller = "label_both") + theme_net() + labs(title = "Average Wave 2 and Wave 3 Networks from Model M1")
 # ggplot(data = M1avg %>% filter(weight >= 51)) + 
 #   geom_net(aes(from_id = from, to_id = to, linewidth = weight/500), 
 #            #directed = TRUE,
