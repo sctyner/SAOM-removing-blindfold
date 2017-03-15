@@ -235,13 +235,14 @@ actual3$Wave <- 3
 alldat <- rbind(actual1, actual2, actual3)
 alldat$X1 <- paste0("V", alldat$X1)
 alldat$X2 <- ifelse(!is.na(alldat$X2), paste0("V", alldat$X2), NA)
-ggplot(data = alldat, 
+alldataviz <- ggplot(data = alldat, 
        aes(from_id = X1, to_id = X2, color = as.ordered(drink), group = as.ordered(drink))) +
   geom_net(fiteach = FALSE, directed=TRUE, layout.alg = 'fruchtermanreingold', size = 3, arrowsize = .5, arrowgap = .03) +
   scale_color_brewer(palette = "YlOrRd", name = "Drinking\nBehavior") + 
   theme_net() +
   facet_wrap(~Wave, labeller = "label_both") + 
   theme(legend.position = 'bottom', panel.background = element_rect(fill = NA, color = "grey30"))
+alldataviz
 @
 
 \section{Model Visualizations} \label{sec:ModelVis}
@@ -256,7 +257,7 @@ The model fitting process in \texttt{RSiena} involves several simulation steps t
 
 A key component of each step of the SIENA method of moments algorithm is the ``microstep." This step simulates from the model in its current state, $x(t_m)$ with current parameter values $\theta_{0}$, to the next state, $x(t_{m+1})$, or as close as it can get to that state. This simulation process follows the steps of the continuous-time Markov chain. First, an ``ego node'' is selected to make a change, and then it randomly makes one change in its ties according to the probability, $p_{ij}$, determined by its objective function. The options for change are (1) removing a current tie, (2) adding a new tie, or (3) making no change at all. Saving all of these steps is not efficient if you're only interested in parameter values, but they can be saved and extracted using options in \texttt{RSiena}, which is exactly what we did to create our visualizations. Between two network observations $x(t_m)$ and $x(t_{m+1})$, there can be hundreds or even thousands of microsteps. We wanted to see these in-between steps in order to better understand the behavior of the underlying continuous-time Markov chain. 
 
-The first vizualization we present here is an animation of microsteps simulated to emulate the transition steps from wave 1 to wave 2 the subset of the friends data shown in Figure ~\ref{fig:alldataviz}. When each ego node is selected in a microstep, it is emphasized in the animation, then the associated edge either appears or disappears. If there are no changes at a particular microstep, no changes are seen. Some frames of the animations are shown in INSERT STATIC FIGURE, and the full movie can be viewed at INSERT LINK TO GIF. 
+The first vizualization we present here is an animation of microsteps simulated to emulate the transition steps from wave 1 to wave 2 the subset of the friends data shown in Figure ~\ref{fig:alldataviz}. When each ego node is selected in a microstep, it is emphasized in the animation, then the associated edge either appears or disappears. If there are no changes at a particular microstep, no changes are seen. Some frames of the animations are shown in INSERT STATIC FIGURE OF THE 5-6 DIFFERENT MICROSTEPS AND ONE TRANSITION SET, and the full movie can be viewed at INSERT LINK TO GIF. 
 
 
 \st{The algorithms here are many!
@@ -378,7 +379,7 @@ simu_spread <- simu2 %>% spread(parameter, estimate)
 ggpairs(simu_spread, columns = 3:8, ggplot2::aes(colour=Model, alpha = .5)) + theme_bw()
 @
 
-We also explore simulations from these different models given parameter values. Using the means from the 1,000 fitted parameter values, we simulated 1,000 observations from each of our three models. We condition on the first friendship network observation, and the second and third observations are simulated from the SAOM models estimated previously. From these simulations, we first create a visualization that represents an ``average" network, we count occurences of each possible edge in the simulations, resulting in a summary network of simulations. 
+We also explore simulations from these different models given parameter values. Using the means from the 1,000 fitted parameter values, we simulated 1,000 observations from each of our three models. We condition on the first friendship network observation, and the second and third observations are simulated from the SAOM models estimated previously. From these simulations, we first create a visualization that represents an ``average" network. To do this, we count occurences of each possible edge in the simulations, resulting in a summary network with weighted edges representing the number of times an edge appeared when simulating from the SAOM. 
 
 <<averagenet>>=
 library(RSiena)
@@ -392,17 +393,61 @@ friendship <- sienaDependent(friendshipData)
 alcohol <- varCovar(drink[20:35,])
 mydata <- sienaDataCreate(friendship, alcohol)
 M1eff <- getEffects(mydata)
+M2eff <- includeEffects(M1eff, jumpXTransTrip, interaction1 = "alcohol")
+M3eff <- includeEffects(M1eff, nbrDist2twice)
 library(netvizinf)
 data(M1ests_bigfriends)
 M1parms <- (means %>% filter(Model == "M1"))$means
-M1sims1000 <- saom_simulate(dat = mydata, struct = M1eff,
-                       parms = as.numeric(M1parms), N = 1000)
+M2parms <- (means %>% filter(Model == "M2"))$means
+M3parms <- (means %>% filter(Model == "M3"))$means
+M1sims1000 <- saom_simulate(dat = mydata, 
+                            struct = M1eff,
+                       parms = as.numeric(M1parms), 
+                       N = 1000)
+M2sims1000 <- saom_simulate(dat = mydata, 
+                            struct = M2eff,
+                       parms = as.numeric(M2parms), 
+                       N = 1000)
+M3sims1000 <- saom_simulate(dat = mydata, 
+                            struct = M3eff,
+                       parms = as.numeric(M3parms), 
+                       N = 1000)
 M1simsdf <- sims_to_df(M1sims1000)
+M2simsdf <- sims_to_df(M2sims1000)
+M3simsdf <- sims_to_df(M3sims1000)
 M1avg <- M1simsdf %>% filter(!is.na(to) & wave == 1) %>%
   group_by(from, to) %>% 
   summarise(count = n()) %>% 
   mutate(weight = ifelse(from == to, 0, count))
+M1avgW2 <- M1simsdf %>% filter(!is.na(to) & wave == 2) %>%
+  group_by(from, to) %>% 
+  summarise(count = n()) %>% 
+  mutate(weight = ifelse(from == to, 0, count))
 M1avg2 <- M1simsdf %>% filter(!is.na(to)) %>%
+ group_by(from, to, wave) %>%
+ summarise(count = n()) %>%
+ mutate(weight = ifelse(from == to, 0, count))
+M2avg <- M2simsdf %>% filter(!is.na(to) & wave == 1) %>%
+  group_by(from, to) %>% 
+  summarise(count = n()) %>% 
+  mutate(weight = ifelse(from == to, 0, count))
+M2avgW2 <- M2simsdf %>% filter(!is.na(to) & wave == 2) %>%
+  group_by(from, to) %>% 
+  summarise(count = n()) %>% 
+  mutate(weight = ifelse(from == to, 0, count))
+M2avg2 <- M2simsdf %>% filter(!is.na(to)) %>%
+ group_by(from, to, wave) %>%
+ summarise(count = n()) %>%
+ mutate(weight = ifelse(from == to, 0, count))
+M3avg <- M3simsdf %>% filter(!is.na(to) & wave == 1) %>%
+  group_by(from, to) %>% 
+  summarise(count = n()) %>% 
+  mutate(weight = ifelse(from == to, 0, count))
+M3avgW2 <- M3simsdf %>% filter(!is.na(to) & wave == 2) %>%
+  group_by(from, to) %>% 
+  summarise(count = n()) %>% 
+  mutate(weight = ifelse(from == to, 0, count))
+M3avg2 <- M3simsdf %>% filter(!is.na(to)) %>%
  group_by(from, to, wave) %>%
  summarise(count = n()) %>%
  mutate(weight = ifelse(from == to, 0, count))
@@ -412,42 +457,226 @@ M1avg$from <- paste0("V", M1avg$from)
 M1avg$to <- paste0("V", M1avg$to)
 M1avg2$from <- paste0("V", M1avg2$from)
 M1avg2$to <- paste0("V", M1avg2$to)
+M1avgW2$from <- paste0("V", M1avgW2$from)
+M1avgW2$to <- paste0("V", M1avgW2$to)
+M2avg$from <- paste0("V", M2avg$from)
+M2avg$to <- paste0("V", M2avg$to)
+M2avgW2$from <- paste0("V", M2avgW2$from)
+M2avgW2$to <- paste0("V", M2avgW2$to)
+M2avg2$from <- paste0("V", M2avg2$from)
+M2avg2$to <- paste0("V", M2avg2$to)
+M3avg$from <- paste0("V", M3avg$from)
+M3avg$to <- paste0("V", M3avg$to)
+M3avgW2$from <- paste0("V", M3avgW2$from)
+M3avgW2$to <- paste0("V", M3avgW2$to)
+M3avg2$from <- paste0("V", M3avg2$from)
+M3avg2$to <- paste0("V", M3avg2$to)
 
 wave2drink <- drink2[,2]
 wave2drink <- as.data.frame(wave2drink)
 wave2drink$id <- paste0("V", 1:16)
 names(wave2drink)[1] <- "drink"
+wave3drink <- drink2[,3]
+wave3drink <- as.data.frame(wave3drink)
+wave3drink$id <- paste0("V", 1:16)
+names(wave3drink)[1] <- "drink"
 M1avgcov <- merge(M1avg, wave2drink, by.x = "from", by.y = "id", all = T)
+M2avgcov <- merge(M2avg, wave2drink, by.x = "from", by.y = "id", all = T)
+M3avgcov <- merge(M3avg, wave2drink, by.x = "from", by.y = "id", all = T)
+M1avgW2cov <- merge(M1avgW2, wave3drink, by.x = "from", by.y = "id", all = T)
+M2avgW2cov <- merge(M2avgW2, wave3drink, by.x = "from", by.y = "id", all = T)
+M3avgW2cov <- merge(M3avgW2, wave3drink, by.x = "from", by.y = "id", all = T)
 library(tidyr)
-M1avg[,-3] %>% spread(to, weight) %>% data.frame-> distmat
-rownames(distmat) <- distmat$from
-distmat <- distmat[,-1]
-distmat <- as.matrix(sqrt(1/distmat))
-distmat[is.na(distmat)] <- 0
-ggplot(data = M1avgcov) + # edge appears > 50% of the time. (is this actually what that is????) 
+M1avg[,-3] %>% spread(to, weight) %>% data.frame-> distmatM1
+rownames(distmatM1) <- distmatM1$from
+distmatM1 <- distmatM1[,-1]
+distmatM1 <- as.matrix(sqrt(1/distmatM1))
+distmatM1[is.na(distmatM1)] <- 0
+M1avgW2[,-3] %>% spread(to, weight) %>% data.frame-> distmatM1W2
+rownames(distmatM1W2) <- distmatM1W2$from
+distmatM1W2 <- distmatM1W2[,-1]
+distmatM1W2 <- as.matrix(sqrt(1/distmatM1W2))
+distmatM1W2[is.na(distmatM1W2)] <- 0
+M2avg[,-3] %>% spread(to, weight) %>% data.frame-> distmatM2
+rownames(distmatM2) <- distmatM2$from
+distmatM2 <- distmatM2[,-1]
+distmatM2 <- as.matrix(sqrt(1/distmatM2))
+distmatM2[is.na(distmatM2)] <- 0
+M2avgW2[,-3] %>% spread(to, weight) %>% data.frame-> distmatM2W2
+rownames(distmatM2W2) <- distmatM2W2$from
+distmatM2W2 <- distmatM2W2[,-1]
+distmatM2W2 <- as.matrix(sqrt(1/distmatM2W2))
+distmatM2W2[is.na(distmatM2W2)] <- 0
+M3avg[,-3] %>% spread(to, weight) %>% data.frame-> distmatM3
+rownames(distmatM3) <- distmatM3$from
+distmatM3 <- distmatM3[,-1]
+distmatM3 <- as.matrix(sqrt(1/distmatM3))
+distmatM3[is.na(distmatM3)] <- 0
+M3avgW2[,-3] %>% spread(to, weight) %>% data.frame-> distmatM3W2
+rownames(distmatM3W2) <- distmatM3W2$from
+distmatM3W2 <- distmatM3W2[,-1]
+distmatM3W2 <- as.matrix(sqrt(1/distmatM3W2))
+distmatM3W2[is.na(distmatM3W2)] <- 0
+
+library(RColorBrewer)
+cols <- brewer.pal(n = 4, "YlOrRd")
+
+plotM1W2 <- ggplot(data = M1avgcov) + 
   geom_net(aes(from_id = from, to_id = to, linewidth = weight/251, color = as.factor(drink)), 
+           arrowgap = .03, size = 3,arrowsize = .5,
            directed = TRUE, curvature = .2,
            #layout.alg = "fruchtermanreingold"
            layout.alg = "kamadakawai",
-           layout.par = list(elen = distmat)
+           layout.par = list(elen = distmatM1)
            ) + 
   scale_color_brewer(palette = "YlOrRd", name = "Drinking\nBehavior") + 
+  #labs(title = "Wave 2, M1") + 
   scale_size_continuous(name = "Weight") + 
-  theme_net()
-M1avg2$wave <- M1avg2$wave + 1
-alldrink <- data.frame(drink2[,2:3])
-alldrink <- gather(alldrink, wave,drink) %>% mutate(wave = parse_number(wave), id = rep(paste0("V",1:16),2))
-
-M1avg2cov <- merge(M1avg2, alldrink, by.x = c("from", "wave"), by.y = c("id", "wave"), all = T)
-ggplot(data = M1avg2cov) + # edge appears > 50% of the time. (is this actually what that is????) 
-  geom_net(aes(from_id = from, to_id = to, linewidth = weight/388, color = as.factor(drink)), 
-           directed = TRUE, curvature = .2, labelon = F,
+  theme_net() + 
+  theme(plot.title = element_text(hjust = .5), legend.position = 'none',plot.margin=unit(c(0,0,0,0),"mm"))
+plotM1W3 <- ggplot(data = M1avgW2cov) + 
+  geom_net(aes(from_id = from, to_id = to, linewidth = weight/388.5, color = as.factor(drink)), 
+           arrowgap = .03, size = 3,arrowsize = .5,
+           directed = TRUE, curvature = .2,
            #layout.alg = "fruchtermanreingold"
-           layout.alg = "kamadakawai", fiteach = T,
-           layout.par = list(elen = distmat)
+           layout.alg = "kamadakawai",
+           layout.par = list(elen = distmatM1W2)
+           ) + 
+  scale_color_manual(values = cols[2:4], name = "Drinking\nBehavior") + 
+  #labs(title = "Wave 3, M1") + 
+  scale_size_continuous(name = "Weight") + 
+  theme_net() + 
+  theme(plot.title = element_text(hjust = .5), legend.position = 'none',plot.margin=unit(c(0,0,0,0),"mm"))
+plotM2W2 <- ggplot(data = M2avgcov) + 
+  geom_net(aes(from_id = from, to_id = to, linewidth = weight/325, color = as.factor(drink)), 
+           arrowgap = .03, size = 3,arrowsize = .5,
+           directed = TRUE, curvature = .2,
+           #layout.alg = "fruchtermanreingold"
+           layout.alg = "kamadakawai",
+           layout.par = list(elen = distmatM2)
            ) + 
   scale_color_brewer(palette = "YlOrRd", name = "Drinking\nBehavior") + 
-  facet_wrap(~wave, labeller = "label_both") + theme_net() + labs(title = "Average Wave 2 and Wave 3 Networks from Model M1")
+  #labs(title = "Wave 2, M2") + 
+  scale_size_continuous(name = "Weight") + 
+  theme_net() + 
+  theme(plot.title = element_text(hjust = .5), legend.position = 'none',plot.margin=unit(c(0,0,0,0),"mm"))
+plotM2W3 <- ggplot(data = M2avgW2cov) + 
+  geom_net(aes(from_id = from, to_id = to, linewidth = weight/357, color = as.factor(drink)), 
+           arrowgap = .03, size = 3,arrowsize = .5,
+           directed = TRUE, curvature = .2,
+           #layout.alg = "fruchtermanreingold"
+           layout.alg = "kamadakawai",
+           layout.par = list(elen = distmatM2W2)
+           ) + 
+  scale_color_manual(values = cols[2:4], name = "Drinking\nBehavior") + 
+  #labs(title = "Wave 3, M2") + 
+  scale_size_continuous(name = "Weight") + 
+  theme_net() + 
+  theme(plot.title = element_text(hjust = .5), legend.position = 'none',plot.margin=unit(c(0,0,0,0),"mm"))
+plotM3W2 <- ggplot(data = M3avgcov) + 
+  geom_net(aes(from_id = from, to_id = to, linewidth = weight/258, color = as.factor(drink)), 
+           arrowgap = .03, size = 3,arrowsize = .5,
+           directed = TRUE, curvature = .2,
+           #layout.alg = "fruchtermanreingold"
+           layout.alg = "kamadakawai",
+           layout.par = list(elen = distmatM3)
+           ) + 
+  scale_color_brewer(palette = "YlOrRd", name = "Drinking\nBehavior") + 
+  #labs(title = "Wave 2, M3") + 
+  scale_size_continuous(name = "Weight") + 
+  theme_net() + 
+  theme(plot.title = element_text(hjust = .5), legend.position = 'none',plot.margin=unit(c(0,0,0,0),"mm"))
+plotM3W3 <- ggplot(data = M3avgW2cov) + 
+  geom_net(aes(from_id = from, to_id = to, linewidth = weight/372.5, color = as.factor(drink)), 
+           arrowgap = .03, size = 3,arrowsize = .5,
+           directed = TRUE, curvature = .2,
+           #layout.alg = "fruchtermanreingold"
+           layout.alg = "kamadakawai",
+           layout.par = list(elen = distmatM3W2)
+           ) + 
+  scale_color_manual(values = cols[2:4], name = "Drinking\nBehavior") + 
+  #labs(title = "Wave 3, M3") + 
+  scale_size_continuous(name = "Weight") + 
+  theme_net() + 
+  theme(plot.title = element_text(hjust = .5), legend.position = 'none',plot.margin=unit(c(0,0,0,0),"mm"))
+
+origW1 <- ggplot(data = alldat %>% filter(Wave==1), 
+       aes(from_id = X1, to_id = X2, color = as.ordered(drink))) +
+  geom_net(fiteach = FALSE, directed=TRUE, layout.alg = "kamadakawai", size = 3, arrowsize = .5, curvature = .2,
+           arrowgap = .03) +
+  scale_color_brewer(palette = "YlOrRd", name = "Drinking\nBehavior") + 
+  theme_net() +
+  theme(legend.position = 'none',plot.margin=unit(c(0,0,0,0),"mm"))
+origW2 <- ggplot(data = alldat %>% filter(Wave==2), 
+       aes(from_id = X1, to_id = X2, color = as.ordered(drink))) +
+  geom_net(fiteach = FALSE, directed=TRUE, layout.alg = "kamadakawai", size = 3, arrowsize = .5, curvature = .2,
+           arrowgap = .03) +
+  scale_color_brewer(palette = "YlOrRd", name = "Drinking\nBehavior") + 
+  theme_net() +
+  theme(legend.position = 'none',plot.margin=unit(c(0,0,0,0),"mm"))
+origW3 <- ggplot(data = alldat %>% filter(Wave==3), 
+       aes(from_id = X1, to_id = X2, color = as.ordered(drink))) +
+  geom_net(fiteach = FALSE, directed=TRUE, layout.alg = "kamadakawai", size = 3, arrowsize = .5, curvature = .2,
+           arrowgap = .03) +
+  scale_color_manual(values = cols[2:4], name = "Drinking\nBehavior") + 
+  theme_net() +
+  theme(legend.position = 'none',plot.margin=unit(c(0,0,0,0),"mm"))
+
+library(gridExtra)
+library(cowplot)
+plot_grid(plot.mpg, plot.diamonds, labels = c("A", "B"), nrow = 2, align = "v")
+grid.arrange(origW2, plotM1W2,
+              plotM2W2,plotM3W2, 
+              ncol=2, clip = T)
+alldataviz2 <- alldataviz + theme(legend.position = 'none')
+ggdraw() +
+  draw_plot(alldataviz2, x=0, y=.75, width=1, height=.25) + 
+  draw_plot(plotM1W2, .1, .5, .5, .25) +
+  draw_plot(plotM1W3, .3, .5, .5, .25) +
+  draw_plot(plotM2W2, .1, .25, .5, .25) +
+  draw_plot(plotM2W3, .3, .25, .5, .25) +
+  draw_plot(plotM3W2, .1, 0, .5, .25) +
+  draw_plot(plotM3W3, .3, 0, .5, .25) + 
+  draw_plot_label(label = c("Original Data", "M1: Wave 2", "M1: Wave 3", "M2: Wave 2", "M2: Wave 3", "M3: Wave 2", "M3: Wave 3"))
+
+M1avg2$Model <- "M1"
+M2avg2$Model <- "M2"
+M3avg2$Model <- "M3"
+allavg <- rbind(as.data.frame(M1avg2), 
+                as.data.frame(M2avg2),
+                as.data.frame(M3avg2))
+
+
+ggplot(data = allavg) + 
+  geom_histogram(aes(x = wt)) + 
+  facet_grid(wave~Model) + 
+  labs(x = "Number of times an edge occurs in 1,000 simulations") +
+  theme_bw()
+
+# ggplot(data = M3avgcov) + 
+#   geom_net(aes(from_id = from, to_id = to, linewidth = weight/251, color = as.factor(drink)), 
+#            directed = TRUE, curvature = .2,
+#            ealpha = .75,
+#            layout.alg = "kamadakawai",
+#            layout.par = list(elen = distmatM2)
+#            ) + 
+#   scale_color_brewer(palette = "YlOrRd", name = "Drinking\nBehavior") + 
+#   scale_size_continuous(name = "Weight") + 
+#   theme_net()
+# M1avg2$wave <- M1avg2$wave + 1
+# alldrink <- data.frame(drink2[,2:3])
+# alldrink <- gather(alldrink, wave,drink) %>% mutate(wave = parse_number(wave), id = rep(paste0("V",1:16),2))
+
+# M1avg2cov <- merge(M1avg2, alldrink, by.x = c("from", "wave"), by.y = c("id", "wave"), all = T)
+# ggplot(data = M1avg2cov) + # edge appears > 50% of the time. (is this actually what that is????) 
+#   geom_net(aes(from_id = from, to_id = to, linewidth = weight/388, color = as.factor(drink)), 
+#            directed = TRUE, curvature = .2, labelon = F,
+#            #layout.alg = "fruchtermanreingold"
+#            layout.alg = "kamadakawai", fiteach = T,
+#            layout.par = list(elen = distmat)
+#            ) + 
+#   scale_color_brewer(palette = "YlOrRd", name = "Drinking\nBehavior") + 
+#   facet_wrap(~wave, labeller = "label_both") + theme_net() + labs(title = "Average Wave 2 and Wave 3 Networks from Model M1")
 # ggplot(data = M1avg %>% filter(weight >= 51)) + 
 #   geom_net(aes(from_id = from, to_id = to, linewidth = weight/500), 
 #            #directed = TRUE,
