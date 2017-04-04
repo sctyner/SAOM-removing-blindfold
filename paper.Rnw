@@ -84,7 +84,7 @@
 \end{abstract}
 
 \noindent%
-{\it Keywords:} social network analysis, model visualization \hh{Other keywords?}
+{\it Keywords:} social network analysis, model visualization, dynamic networks, network visualization, network mapping, animation
 \vfill
 
 \newpage
@@ -97,8 +97,19 @@
 options(replace.assign=TRUE,width=70, digits=3)
 require(knitr)
 opts_chunk$set(fig.path='figure/', cache.path='cache/', fig.align='center', fig.width=5, fig.height=5, par=TRUE, cache=TRUE, concordance=TRUE, autodep=TRUE, message=F, warning=F, echo = FALSE, root.dir = "~/Desktop/Dissertation - LETS GO/SAOM-removing-blindfold/")
+@
 
-library(dplyr)
+<<pkgs>>=
+library(tidyverse)
+library(RSiena)
+library(network)
+library(sna)
+library(geomnet)
+library(GGally)
+library(netvizinf)
+library(RColorBrewer)
+library(gridExtra)
+library(cowplot)
 @
 
 \section{Introduction} 
@@ -218,9 +229,6 @@ where $\theta$ is the vector of rate and objective function parameters, and $s_{
 
 To guide our visual exploration of stochastic actor-oriented models, we used a subset of the 50 actor dataset from the ``Teenage Friends and Lifestyle Study" that is provided on the \texttt{RSiena} webpage. These data come from \citet{friendsdata}, and we chose to only work with a subset of the data to make network visualizations less busy, with changes that are more noticeable. The subset contained actors 20 through 35 and the ties between them, as well as the drinking behavior of each actor at each of the three waves. This specific subset was chosen because it showed somewhat higher connectivity than other subsets, as we've emphasized in the visualizations of the three network adjacency matrices in Figure~\ref{fig:adjmatviz}. For model fitting, we condition on wave 1 and estimate the parameters of the models from the second and third waves. We will also be working with one actor level categorical covariate, drinking behavior. This variable has five values in the original data: (1) does not drink, (2) drinks once or twice a year, (3) drinks once a month, (4) drinks once a week, and (5) drinks more than once a week. The actor covariates adn networks are visualized in Figure~\ref{fig:alldataviz}. 
 <<adjmatviz, fig.align='center', fig.cap="A visualization of the adjacency matrices of the three waves of network observations in the ``Teenage Friends and Lifestyle Study'' data. The subset we will be using is outlined in red.", fig.width=8>>=
-library(network)
-library(sna)
-library(geomnet)
 source("code/00e_small_friends.R")
 view_rs2$wave <- factor(view_rs2$wave)
 levels(view_rs2$wave) <- c("Wave 1", "Wave 2", "Wave 3")
@@ -275,19 +283,13 @@ A key component of each step of the SIENA method of moments algorithm is the ``m
 $$C = \sum_{i \neq j} |x_{ij}(t_{m+1}) - x_{ij}(t_{m})|.$$ 
 This simulation process follows the steps of the continuous-time Markov chain. First, an ``ego node'' is selected to make a change, and then it randomly makes one change in its ties according to the probability, $p_{ij}$, determined by its objective function. The options for change are (1) removing a current tie, (2) adding a new tie, or (3) making no change at all. Saving all of these steps is not efficient if you're only interested in estimating parameter values, but they can be saved and extracted using options in \texttt{RSiena}, which is exactly what we did to create our visualizations. Between two network observations $x(t_m)$ and $x(t_{m+1})$, there can be dozens, hundreds, or even thousands of microsteps, depending on the size of the network. We wanted to see these in-between steps in order to better understand the behavior of the underlying continuous-time Markov chain. 
 
-The first vizualization we present here is an animation of microsteps simulated to emulate the transition steps from wave 1 to wave 2 the subset of the friends data shown in Figure ~\ref{fig:alldataviz}. Movies similar to our animation were used to visualize the changes of dynamic networks in \citet{dynnetviz}. When each ego node is selected in a microstep, it is emphasized in the animation, then the associated edge either appears or disappears. If there are no changes at a particular microstep, no changes are seen. Some frames of the animations are shown in INSERT STATIC FIGURE OF THE 5-6 DIFFERENT MICROSTEPS AND ONE TRANSITION SET, and the full movie can be viewed at INSERT LINK TO GIF. 
+The first vizualization we present here is an animation of microsteps simulated to emulate the transition steps from wave 1 to wave 2 the subset of the friends data shown in Figure ~\ref{fig:alldataviz}. Movies similar to our animation were used to visualize the changes of dynamic networks in \citet{dynnetviz}. When each ego node is selected in a microstep, it is emphasized in the animation, then the associated edge either appears or disappears. If there are no changes at a particular microstep, no changes are seen. Some frames of the animations are shown in Figure~\ref{fig:makinggif}, and the full movie can be viewed at INSERT LINK TO GIF. 
 
-<<makinggif>>=
-library(RSiena)
-library(tidyverse)
-library(sna)
-library(network)
-library(netvizinf)
-library(gganimate)
-friend.data.w1 <- as.matrix(read.table("../data/s50-network1.dat"))
-friend.data.w2 <- as.matrix(read.table("../data/s50-network2.dat"))
-friend.data.w3 <- as.matrix(read.table("../data/s50-network3.dat"))
-drink <- as.matrix(read.table("../data/s50-alcohol.dat"))
+<<makinggif, fig.cap='A selection of images in the microstep animation. The selected edges and nodes are emphasized by changing the size and the color, then when edges are removed, they fade out, shrinking in size, while the nodes change color and shrink to blend in with the other nodes.', fig.width=8>>=
+friend.data.w1 <- as.matrix(read.table("data/s50_data/s50-network1.dat"))
+friend.data.w2 <- as.matrix(read.table("data/s50_data/s50-network2.dat"))
+friend.data.w3 <- as.matrix(read.table("data/s50_data/s50-network3.dat"))
+drink <- as.matrix(read.table("data/s50_data/s50-alcohol.dat"))
 fd2.w1 <- friend.data.w1[20:35,20:35]
 fd2.w2 <- friend.data.w2[20:35,20:35]
 fd2.w3 <- friend.data.w3[20:35,20:35]
@@ -312,20 +314,31 @@ ansnullchains %>%
   mutate(val = as.numeric(!from == to),
          from = paste0("V", parse_number(from)+1), # make the chains
          to = paste0("V", parse_number(to)+1)) -> ansnullchainsw1w2
-library(geomnet)
 colnames(fd2.w1) <- paste0("V", 1:16)
 rownames(fd2.w1) <- paste0("V", 1:16)
 wave1friends <- fortify(as.adjmat(fd2.w1))
 ms1 <- listMicrosteps(dat = wave1friends,
                       microsteps = filter(ansnullchainsw1w2, rep == 1))
+microsteps <- ms1[1:9]
 
+microsteps_df <- getMicrostepsDF(microsteps)
+pte <- pretween_edges(microsteps = microsteps)
+ptv <- pretween_vertices(pte = pte, layoutparams = list(n = 16))
+
+# get tweened data for all microsteps
+pall <- tween_microsteps(ptv, pte, microsteps_df)
+
+static_pall <- filter(pall, .frame %in% (1:12 * 3-2))
+
+create_net_animate(static_pall) + 
+  facet_wrap(~.frame, nrow=3, labeller = 'label_both') + 
+  theme(panel.background = element_rect(color = 'black'))
 @
 
-XXX HH's code XXX
 
 XX INSERT DESCRIPTION OF THE MOVIE - WHAT IT ALLOWS US TO SEE, ETC. XX
 
-We also use animation to view the changing structure of the adjacency matrix the microsteps. The adjacency matrices for the three waves of friendship data as shown in Figure~\ref{fig:alldataviz} are ordered by node id. There are 50 nodes in the data, numbered 1-50, and that order is used on the $x$ and $y$ axes for the matrix visualization. Viewing the adjacency matrices with this arbitrary ordering does not provide much information to the viewer about the underlying structure of the network. This lack of perceived structure would be exacerbated in an animation. So, we adjust the ordering so that the viewer can perceive more of the structure of the graph. This process is known as matrix seriation \citep{seriation}. 
+We also use animation to view the changing structure of the adjacency matrix the microsteps. The adjacency matrices for the three waves of friendship data as shown in Figure~\ref{fig:alldataviz} are ordered by node id. There are 16 nodes in the data, numbered 1-16, and that order is used on the $x$ and $y$ axes for the matrix visualization. Viewing the adjacency matrices with this arbitrary ordering does not provide much information to the viewer about the underlying structure of the network. This lack of perceived structure would be exacerbated in an animation. So, we adjust the ordering so that the viewer can perceive more of the structure of the graph. This process is known as matrix seriation \citep{seriation}. 
 
 To reorder the vertices for the matrix visualization, we first constructed a cumulative adjaceny matrix, $\mathbf{A}^{cum}$, for the series of microsteps simulating the network from $x(t_m)$ to $x(t_{m+1})$. A single entry in the cumulative adjacency matrix, $\mathbf{A}^{cum}_{ij}$, is the total number of times the edge from node $i$ to node $j$ appears in the network from the initial observation, $x(t_m) \equiv X(0)$ to the final reult of the last microstep, $X(C)$: 
 $$ \mathbf{A}^{cum}_{ij} = \sum_{c = 0}^C X_{ij}(c). $$
@@ -469,7 +482,6 @@ simu2 <- read.csv("data/simulation-1000-M1-M2-M3.csv")
 means <- simu2 %>% group_by(Model, parameter) %>% summarize(
   means = mean(estimate)
 )
-library(dplyr)
 null_mod_sv <- as.numeric(nulls[,-c(1,6,7)] %>% summarise_each(funs(mean)))
 alt_mod_sv <- as.numeric(alt[,-c(1, 7,8)] %>% summarise_each(funs(mean)))
 alt_mod2_sv <- as.numeric(alt2nd[,-c(1,7,8)] %>% summarise_each(funs(mean)))
@@ -487,8 +499,7 @@ ggplot(data = simu2) +
 
 
 <<corplots, fig.cap="A matrix of plots demonstrating the strong correlations between parameter estimate in our SAOMs. The strongest correlation within each model is between $\\beta_1$ and $\\beta_2$.", fig.width=8>>=
-library(GGally)
-library(tidyr)
+
 simu2 <- read.csv("data/simulation-1000-M1-M2-M3.csv")
 
 simu_spread <- simu2 %>% spread(parameter, estimate)
@@ -498,8 +509,6 @@ ggpairs(simu_spread, columns = 3:8, ggplot2::aes(colour=Model, alpha = .5)) + th
 We also explore simulations from these different models given parameter values. Using the means from the 1,000 fitted parameter values, we simulated 1,000 observations from each of our three models. We condition on the first friendship network observation, and the second and third observations are simulated from the SAOM models estimated previously. From these simulations, we first create a visualization that represents an ``average" network. To do this, we count occurences of each possible edge in the simulations, resulting in a summary network with weighted edges representing the number of times an edge appeared when simulating from the SAOM. 
 
 <<averagenet>>=
-library(RSiena)
-library(tidyverse)
 #friend.data.w1 <- as.matrix(read.table("s50_data/s50-network1.dat"))
 #friend.data.w2 <- as.matrix(read.table("s50_data/s50-network2.dat"))
 #friend.data.w3 <- as.matrix(read.table("s50_data/s50-network3.dat"))
@@ -511,7 +520,6 @@ mydata <- sienaDataCreate(friendship, alcohol)
 M1eff <- getEffects(mydata)
 M2eff <- includeEffects(M1eff, jumpXTransTrip, interaction1 = "alcohol")
 M3eff <- includeEffects(M1eff, nbrDist2twice)
-library(netvizinf)
 data(M1ests_bigfriends)
 M1parms <- (means %>% filter(Model == "M1"))$means
 M2parms <- (means %>% filter(Model == "M2"))$means
@@ -568,7 +576,6 @@ M3avg2 <- M3simsdf %>% filter(!is.na(to)) %>%
  summarise(count = n()) %>%
  mutate(weight = ifelse(from == to, 0, count))
 
-library(geomnet)
 M1avg$from <- paste0("V", M1avg$from)
 M1avg$to <- paste0("V", M1avg$to)
 M1avg2$from <- paste0("V", M1avg2$from)
@@ -602,7 +609,7 @@ M3avgcov <- merge(M3avg, wave2drink, by.x = "from", by.y = "id", all = T)
 M1avgW2cov <- merge(M1avgW2, wave3drink, by.x = "from", by.y = "id", all = T)
 M2avgW2cov <- merge(M2avgW2, wave3drink, by.x = "from", by.y = "id", all = T)
 M3avgW2cov <- merge(M3avgW2, wave3drink, by.x = "from", by.y = "id", all = T)
-library(tidyr)
+
 M1avg[,-3] %>% spread(to, weight) %>% data.frame-> distmatM1
 rownames(distmatM1) <- distmatM1$from
 distmatM1 <- distmatM1[,-1]
@@ -634,7 +641,7 @@ distmatM3W2 <- distmatM3W2[,-1]
 distmatM3W2 <- as.matrix(sqrt(1/distmatM3W2))
 distmatM3W2[is.na(distmatM3W2)] <- 0
 
-library(RColorBrewer)
+
 cols <- brewer.pal(n = 4, "YlOrRd")
 
 plotM1W2 <- ggplot(data = M1avgcov) + 
@@ -649,7 +656,8 @@ plotM1W2 <- ggplot(data = M1avgcov) +
   #labs(title = "Wave 2, M1") + 
   scale_size_continuous(name = "Weight") + 
   theme_net() + 
-  theme(plot.title = element_text(hjust = .5), legend.position = 'none',plot.margin=unit(c(0,0,0,0),"mm"))
+  theme(plot.title = element_text(hjust = .5), legend.position = 'none',plot.margin=unit(c(0,0,0,0),"mm")) + 
+  labs(title = "Model 1 Simulated Wave 2")
 plotM1W3 <- ggplot(data = M1avgW2cov) + 
   geom_net(aes(from_id = from, to_id = to, linewidth = weight/388.5, color = as.factor(drink)), 
            arrowgap = .03, size = 3,arrowsize = .5,
@@ -675,7 +683,8 @@ plotM2W2 <- ggplot(data = M2avgcov) +
   #labs(title = "Wave 2, M2") + 
   scale_size_continuous(name = "Weight") + 
   theme_net() + 
-  theme(plot.title = element_text(hjust = .5), legend.position = 'none',plot.margin=unit(c(0,0,0,0),"mm"))
+  theme(plot.title = element_text(hjust = .5), legend.position = 'none',plot.margin=unit(c(0,0,0,0),"mm")) + 
+  labs(title = "Model 2 Simulated Wave 2")
 plotM2W3 <- ggplot(data = M2avgW2cov) + 
   geom_net(aes(from_id = from, to_id = to, linewidth = weight/357, color = as.factor(drink)), 
            arrowgap = .03, size = 3,arrowsize = .5,
@@ -701,7 +710,8 @@ plotM3W2 <- ggplot(data = M3avgcov) +
   #labs(title = "Wave 2, M3") + 
   scale_size_continuous(name = "Weight") + 
   theme_net() + 
-  theme(plot.title = element_text(hjust = .5), legend.position = 'none',plot.margin=unit(c(0,0,0,0),"mm"))
+  theme(plot.title = element_text(hjust = .5), legend.position = 'none',plot.margin=unit(c(0,0,0,0),"mm")) + 
+  labs(title = "Model 3 Simulated Wave 2")
 plotM3W3 <- ggplot(data = M3avgW2cov) + 
   geom_net(aes(from_id = from, to_id = to, linewidth = weight/372.5, color = as.factor(drink)), 
            arrowgap = .03, size = 3,arrowsize = .5,
@@ -729,7 +739,8 @@ origW2 <- ggplot(data = alldat %>% filter(Wave==2),
            arrowgap = .03) +
   scale_color_brewer(palette = "YlOrRd", name = "Drinking\nBehavior") + 
   theme_net() +
-  theme(legend.position = 'none',plot.margin=unit(c(0,0,0,0),"mm"))
+  theme(legend.position = 'none',plot.margin=unit(c(0,0,0,0),"mm")) + 
+  labs(title = "Observed Wave 2")
 origW3 <- ggplot(data = alldat %>% filter(Wave==3), 
        aes(from_id = X1, to_id = X2, color = as.ordered(drink))) +
   geom_net(fiteach = FALSE, directed=TRUE, layout.alg = "kamadakawai", size = 3, arrowsize = .5, curvature = .2,
@@ -738,9 +749,6 @@ origW3 <- ggplot(data = alldat %>% filter(Wave==3),
   theme_net() +
   theme(legend.position = 'none',plot.margin=unit(c(0,0,0,0),"mm"))
 
-library(gridExtra)
-library(cowplot)
-plot_grid(plot.mpg, plot.diamonds, labels = c("A", "B"), nrow = 2, align = "v")
 grid.arrange(origW2, plotM1W2,
               plotM2W2,plotM3W2, 
               ncol=2, clip = T)
@@ -764,8 +772,8 @@ allavg <- rbind(as.data.frame(M1avg2),
 
 
 ggplot(data = allavg) + 
-  geom_histogram(aes(x = wt)) + 
-  facet_grid(wave~Model) + 
+  geom_histogram(aes(x = weight), binwidth = 25) + 
+  facet_grid(wave~Model, labeller = "label_both") + 
   labs(x = "Number of times an edge occurs in 1,000 simulations") +
   theme_bw()
 
