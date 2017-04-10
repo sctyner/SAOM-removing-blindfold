@@ -136,11 +136,11 @@ Network visualization, also called network mapping, is a prominent subfield of n
 
 There are two primary methods used to visualize networks. The first method, often referred to as node-link diagrams, represents nodes with points in 2D Euclidean space and then represents edges by connecting the points with lines when there is an edge between the two nodes. But, because there is no natural placement of the points, a random placement is used, then adjusted iteratively via a layout algorithm, of which there are many.
 
-Some layout algorithms were designed to mimic physical systems, drawing the graphs based on the "forces" connecting them. The network's edges act as springs pushing and pulling the nodes in 2D space. Others use properties of the network's adjaceny matrix in order to place the nodes. Some commonly used layout algorithms are  XX ADD MORE DETAIL LATER XX
+Some layout algorithms were designed to mimic physical systems, drawing the graphs based on the "forces" connecting them. The network's edges act as springs pushing and pulling the nodes in 2D space. Others use properties of the network's adjaceny matrix in order to place the nodes. Some commonly used layout algorithms are  
 \begin{itemize}
-\item Kamada-Kawai
-\item Fructerman-Reingold
-\item Multi-dimensional scaling
+\item Kamada-Kawai: The ``graph theoretic distance'' from one node to another is represented in the 2D node placement. This network drawing method results in several nice properties such as ``symmetric drawings [and] a relatively small number of edge crossings'' \citep[p. 15]{kamadakawai}.
+\item Fructerman-Reingold: This algorithm is a spring-embedder type where ``the vertices behave as [...] celestial bodies, exerting attractive and repulsive forces on one another,'' where the simple goal of drawing connected nodes near to each other \citep[p. 1131]{fruchterman-reingold}.
+\item Multi-dimensional scaling:
 \item Eigen
 \end{itemize}
 
@@ -388,6 +388,50 @@ p2 <- ggplot(data = pcaordersf, aes(x = from, y = to)) + geom_tile(color = 'blac
   coord_fixed()
 
 grid.arrange(p1,p2, nrow = 1)
+@
+
+<<histogramalters, fig.width = 8, fig.height=11, fig.cap="Probabilities of">>=
+ansnullchains %>% group_by(period, rep) %>% 
+  mutate(ms = row_number()) %>% 
+  filter(ms == 1, period == 1) %>% 
+  mutate(alterProb = exp(logAlterProb),
+         ego = as.numeric(as.character(ego)),
+         alter = as.numeric(as.character(alter))) %>% 
+  ungroup() %>% 
+  group_by(ego, alter) %>% 
+  summarize(count = n(), alterProb = unique(alterProb)) %>% ungroup() %>% 
+  group_by(ego) %>% 
+  mutate(csum = cumsum(alterProb)) %>% 
+  arrange(ego, csum) -> cumprobs 
+cumprobs$ego <- factor(paste0("V",cumprobs$ego+1), levels = paste0("V", 1:16))
+
+cumprobs %>% ggplot() + geom_histogram(aes(x = alter, weight = alterProb), color = 'black', fill = 'white', binwidth = 1) + scale_x_continuous(labels = paste0("V",1:16), breaks = 0:15) + coord_flip() + facet_wrap(~ego, labeller = "label_both") + theme_gray()
+
+# cprobslist <- split(cumprobs, cumprobs$ego)
+# plots <- list()
+# for(i in 1:length(cprobslist)){
+#   cprobslist[[i]] %>%
+#   ggplot() + 
+#   geom_histogram(aes(x = as.numeric(as.character(alter)),
+#                      y = alterProb), stat = 'identity', fill = 'white', color = 'black') + 
+#   geom_line(aes(x = as.numeric(as.character(alter)), 
+#                 y = csum)) + 
+#   geom_point(aes(x = as.numeric(as.character(alter)), 
+#                 y = csum)) +
+#   scale_x_continuous(limits = c(-.5, 15), breaks = 0:15, labels = 0:15) +   
+#   geom_hline(yintercept = 1, color = 'red', linetype = 'dashed') + 
+#   labs(x = "alter", y = expression(p[ij]), title = paste("Ego node:", names(cprobslist)[i])) + # ylab(expression(p[ij])) + 
+#   theme_gray() + 
+#     theme(plot.title = element_text(size = 10), 
+#           axis.title = element_text(size = 8), 
+#           plot.margin = unit(rep(0,4),"pt")) -> p
+#   plots[[i]] <- p
+# }
+# grid.arrange(plots[[1]], plots[[2]], plots[[3]], plots[[4]],
+#              plots[[5]], plots[[6]], plots[[7]], plots[[8]],
+#              #plots[[9]], plots[[10]], plots[[11]], plots[[12]],
+#              #plots[[13]], plots[[14]], plots[[15]], plots[[16]], 
+#              ncol = 2, padding = unit(0, 'line'))
 @
 
 \st{The algorithms here are many!
