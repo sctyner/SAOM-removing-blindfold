@@ -319,7 +319,7 @@ This simulation process follows the steps of the continuous-time Markov chain. F
 
 The first vizualization we present here is an animation of microsteps simulated to emulate the transition steps from wave 1 to wave 2 the subset of the friends data shown in Figure ~\ref{fig:alldataviz}. Movies similar to our animation were used to visualize the changes of dynamic networks in \citet{dynnetviz}. When each ego node is selected in a microstep, it is emphasized in the animation, then the associated edge either appears or disappears. If there are no changes at a particular microstep, no changes are seen. Some frames of the animations are shown in Figure~\ref{fig:makinggif}, and the full movie can be viewed at INSERT LINK TO GIF. 
 
-<<makinggif, fig.cap='A selection of images in the microstep animation. The selected edges and nodes are emphasized by changing the size and the color, then when edges are removed, they fade out, shrinking in size, while the nodes change color and shrink to blend in with the other nodes.', fig.width=8>>=
+<<makinggif, fig.cap='A selection of images in the microstep animation. The selected edges and nodes are emphasized by changing the size and the color, then when edges are removed, they fade out, shrinking in size, while the nodes change color and shrink to blend in with the other nodes.', fig.width=8, cache=TRUE>>=
 friend.data.w1 <- as.matrix(read.table("data/s50_data/s50-network1.dat"))
 friend.data.w2 <- as.matrix(read.table("data/s50_data/s50-network2.dat"))
 friend.data.w3 <- as.matrix(read.table("data/s50_data/s50-network3.dat"))
@@ -336,8 +336,8 @@ mydata <- sienaDataCreate(friendship, alcohol)
 myeffnull <- getEffects(mydata)
 myalgorithm <- sienaAlgorithmCreate(projname = 's16_3')
 set.seed(823746)
-load("data/ansnull.rda")
-ansnullchains <- get_chain_info(ansnullpaper)
+load("data/ansnullpaper.rda")
+ansnullchains <- get_chain_info(ansnull)
 ansnullchains %>%
   filter(period == 1) %>%  #only look at chains from wave 1 to wave 2
   group_by(rep) %>%
