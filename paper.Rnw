@@ -113,14 +113,14 @@ library(cowplot)
 @
 
 \section{Introduction} 
-\st{
-\begin{itemize}
-%\item What? - model visualization and SAOMs. briefly dsecribe what these things are
-%\item Why? - bring light to the RSiena blackbox. Need ways to visualize network models, collections of networks. 
-\item How?
-\end{itemize}
-%also talk about other dynamic network models briefly to put SAOMs in context.
-}
+% \st{
+% \begin{itemize}
+% %\item What? - model visualization and SAOMs. briefly dsecribe what these things are
+% %\item Why? - bring light to the RSiena blackbox. Need ways to visualize network models, collections of networks. 
+% \item How?
+% \end{itemize}
+% %also talk about other dynamic network models briefly to put SAOMs in context.
+% }
 
 Models for dynamic social networks are extremely important because of how realistic they are. Social networks do not form spontaneously; they evolve over time. Ties are added and removed, and new actors can join the network. Modeling the underlying mechanisms that create network changes over time is very complex but also has the potential to uncover hidden truths. 
 
@@ -128,9 +128,11 @@ Models for dynamic social networks are extremely important because of how realis
 
 \par The software SIENA, and its \texttt{R} implementation \texttt{RSiena}, was developed by \citet{RSiena} to estimate the parameters of the SAOMs, among other social network models. This software is a huge contribution to the field of social network analysis, and when we began working with it we were eager to understand how it works. To better understand the \texttt{RSiena} software and the SAOMs themselves, we combine the principals of network visualization with those of model visualization from \citet{modelvis}. With the work of \citet{modelvis} guiding us, we explore RSiena and SAOMs with innovative network visualizations, both static and dynamic. By bringing some light to the underlying methods and structures "behind the scenes" of SAOMs and RSiena, we will help other researchers working with the models better understand and better use these models.
 
-\par The guiding principles of model visualization from \citet{modelvis} are (1) display the model in the data space, (2) collections of models are more informative than singletons, and (3) explore how algorithms work, instead of just looking at the final result. Stochastic actor-oriented models are a prime example of a set of models that  benefit greatly from application of model visualization. First, the models themselves include a continuous-time Markov chain (CTMC) that is completely hidden in the model fitting process. Bringing the CTMC out from behind-the-scenes and into the light of visualization  provides researchers with insights into the underlying features of the model. Secondly, SAOMs allow for a great deal of parameters that can be added to the objective function, each of which are attached to a network statistic. These statistics are often somewhat, if not highly, correlated, and so are the associated parameters. By visualizing collections of SAOMs, we can gain a better understanding of these correlations and find ways to deal with them and rectify their effects. Finally, estimation of the parameters in a SAOM relies on a Robbins-Monro algorithm, and convergence checks rely on simulations from the fitted model. Again, in these steps are largely hidden from the researcher computing them with software. We hope that by bringing these background elements and others into the foreground with static and dynamic visualizations, stochastic actor-oriented models will be better understood and more accessible to social network analysts.
+\par The guiding principles of model visualization from \citet{modelvis} are (1) display the model in the data space, (2) collections of models are more informative than singletons, and (3) explore how algorithms work, instead of just looking at the final result. Stochastic actor-oriented models are a prime example of a set of models that  benefit greatly from application of model visualization. First, the models themselves include a continuous-time Markov chain (CTMC) that is completely hidden in the model fitting process. Bringing the CTMC out from behind-the-scenes and into the light of visualization  provides researchers with insights into the underlying features of the model. Secondly, SAOMs allow for a great deal of parameters that can be added to the objective function, each of which are attached to a network statistic. These statistics are often somewhat, if not highly, correlated, and so are the associated parameters. By visualizing collections of SAOMs, we can gain a better understanding of these correlations and find ways to deal with them and rectify their effects. Finally, estimation of the parameters in a SAOM relies on a Robbins-Monro algorithm, and convergence checks rely on simulations from the fitted model. Again, in these steps are largely hidden from the researcher computing them with software. We hope that by bringing these background elements and others into the foreground with static and dynamic visualizations, stochastic actor-oriented models will be better understood and more accessible to social network analysts. 
 
-\section{Networks and their Visualizations}
+In Section~\ref{sec:netintro}, we introduce the concepts of networks and network visualizations. In Section~\ref{sec:saoms}, we present the SAOM for social network analysis. Then, in Section~\ref{sec:ModelVis}, we combine concepts from Sections~\ref{sec:netintro} and \ref{sec:saoms} in an application of the model-vis paradigm, and conclude with a discussion in Section~\ref{sec:discussion}.
+
+\section{Networks and their Visualizations} \label{sec:netintro}
 
 \subsection{Introduction to Network Structures}
 
@@ -142,21 +144,50 @@ The multiple layers, so to speak, of network data structures create unique strug
 
 Network visualization, also called network mapping, is a prominent subfield of network analysis. Visualizing network data is uniquely difficult because of the structure of the data itself.  Most, if not all, data visualizations rely on a well-defined axis inherited from the data. If data are numerical, histograms, scatterplots, or time series plots are straightforward to construct. If the data are categorical, bar charts and mosaic plots are available to to the researcher. If the data are spatial, there is a well-defined region in which to view information. Network data, however, are much less cut-and-dried.
 
-There are two primary methods used to visualize networks. The first method, often referred to as node-link diagrams, represents nodes with points in 2D Euclidean space and then represents edges by connecting the points with lines when there is an edge between the two nodes. But, because there is no natural placement of the points, a random placement is used, then adjusted iteratively via a layout algorithm, of which there are many.
+There are two primary methods used to visualize networks: node-link diagrams and matrix visualization. We will use the toy data set show below to demonstrate these two methods.
+
+<<toyex>>=
+set.seed(81393)
+nodes <- data.frame(id = 1:5, group = sample(LETTERS[1:2], size = 5, replace = T), stringsAsFactors = F)
+g <- igraph::as_data_frame(igraph::random.graph.game(n = 5, p = .4))
+toynet <- list(nodes = nodes, edges = rbind(g, c(5,4)))
+toynet
+@
+
+The first method, the node-link diagram, represents nodes with points in 2D Euclidean space and then represents edges by connecting the points with lines when there is an edge between the two nodes. But, because there is no natural placement of the points, a random placement is used, then adjusted iteratively via a layout algorithm, of which there are many. The node-link diagram for our toy network is shown in Figure~\ref{fig:toyplots}.
 
 Some layout algorithms were designed to mimic physical systems, drawing the graphs based on the "forces" connecting them. The network's edges act as springs pushing and pulling the nodes in 2D space. Others use properties of the network's adjaceny matrix in order to place the nodes. Some commonly used layout algorithms that treat networks like physical systems are Kamada-Kawai \citep{kamadakawai}, Fructerman-Reingold  \citep{fruchterman-reingold}. Other algorithms inclue multi-dimensional scaling, which relies on a defined distance matrix, or an eigen value, which depends on the eigenvalues of the network's adjacency matrix. 
 
-The second primary method for network visualization uses the adjacency matrix of the network. This method is particularly useful when the network is very complex, dense, or large. Experimental studies have shown this to be true. For example, with seven basic perceptual tasks on networks, including things like node and edge count, adjacency matrix visualizations outperform node-link diagrams as the size and density of the network increases \citep{adjmatviz}. One drawback of the adjacency matrix visualization that \citeauthor{adjmatviz} found was that edges are overrepresented for undirected graphs. This, however, may actually be an advantage for \emph{directed} graphs, where exactly the correct number of edges is represented in a matrix visualization, but a node-link diagram may underrepresent the edge count.  
+The second primary method for network visualization uses the adjacency matrix of the network. An example of this type of visualization is also shown in Figure~\ref{fig:toyplots} for our toy example. This method is particularly useful when the network is very complex, dense, or large. Experimental studies have shown this to be true. For example, with seven basic perceptual tasks on networks, including things like node and edge count, adjacency matrix visualizations outperform node-link diagrams as the size and density of the network increases \citep{adjmatviz}. One drawback of the adjacency matrix visualization that \citeauthor{adjmatviz} found was that edges are overrepresented for undirected graphs. This, however, may actually be an advantage for \emph{directed} graphs, where exactly the correct number of edges is represented in a matrix visualization, but a node-link diagram may underrepresent the edge count with overlapping edges.  
 
+<<toyplots, fig.show='hold', fig.cap="On the left, a node-link diagram of our undirected toy network, with nodes placed using the Kamada-Kawai algorithm. On the right, the adjacency matrix visualization for that same network.", out.width='.49\\linewidth'>>=
+toynetdat <- fortify(as.edgedf(toynet$edges), toynet$nodes)
+ggplot(data = toynetdat) + 
+  geom_net(aes(from_id=from_id, to_id=to_id, shape =group, color = group), labelon = T, size = 7, labelcolour = 'white', ecolour = 'black', vjust = .5, hjust = .5, arrowgap = .02) +
+  scale_color_manual(values = c("red", "blue")) + 
+  theme_net() + 
+  labs(title = "Node-Link Diagram")
 
-\section{Stochastic Actor-Oriented Models for Longitudinal Social Networks}
+ggplot(data = toynet$edges) +
+  geom_tile(aes(x = from, y = to), color = 'black', fill = 'black') +
+  geom_tile(aes(x = to, y = from), color = 'black', fill = 'black') +
+  geom_vline(xintercept = 0:5+.5) + 
+  geom_hline(yintercept = 0:5+.5) + 
+  scale_x_continuous(breaks = 1:5, labels = 1:5, limits = c(0.5,5.5)) +
+  scale_y_continuous(breaks = 1:5, labels = 1:5, limits = c(0.5,5.5)) +
+  theme_bw() + 
+  labs(title = "Adjacency Matrix Visualization") + 
+  theme(aspect.ratio = 1)
+@
 
-\st{What do I need to communicate in this section? 
-\begin{itemize}
-\item What the models are for: dynamic social networks with actor-level covariates
-\item What are the model components? rate function, objective function (network statistics, actor covariates, interactions between covariates and network statistics), time points ($t_m = 1, \dots, M$)
-\item What is RSiena? What methods of estimation, convergence checks does it use? What are the algorithms? What kinds of models can it fit? 
-\end{itemize}}
+\section{Stochastic Actor-Oriented Models for Longitudinal Social Networks} \label{sec:saoms}
+
+% \st{What do I need to communicate in this section? 
+% \begin{itemize}
+% \item What the models are for: dynamic social networks with actor-level covariates
+% \item What are the model components? rate function, objective function (network statistics, actor covariates, interactions between covariates and network statistics), time points ($t_m = 1, \dots, M$)
+% \item What is RSiena? What methods of estimation, convergence checks does it use? What are the algorithms? What kinds of models can it fit? 
+% \end{itemize}}
 
 
 %The stochastic actor-oriented models are very aptly named: they model dynamic networks that can account for the individual node characteristics when making the edge changes. The object of analysis is a social network that has been observed at several discrete time points. The nodes in the network can have associated covariate variables that may be incorporated into modeling the tie changes in the network. The model itself has two primary pieces: the rate of change of ties, and the objective function of the nodes, which determines the exact change that gets made. 
@@ -871,7 +902,7 @@ ggplot(data = allavg) +
 
 
 
-\section{Discussion}
+\section{Discussion} \label{sec:discussion}
 
 \bibliographystyle{asa}
 \bibliography{references}
