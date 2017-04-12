@@ -142,15 +142,10 @@ Network visualization, also called network mapping, is a prominent subfield of n
 
 There are two primary methods used to visualize networks. The first method, often referred to as node-link diagrams, represents nodes with points in 2D Euclidean space and then represents edges by connecting the points with lines when there is an edge between the two nodes. But, because there is no natural placement of the points, a random placement is used, then adjusted iteratively via a layout algorithm, of which there are many.
 
-Some layout algorithms were designed to mimic physical systems, drawing the graphs based on the "forces" connecting them. The network's edges act as springs pushing and pulling the nodes in 2D space. Others use properties of the network's adjaceny matrix in order to place the nodes. Some commonly used layout algorithms are  
-\begin{itemize}
-\item Kamada-Kawai: The ``graph theoretic distance'' from one node to another is represented in the 2D node placement. This network drawing method results in several nice properties such as ``symmetric drawings [and] a relatively small number of edge crossings'' \citep[p. 15]{kamadakawai}.
-\item Fructerman-Reingold: This algorithm is a spring-embedder type where ``the vertices behave as [...] celestial bodies, exerting attractive and repulsive forces on one another,'' where the simple goal of drawing connected nodes near to each other \citep[p. 1131]{fruchterman-reingold}.
-\item Multi-dimensional scaling: 
-\item Eigen:
-\end{itemize}
+Some layout algorithms were designed to mimic physical systems, drawing the graphs based on the "forces" connecting them. The network's edges act as springs pushing and pulling the nodes in 2D space. Others use properties of the network's adjaceny matrix in order to place the nodes. Some commonly used layout algorithms that treat networks like physical systems are Kamada-Kawai \citep{kamadakawai}, Fructerman-Reingold  \citep{fruchterman-reingold}. Other algorithms inclue multi-dimensional scaling, which relies on a defined distance matrix, or an eigen value, which depends on the eigenvalues of the network's adjacency matrix. 
 
-The second primary method for network visualization uses the adjacency matrix of the network. This method is particularly useful when the network is very complex, dense, or large. XX MORE STUFF ABOUT ADJ MAT VIZ XX 
+The second primary method for network visualization uses the adjacency matrix of the network. This method is particularly useful when the network is very complex, dense, or large. Experimental studies have shown this to be true. For example, with seven basic perceptual tasks on networks, including things like node and edge count, adjacency matrix visualizations outperform node-link diagrams as the size and density of the network increases \citep{adjmatviz}. One drawback of the adjacency matrix visualization that \citeauthor{adjmatviz} found was that edges are overrepresented for undirected graphs. This, however, may actually be an advantage for \emph{directed} graphs, where exactly the correct number of edges is represented in a matrix visualization, but a node-link diagram may underrepresent the edge count.  
+
 
 \section{Stochastic Actor-Oriented Models for Longitudinal Social Networks}
 
