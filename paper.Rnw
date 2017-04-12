@@ -491,16 +491,19 @@ One tool that can bring these three data spaces together in this way is the \tex
 
 XXX INSERT AN EXAMPLE OF DATA WITH LOTS OF EDGE, NODE VARS OF INTEREST XXX 
 
-
 These visual connections between the node, edge, and time data spaces are themselves part of the data space, because they can be viewed in different ways. Another way to connect the node and the edge data, as discussed in Section~\ref{sec:netvizintro}, is through the network's adjaceny matrix. The time dimension can also be incorporated with side-by-side adjacency matrix visualizations. 
-\st{
-\begin{itemize}
-\item WHat is the model? the network model (SAOM model is just one of many)
-\item What is the data? Edge data, node data, observed time points, unobserved timepoints (CTMC)
-\item Note: specifically dealing with dynamic networks observed at discrete time points. 
-\end{itemize}
-What are some things that could go in here? need more data examples; not just the friends data.
-Harry Potter data??? I want to find my own data, too.}
+
+\st{Because of the multi-level data structure of a network, viewing the model in the data space can depend on which aspect of the model you are interested in viewing. XXX Ideas: summary statistic dist. on nets simulated from model and show statistic from data; interactive plots showing objective function values on nodes; select node, select other node, show how the function values change interactively (future); XXX} 
+
+
+% \st{
+% \begin{itemize}
+% \item WHat is the model? the network model (SAOM model is just one of many)
+% \item What is the data? Edge data, node data, observed time points, unobserved timepoints (CTMC)
+% \item Note: specifically dealing with dynamic networks observed at discrete time points. 
+% \end{itemize}
+% What are some things that could go in here? need more data examples; not just the friends data.
+% Harry Potter data??? I want to find my own data, too.}
 
 \subsection{Collections are more informative than singletons}
 
