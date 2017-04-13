@@ -374,7 +374,7 @@ create_net_animate(static_pall) +
 @
 
 
-The top row of Figure~\ref{makinggif} shows an edge being removed, and the bottom row shows one being added. In both cases 
+The top row of Figure~\ref{makinggif} shows an edge being removed, and the bottom row shows one being added. In both cases, the nodes... 
 
 We also use animation to view the changing structure of the adjacency matrix the microsteps. The adjacency matrices for the three waves of friendship data as shown in Figure~\ref{fig:alldataviz} are ordered by node id. There are 16 nodes in the data, numbered 1-16, and that order is used on the $x$ and $y$ axes for the matrix visualization. Viewing the adjacency matrices with this arbitrary ordering does not provide much information to the viewer about the underlying structure of the network. This lack of perceived structure would be exacerbated in an animation. So, we adjust the ordering so that the viewer can perceive more of the structure of the graph. This process is known as matrix seriation \citep{seriation}. 
 
@@ -440,10 +440,19 @@ ansnullchains %>% group_by(period, rep) %>%
   summarize(count = n(), alterProb = unique(alterProb)) %>% ungroup() %>% 
   group_by(ego) %>% 
   mutate(csum = cumsum(alterProb)) %>% 
-  arrange(ego, csum) -> cumprobs 
+  arrange(ego, csum) %>% 
+  mutate(totego = sum(count), 
+         empprob = count / totego) -> cumprobs 
 cumprobs$ego <- factor(paste0("V",cumprobs$ego+1), levels = paste0("V", 1:16))
 
-cumprobs %>% ggplot() + geom_histogram(aes(x = alter, weight = alterProb), color = 'black', fill = 'white', binwidth = 1) + scale_x_continuous(labels = paste0("V",1:16), breaks = 0:15) + coord_flip() + facet_wrap(~ego, labeller = "label_both") + theme_gray()
+cumprobs %>% ggplot() + 
+  geom_histogram(
+    aes(x = alter, weight = alterProb), 
+    color = 'black', fill = 'white', binwidth = 1) + 
+  geom_point(aes(x = alter, y = empprob), color = 'red') + 
+  scale_x_continuous(labels = paste0("V",1:16), breaks = 0:15) + coord_flip() + facet_wrap(~ego, labeller = "label_both") + theme_gray()
+# 
+# cumprobs %>% ggplot() + geom_histogram(aes(x = alter, weight = count), color = 'black', fill = 'white', binwidth = 1) + scale_x_continuous(labels = paste0("V",1:16), breaks = 0:15) + coord_flip() + facet_wrap(~ego, labeller = "label_both") + theme_gray()
 
 # cprobslist <- split(cumprobs, cumprobs$ego)
 # plots <- list()
