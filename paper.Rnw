@@ -291,11 +291,13 @@ actual3 <- merge(data.frame(as.edgelist(as.network(fd2.w3))),
                  by.x = "X1", by.y = "id", all = T)
 actual3$Wave <- 3
 alldat <- rbind(actual1, actual2, actual3)
-alldat$X1 <- paste0("V", alldat$X1)
-alldat$X2 <- ifelse(!is.na(alldat$X2), paste0("V", alldat$X2), NA)
+#alldat$X1 <- paste0("V", alldat$X1)
+alldat$X1 <- as.factor(alldat$X1)
+#alldat$X2 <- ifelse(!is.na(alldat$X2), paste0("V", alldat$X2), NA)
+alldat$X2 <- as.factor(alldat$X2)
 alldataviz <- ggplot(data = alldat, 
        aes(from_id = X1, to_id = X2, color = as.ordered(drink), group = as.ordered(drink))) +
-  geom_net(fiteach = FALSE, directed=TRUE, layout.alg = 'fruchtermanreingold', size = 3, arrowsize = .5, arrowgap = .03, ecolor = 'grey40') +
+  geom_net(fiteach = FALSE, directed=TRUE, layout.alg = 'fruchtermanreingold', size = 4, arrowsize = .25, arrowgap = .03, ecolour = 'grey40', labelon=T, labelcolour = 'black', fontsize = 3, vjust = .5) +
   scale_color_brewer(palette = "YlOrRd", name = "Drinking\nBehavior") + 
   theme_net() +
   facet_wrap(~Wave, labeller = "label_both") + 
