@@ -350,24 +350,29 @@ rownames(fd2.w1) <- paste0("V", 1:16)
 wave1friends <- fortify(as.adjmat(fd2.w1))
 ms1 <- listMicrosteps(dat = wave1friends,
                       microsteps = filter(ansnullchainsw1w2, rep == 1))
-microsteps <- ms1[1:9]
+microsteps <- ms1[1:20]
 
 microsteps_df <- getMicrostepsDF(microsteps)
 pte <- pretween_edges(microsteps = microsteps)
 ptv <- pretween_vertices(pte = pte, layoutparams = list(n = 16))
-
+# step 1 is remove, step 9 is add. 
 # get tweened data for all microsteps
 pall <- tween_microsteps(ptv, pte, microsteps_df)
 
-static_pall <- filter(pall, .frame %in% (1:12 * 3-2))
+static_pall <- filter(pall, .frame %in% c(15,20,22,24,26:28, 71:73, 75, 79, 81, 84))
 
+static_pall$type <- NA
+static_pall$type[which(static_pall$.frame %in% c(15,20,22,24,26:28))] <- "Remove Edge"
+static_pall$type[which(static_pall$.frame %in% c(71:73, 75, 79, 81, 84))] <- "Add Edge"
+
+set.seed(34569234)
 create_net_animate(static_pall) + 
-  facet_wrap(~.frame, nrow=3, labeller = 'label_both') + 
+  facet_wrap(~.frame, nrow=2, labeller = 'label_both') + 
   theme(panel.background = element_rect(color = 'black'))
 @
 
 
-XX INSERT DESCRIPTION OF THE MOVIE - WHAT IT ALLOWS US TO SEE, ETC. XX
+The top row of Figure~\ref{makinggif} shows an edge being removed, and the bottom row shows one being added. In both cases 
 
 We also use animation to view the changing structure of the adjacency matrix the microsteps. The adjacency matrices for the three waves of friendship data as shown in Figure~\ref{fig:alldataviz} are ordered by node id. There are 16 nodes in the data, numbered 1-16, and that order is used on the $x$ and $y$ axes for the matrix visualization. Viewing the adjacency matrices with this arbitrary ordering does not provide much information to the viewer about the underlying structure of the network. This lack of perceived structure would be exacerbated in an animation. So, we adjust the ordering so that the viewer can perceive more of the structure of the graph. This process is known as matrix seriation \citep{seriation}. 
 
