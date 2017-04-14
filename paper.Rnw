@@ -380,7 +380,7 @@ We also use animation to view the changing structure of the adjacency matrix the
 
 To reorder the vertices for the matrix visualization, we first constructed a cumulative adjaceny matrix, $\mathbf{A}^{cum}$, for the series of microsteps simulating the network from $x(t_m)$ to $x(t_{m+1})$. A single entry in the cumulative adjacency matrix, $\mathbf{A}^{cum}_{ij}$, is the total number of times the edge from node $i$ to node $j$ appears in the network from the initial observation, $x(t_m) \equiv X(0)$ to the final reult of the last microstep, $X(C)$: 
 $$ \mathbf{A}^{cum}_{ij} = \sum_{c = 0}^C X_{ij}(c). $$
-We then performed a principal component analysis on $\mathbf{A}^{cum}$, and used the values of the first principal component to order the vertices on the $x$ and $y$ axes for the adjacency matrix animation. For one such series of microsteps simulated by \texttt{RSiena}, we present the adjacency matrix ordered by the (arbitrary) vertex id alongside the seriated adjacency microsteps using the first principal component loading on the cumulative adjacency matrix, $A^{cum}$
+We then performed a principal component analysis on $\mathbf{A}^{cum}$, and used the values of the first principal component to order the vertices on the $x$ and $y$ axes for the adjacency matrix animation. For one such series of microsteps simulated by \texttt{RSiena}, we present the adjacency matrix ordered by the (arbitrary) vertex id alongside the seriated adjacency microsteps using the first principal component loading on the cumulative adjacency matrix, $\mathbf{A}^{cum}$, in Figure~\ref{adjmatorder}. 
 
 <<adjmatorder, fig.cap="On the left, the starting friendship network represented in adjacency matrix form, ordered by vertex id. On the right, the same adjacency matrix is presented after ordering the vertices by one repitition of the microstep simulation process from wave one to wave two.", fig.width=8>>=
 # first present the original wave 1 adj mat, then present the adj mat after being ordered by the 1st pc of the big adjmat A. 
@@ -428,7 +428,9 @@ p2 <- ggplot(data = pcaordersf, aes(x = from, y = to)) + geom_tile(color = 'blac
 grid.arrange(p1,p2, nrow = 1)
 @
 
-<<histogramalters, fig.width = 8, fig.height=11, fig.cap="Probabilities of">>=
+Using the principal component analysis on $\mathbf{A}^{cum}$ to order the rows and columns of the adjacency matrix visualization significantly improves the ability of the viewer to detect the two connected components in the first wave of the network. 
+
+<<histogramalters, fig.width = 8, fig.height=11, fig.cap="Each panel shows the theoretical (as bars) and empirical (as points) probabilities of the chosen ego node changing its tie to each of the other nodes.">>=
 ansnullchains %>% group_by(period, rep) %>% 
   mutate(ms = row_number()) %>% 
   filter(ms == 1, period == 1) %>% 
