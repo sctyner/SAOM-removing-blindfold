@@ -428,7 +428,9 @@ p2 <- ggplot(data = pcaordersf, aes(x = from, y = to)) + geom_tile(color = 'blac
 grid.arrange(p1,p2, nrow = 1)
 @
 
-Using the principal component analysis on $\mathbf{A}^{cum}$ to order the rows and columns of the adjacency matrix visualization significantly improves the ability of the viewer to detect the two connected components in the first wave of the network. 
+Using the principal component analysis on $\mathbf{A}^{cum}$ to order the rows and columns of the adjacency matrix visualization clearly shows the two distinct connected components in the first wave of the network, which are difficult to find in the arbitrarily ordered visualization. 
+
+We also attempt to better understand the microstep process by visualizing all transition probabilites for the first microstep in the process. We only do the first step of many for now because the \texttt{RSiena} transition probabilities after the first step are only comparable for identical steps due to the conditioning on the current network state in the model. Thus we have one step for each of the 1,000 repititions to visualize. In Figure ~\ref{histogramalters}, we present each acting node, (ego node) and the resulting probabilities of change. The probability shown by the bars is the theoretical probability according to the objective function of the ego node changing the tie to the alter node. The probability shown by the points is the empirical probability of that change being made, calculated by counting all instances of the ego node first, then computing the proprotion of each change. In most cases, they are almost identical, showing that the algorithm is performing as expected. 
 
 <<histogramalters, fig.width = 8, fig.height=11, fig.cap="Each panel shows the theoretical (as bars) and empirical (as points) probabilities of the chosen ego node changing its tie to each of the other nodes.">>=
 ansnullchains %>% group_by(period, rep) %>% 
@@ -446,10 +448,21 @@ ansnullchains %>% group_by(period, rep) %>%
   mutate(totego = sum(count), 
          empprob = count / totego) -> cumprobs 
 cumprobs$ego <- factor(paste0("V",cumprobs$ego+1), levels = paste0("V", 1:16))
+cumprobs$alter <- factor(paste0("V",cumprobs$alter+1), levels = paste0("V", 1:16))
 
-cumprobs %>% ggplot() + 
+# is the tie that's added new, removed, or does the network stay the same 
+
+changes <- cumprobs %>% select(ego, alter) %>% unique 
+
+wave1friends2 <- wave1friends[,-3]
+wave1friends2$type <- "remove"
+changes2 <- left_join(changes, wave1friends2, c("ego" = "from", "alter" = "to"))
+
+changes2$type[is.na(changes2$type)] <- ifelse(changes2$ego[is.na(changes2$type)] == changes2$alter[is.na(changes2$type)], "noChange", "add")
+
+cumprobs %>% left_join(changes2) %>% ggplot() + 
   geom_histogram(
-    aes(x = alter, weight = alterProb), 
+    aes(x = alter, weight = alterProb, fill = type), 
     color = 'black', fill = 'white', binwidth = 1) + 
   geom_point(aes(x = alter, y = empprob), color = 'red') + 
   scale_x_continuous(labels = paste0("V",1:16), breaks = 0:15) + coord_flip() + facet_wrap(~ego, labeller = "label_both") + theme_gray()
