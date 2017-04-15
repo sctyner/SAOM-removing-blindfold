@@ -295,6 +295,7 @@ alldat <- rbind(actual1, actual2, actual3)
 alldat$X1 <- as.factor(alldat$X1)
 #alldat$X2 <- ifelse(!is.na(alldat$X2), paste0("V", alldat$X2), NA)
 alldat$X2 <- as.factor(alldat$X2)
+write_csv(alldat, "smallfriends4Geomnet.csv")
 alldataviz <- ggplot(data = alldat, 
        aes(from_id = X1, to_id = X2, color = as.ordered(drink), group = as.ordered(drink))) +
   geom_net(fiteach = FALSE, directed=TRUE, layout.alg = 'fruchtermanreingold', size = 4, arrowsize = .25, arrowgap = .03, ecolour = 'grey40', labelon=T, labelcolour = 'black', fontsize = 3, vjust = .5) +
@@ -306,8 +307,6 @@ alldataviz
 @
 
 \section{Model Visualizations} \label{sec:ModelVis}
-
-\st{Introduce the concepts from Wickham et al. }
 
 The concept of model visualization was developed to complement traditional model diagnostic tools. Typically, numerical summaries such as $R^2$ are used to assess model fit, and visualizations, like residual plots, are restricted to the data. Every good data analysis includes both numerical and visual summaries of the data, so why should model description be restricted to numerical summaries? \citeauthor{modelvis} outline the three different parts of a model: the model family, the model form, and the fitted model. The latter is primarily what one thinks of first when considering a model in a data analysis, where a model is fit to data, and parameter estimates are reported. In the context of SAOMs, the fitted model contains the estimated rate parameters and the estimated objective function parameters. The model form describes the the model before the fitting process and how variables describe the data in the model. In SAOMs, the model form includes description of the rate and objective functions and the variables therein that describe how the network evolves over time. Finally, the model family is the most broad description of the model. This is the type of model that you wish to fit to the data, and is chosen based on the problem and knowledge at had. For example, we chose to use a SAOM to model network data over an exponential random graph model (ERGM) because we believe that actor-level variables effect network dynamics. These three parts of a "model" are should be visualized according to the three principals of model visualization: display the model in the data space, look at a collection of models, and explore the process of fitting the model, not just the end result. 
 
@@ -373,8 +372,7 @@ create_net_animate(static_pall) +
   theme(panel.background = element_rect(color = 'black'))
 @
 
-
-The top row of Figure~\ref{makinggif} shows an edge being removed, and the bottom row shows one being added. In both cases, the nodes... 
+The top row of Figure~\ref{makinggif} shows an edge being removed, and the bottom row shows one being added. In both cases, the ego nodes chosen to act change color from black to red, and they also increase greatly in size. In the case of an edge being removed, the edge that currently exists is emphasized with the color and size change that the node also gets, and as the animation proceeds the edge shrinks to disappearing, while the node shrinks and changes color back to the original black. If the edge is being added, it appears colored red from nothing and grows to a large size, then changes color to match the rest of the edges, while the node shrinks and changes color to match the other nodes.  
 
 We also use animation to view the changing structure of the adjacency matrix the microsteps. The adjacency matrices for the three waves of friendship data as shown in Figure~\ref{fig:alldataviz} are ordered by node id. There are 16 nodes in the data, numbered 1-16, and that order is used on the $x$ and $y$ axes for the matrix visualization. Viewing the adjacency matrices with this arbitrary ordering does not provide much information to the viewer about the underlying structure of the network. This lack of perceived structure would be exacerbated in an animation. So, we adjust the ordering so that the viewer can perceive more of the structure of the graph. This process is known as matrix seriation \citep{seriation}. 
 
