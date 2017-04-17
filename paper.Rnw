@@ -186,6 +186,7 @@ ggplot(data = toynet$edges) +
   labs(title = "Adjacency Matrix Visualization") + 
   theme(aspect.ratio = 1)
 @
+ \hh{XXX Explain each of these visualizations and either comment on the differences in the visualizations (colors) or don't show them. }
 
 \section{Stochastic Actor-Oriented Models for Longitudinal Social Networks} \label{sec:saoms}
 
