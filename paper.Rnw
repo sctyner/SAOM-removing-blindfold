@@ -502,6 +502,23 @@ cumprobs %>% left_join(changes2) %>% ggplot() +
 #              ncol = 2, padding = unit(0, 'line'))
 @
 
+Another way to view the transition probabilities is through the adjacency matrix visualization. In Figure~\ref{fig:heatmap}, we build on the concept of the ordered adjacency matrix of Figure~\ref{fig:adjmatorder}. This heatmap shows the transition probabilities of all ties that are changed in the first microstep of the 1,000 simulations. The heatmap is noticeably sparse, showing the lack of coverage in the model.  Of the 256 possible steps, only 81, or about 32\%, are taken in the 1,000 simulated chains. XXX Check this again.... XXX
+<<heatmap>>=
+ansnullchains %>% 
+  filter(rep == 1, period == 1) %>% 
+  mutate(ego = paste0("V",as.numeric(as.character(ego))+1),
+         alter = paste0("V",as.numeric(as.character(alter))+1), 
+         prob = exp(logAlterProb)) %>% 
+  ggplot(aes(x = factor(ego, levels = order1), 
+             y = factor(alter, levels = rev(order1)), 
+             fill = prob)) + 
+  geom_tile(color = 'black') + 
+  scale_fill_gradient(low = 'white', high = 'blue', limits = c(0,1)) +
+  theme(panel.background = element_rect(fill = 'white')) + 
+  labs(x = "ego", y = "alter")+
+  coord_fixed()
+@
+
 \st{The algorithms here are many!
 \begin{enumerate}
 %\item First, the microsteps / CTMC between each time point (gifs, other animations)
