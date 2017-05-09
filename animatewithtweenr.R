@@ -91,11 +91,17 @@ listMicrosteps <- function(dat, microsteps){
   return(iters)
 }
 
+
 # test it on one of the reps from the null model
 
 ms1 <- listMicrosteps(dat = w1, 
                       microsteps = filter(ansnullchainsw1w2, rep == 1))
-
+lapply(seq_along(mylist), 
+                  +                   function(i, x){
+                    +                       x[[i]]$id <- i
+                    +                       return (x[[i]])
+                    +                   }, mylist
+                  + )
 # Step 1: Layout the initial data
 library(sna)
 w1.net <- as.network(friend.data.w1)
@@ -134,7 +140,12 @@ netwave1ms1 <- merge(merge(wave1friendsms1, data2, by.x = 'from', by.y = 'id'), 
 
 library(tweenr)
 # TWEEN EM
-# data <- tween_states(data = list(data1, data2), tweenlength = 3, 1, "linear", 100)
+data <- tween_states(data = list(data1, data2), tweenlength = 3, 1, "linear", 100)
+
+step1 <- merge(ms1[[2]], data, by.x = "from", by.y = "id", all = TRUE)
+names(step1)[6:7] <- c("x.from", "y.from")
+step2 <- merge(step1, data, by.x = c("to", ".frame"), by.y = c("id", ".frame"), all.x = TRUE)
+names(step2)[9:10]  <- c("x.to", "y.to")
 # fulldata <- tween_states(data = list(netwave1, netwave1ms1), 3, 1, 'linear', 50)
 # # doesn't work, need same # of rows. Need to deal with to NAs somehow. 
 # netwave1 <- arrange(netwave1, to,from)
@@ -146,13 +157,14 @@ library(ggplot2)
 library(gganimate)
 
 #animate em
-# p <- ggplot(data=data, aes(x=x, y=y)) + 
-#   geom_point(aes(frame = .frame, colour = colour), size=5) + 
+ p <- ggplot(data=step2) + 
+   geom_point(aes(x = x.from, y = y.from, frame = .frame), size=5, color = 'grey40') + 
+    geom_segment(aes(x = x.from, y = y.from, frame = .frame, xend = x.to, yend = y.to))
 #   geom_text(aes(frame = .frame, label=id), alpha = .6) + 
 #   scale_colour_identity() + 
 #   theme_bw()
-# animation::ani.options(interval = 1/15)
-# gganimate(p, "dancing ball.gif", title_frame = F)
+ animation::ani.options(interval = 1/15)
+ gganimate(p, "dancing ball.gif", title_frame = F)
 
 # okay - here's what we need:
   # a data frame of every possible edge
@@ -246,3 +258,4 @@ ggplot(data = weirdness, aes(color = color)) +
   scale_alpha_identity() +
   theme_bw()
 
+# 

@@ -1,5 +1,6 @@
 # for carson
 library(tidyverse)
+library(netvizinf)
 library(RSiena)
 sfmsall <- read_csv("data/smallfriendsmicrosteps.csv")
 

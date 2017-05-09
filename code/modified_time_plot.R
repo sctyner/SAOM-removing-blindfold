@@ -82,6 +82,19 @@ ggplot(data = summary_allreps4 %>% filter(eid %in% 1:20)) +
 # try again
 ggplot(data = summary_allreps5) + 
   geom_segment(aes(x = scaled_time, xend = scaled_time, y = y, yend = yend))
+# another way 
+ggplot(data = summary_allreps5) +
+  geom_point(aes(x = scaled_time, y = appears_time))
+# density
+ggplot(data = summary_allreps5) +
+  geom_density(aes(x = appears_time))
+ggplot(data = summary_allreps5) +
+  geom_density(aes(x = scaled_time))
+ggplot(data = summary_allreps5) +
+  geom_density2d(aes(x = scaled_time, y = appears_time))
+
+
+
 
 max(summary_allreps$ms)
 

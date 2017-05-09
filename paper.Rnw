@@ -267,6 +267,10 @@ To fit a SAOM to longitudinal network data, we use the package \texttt{RSiena} \
 $$ E_{\theta}S = s_{obs}$$
 where $\theta$ is the vector of rate and objective function parameters, and $s_{obs}$ is the observed vector of model statistics, $S$. The entire algorithm is provided in \citet{SienaAlgs}. \par There are three phases in the the SIENA algorithm, as described in \citet{RSienamanual, SienaAlgs}. The first phase performs initial estimation of the score functions used in the Robbins-Monro procedure. The second phase carries out the Robbins-Monro algorithm and obtains iterative estimates of the parameter values. The third phase uses the parameter vector estimated in phase two to estimate the score functions and the covariance matrix of the parameters, as well as performs convergence checks. In each of the the first two phases, the estimation procedure also relies on ``microsteps" that simulate from the model as it exists in its current state in order to update either the score functions or the parameter estimates. These microsteps become observed instances of the continuous-time Markov chain that is the backbone of the stochastic actor-oriented model. In Section~\ref{sec:ModelVis}, we visualize the parts of the SIENA method-of-moments algorithm, bringing them out of the ``black-box" and into the light. 
 
+\subsection{Model Goodness-of-Fit}
+
+The \texttt{RSiena} software that fits the models to data also comes equipped with the \verbatim{sienaGOF()} function for examining model fit. This function ``assess[es] the fit of the model with respect to auxiliary statistics of networks" \citep[p.~53]{RSienamanual}. Examples of the auxiliary statistics are the out- or indegree distribution on the nodes, with the option for users to create their own. 
+
 \subsection{Example Data}
 
 To guide our visual exploration of stochastic actor-oriented models, we used a subset of the 50 actor dataset from the ``Teenage Friends and Lifestyle Study" that is provided on the \texttt{RSiena} webpage. These data come from \citet{friendsdata}, and we chose to only work with a subset of the data to make network visualizations less busy, with changes that are more noticeable. The subset contained actors 20 through 35 and the ties between them, as well as the drinking behavior of each actor at each of the three waves. This specific subset was chosen because it showed somewhat higher connectivity than other subsets, as we've emphasized in the visualizations of the three network adjacency matrices in Figure~\ref{fig:adjmatviz}. For model fitting, we condition on wave 1 and estimate the parameters of the models from the second and third waves. We will also be working with one actor level categorical covariate, drinking behavior. This variable has five values in the original data: (1) does not drink, (2) drinks once or twice a year, (3) drinks once a month, (4) drinks once a week, and (5) drinks more than once a week. The actor covariates adn networks are visualized in Figure~\ref{fig:alldataviz}. 
@@ -339,11 +343,11 @@ fd2.w3 <- friend.data.w3[20:35,20:35]
 friendshipData <- array(c(fd2.w1, fd2.w2,fd2.w3), dim = c(16, 16, 3))
 
 # running Siena
-friendship <- sienaDependent(friendshipData)
-alcohol <- varCovar(drink[20:35,])
-mydata <- sienaDataCreate(friendship, alcohol)
-myeffnull <- getEffects(mydata)
-myalgorithm <- sienaAlgorithmCreate(projname = 's16_3')
+#friendship <- sienaDependent(friendshipData)
+#alcohol <- varCovar(drink[20:35,])
+#mydata <- sienaDataCreate(friendship, alcohol)
+#myeffnull <- getEffects(mydata)
+#myalgorithm <- sienaAlgorithmCreate(projname = 's16_3')
 set.seed(823746)
 load("data/ansnullpaper.rda")
 ansnullchains <- get_chain_info(ansnull)
