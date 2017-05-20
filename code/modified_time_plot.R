@@ -4,6 +4,7 @@ library(netvizinf)
 library(geomnet)
 library(RSiena)
 smallfriends <- read_csv("data/smallfriends4Geomnet.csv")
+names(smallfriends)[1:2] <- c("from", "to")
 ansnullchains <- get_chain_info(ansnull)
 chainsms <- ansnullchains %>% 
   group_by(rep, period) %>% 
@@ -16,20 +17,22 @@ wave1friends <- fortify(as.adjmat(fd2.w1))
 chainsms_wave2 <- filter(chainsms, period == 1)
 chainsms_wave3 <- filter(chainsms, period == 2)
 wave2 <- smallfriends %>% filter(Wave == 2) %>% na.omit %>% data.frame()
-
+wave3 <- smallfriends %>% filter(Wave == 3) %>% na.omit %>% data.frame()
+## make more generic for wave 3. 
 create_microstep_summary <- function(chains, truedat){
+  browser()
   R <- max(chains$rep)
-  wave2 <- truedat 
-  names(wave2) <- c("from", "to", "drink", "Wave")
+  wave <- truedat 
+  names(wave) <- c("from", "to", "drink", "Wave")
   all_reps <- list()
   for (i in 1:R){
-    msall <- netvizinf::listMicrosteps(dat = wave1friends,
+    msall <- netvizinf::listMicrosteps(dat = wave,
                                        microsteps = filter(chainsms, rep == i))
     msall_df <- plyr::rbind.fill(lapply(X = seq_along(msall), FUN = function(i, x) {
       x[[i]]$ms <- i - 1
       return(x[[i]])
     }, msall))
-    msall_df <- msall_df %>% select(from, to, ms)
+    msall_df <- msall_df %>% dplyr::select(from, to, ms)
    # msall_df <- msall_df %>% add_row(from = paste0("V",wave2$from),
    #                                  to = paste0("V",wave2$to), 
    #                                  ms = max(msall_df$ms)+1)
@@ -40,7 +43,7 @@ create_microstep_summary <- function(chains, truedat){
 }
 testing <- create_microstep_summary(chains = filter(chainsms_wave2, rep %in% 1:5), truedat = wave2)
 
-testingdf <-plyr::rbind.fill(testing)
+testingdf<-plyr::rbind.fill(testing)
 
 testingdf %>% 
   group_by(from, to, ms) %>% 
@@ -49,6 +52,7 @@ testingdf %>%
 
 # okay, it works. do it for all
 allms_allreps <- create_microstep_summary(chains = chainsms_wave2, truedat = wave2)
+allms_allrepsW3 <- create_microstep_summary(chains = chainsms_wave3, truedat = wave3)
 
 allms_allreps_df <- plyr::rbind.fill(allms_allreps)
 
@@ -61,6 +65,12 @@ summary_allreps <- allms_allreps_df %>%
 summary_allreps2 <- summary_allreps %>% ungroup() %>% 
   group_by(rep) %>% 
   mutate(scaled_time = ms / max(ms))
+
+summary_allreps2 %>% ungroup() %>% 
+  group_by(rep) %>% summarise(numms = max(ms)) %>% 
+  ggplot() + 
+  geom_histogram(aes(x = numms), binwidth = 5) 
+
 
 summary_allreps3 <- allms_allreps_df %>%
   group_by(from, to) %>% 

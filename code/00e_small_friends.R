@@ -10,9 +10,9 @@ friend.data.w1 <- as.matrix(read.table("data/s50_data/s50-network1.dat"))
 friend.data.w2 <- as.matrix(read.table("data/s50_data/s50-network2.dat"))
 friend.data.w3 <- as.matrix(read.table("data/s50_data/s50-network3.dat"))
 
-val1 <- data.frame(friend.data.w1) %>% gather(x,y, V1:V50) %>% select(y)
-val2 <- data.frame(friend.data.w2) %>% gather(x,y, V1:V50) %>% select(y)
-val3 <- data.frame(friend.data.w3) %>% gather(x,y, V1:V50) %>% select(y)
+val1 <- data.frame(friend.data.w1) %>% gather(key = x, value = y, V1:V50) %>% dplyr::select(y)
+val2 <- data.frame(friend.data.w2) %>% gather(x,y, V1:V50) %>% dplyr::select(y)
+val3 <- data.frame(friend.data.w3) %>% gather(x,y, V1:V50) %>% dplyr::select(y)
 
 all_girls <- expand.grid(x = 1:50, y= 1:50)
 
