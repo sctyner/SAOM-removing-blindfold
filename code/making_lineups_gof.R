@@ -74,23 +74,24 @@ smallfriends <- read_csv("data/smallfriends4Geomnet.csv")
 smallfriends2 <- smallfriends[,c(1,2,4)]
 names(smallfriends2) <- c("from", "to", "wave")
 smallfriends2$sim = "dat"
-sims_to_lineup <- function(sims, dat, w, sd, filename){
+sims_to_lineup <- function(sims, dat, w, sd, modelNum){
   dat2 <- filter(dat, wave == w) %>% dplyr::select(from, to, sim)
   sims_df <- sims_to_df(sims = sims)
   sims_df2 <- dplyr::filter(sims_df, wave == w-1) %>% 
     dplyr::select(from, to, sim)
   sims_df2$from <- ifelse(is.na(sims_df2$from), NA, paste0("V", sims_df2$from))
   sims_df2$to <- ifelse(is.na(sims_df2$to), NA, paste0("V", sims_df2$to))
-  # sims_for_plot <- fortify(as.edgedf(sims_df2), group = "sim")
-  # names(sims_for_plot) <- c("from", "sim", "to")
-  # sims_for_plot <- sims_for_plot[,c("from", "to", "sim")]
+  sims_for_plot <- fortify(as.edgedf(sims_df2), data.frame(id = paste0("V", 1:16)), group = "sim")
+  names(sims_for_plot) <- c("from", "sim", "to")
+  sims_for_plot <- sims_for_plot[,c("from", "to", "sim")]
   dat2$from <- ifelse(is.na(dat2$from), NA, paste0("V", dat2$from))
   dat2$to <- ifelse(is.na(dat2$to), NA, paste0("V", dat2$to))
   
   #create_lineup(sims = sims_df2, dat = dat2, sd = 12345)
   # copy over from create_lineup function. it's not working right
   
-  dat_for_lu <- rbind(sims_df2, dat2)
+  dat_for_lu <- rbind(sims_for_plot, dat2)
+  #dat_for_lu <- rbind(sims_df2, dat2)
   M <- max(sims_df2$sim) + 1
   if (!is.null(sd)) {
     set.seed(sd)
@@ -99,31 +100,37 @@ sims_to_lineup <- function(sims, dat, w, sd, filename){
   dat_for_lu <- arrange(dat_for_lu, sim)
   dat_for_lu$plot_order <- rep(sample(M), as.vector(table(dat_for_lu$sim, 
                                                           useNA = "ifany")))
-  ans <- unique(subset(dat_for_lu, sim == "dat")$plot_order)
+  dat_for_lu$label <- readr::parse_number(dat_for_lu$from)
+  #ans <- unique(subset(dat_for_lu, sim == "dat")$plot_order)
   require(geomnet)
   p <- ggplot(data = dat_for_lu) + 
     geom_net(color = 'black', directed = T, fiteach = T, 
-             aes(from_id = as.factor(from), to_id = as.factor(to)), 
-             ecolour = "grey60", arrowgap = 0.02, 
-             size = 3, linewidth = 1, arrowsize = 0.5,
-             singletons = T) + 
+             aes(from_id = as.factor(from), to_id = as.factor(to), label = label), 
+             ecolour = "grey60", arrowgap = 0.02, singletons = T,
+             size = 4, linewidth = .7, labelon = T, labelcolour = "white",
+             vjust = .5, hjust = .5, fontsize = 2.5,
+             arrow = arrow(type = "open", angle = 20, length = unit(.03, "npc"))) + 
+    expand_limits(x = c(-.05,1.05), y = c(-.05,1.05)) + 
     facet_wrap(~plot_order) + 
     theme_net() + 
-    theme(panel.background = element_rect(fill = NA, color = "black") ) 
-  ggplot2::ggsave(filename, p, width = unit(11, units = "in"), height = unit(8.5, units = "in"))
-  return(list(p = p, dat_plot = ans))
+    theme(panel.background = element_rect(fill = NA, color = "black") )  
+  filename1 <- paste0("img/lineups/lineupdata-Model-", modelNum, "-m-", M,".csv")
+  readr::write_csv(dat_for_lu, path = filename1)
+  filename2 <- paste0("img/lineups/lineup-Model-", modelNum, "-m-", M,".pdf")
+  ggplot2::ggsave(filename2, p, width = unit(11, units = "in"), height = unit(8.5, units = "in"))
+  return(p)
 }
 
 
-sims_to_lineup(sims = simsM6, dat = smallfriends2, w = 2, sd = 12345, filename = "img/Model1_m6.pdf")
-sims_to_lineup(sims = simsM6.2, dat = smallfriends2, w = 2, sd = 12345, filename =  "img/Model2_m6.pdf")
-sims_to_lineup(sims = simsM6.3, dat = smallfriends2, w = 2, sd = 12345, filename =  "img/Model3_m6.pdf")
-sims_to_lineup(sims = simsM12, dat = smallfriends2, w = 2, sd = 12345, filename = "img/Model1_m12.pdf")
-sims_to_lineup(sims = simsM12.2, dat = smallfriends2, w = 2, sd = 12345, filename =  "img/Model2_m12.pdf")
-sims_to_lineup(sims = simsM12.3, dat = smallfriends2, w = 2, sd = 12345, filename =  "img/Model3_m12.pdf")
-sims_to_lineup(sims = simsM16, dat = smallfriends2, w = 2, sd = 12345, filename = "img/Model1_m16.pdf")
-sims_to_lineup(sims = simsM16.2, dat = smallfriends2, w = 2, sd = 12345, filename =  "img/Model2_m16.pdf")
-sims_to_lineup(sims = simsM16.3, dat = smallfriends2, w = 2, sd = 12345, filename =  "img/Model3_m16.pdf")
-sims_to_lineup(sims = simsM20, dat = smallfriends2, w = 2, sd = 12345, filename = "img/Model1_m20.pdf")
-sims_to_lineup(sims = simsM20.2, dat = smallfriends2, w = 2, sd = 12345, filename =  "img/Model2_m20.pdf")
-sims_to_lineup(sims = simsM20.3, dat = smallfriends2, w = 2, sd = 12345, filename =  "img/Model3_m20.pdf")
+sims_to_lineup(sims = simsM6, dat = smallfriends2, w = 2, sd = 12345, modelNum = 1)
+sims_to_lineup(sims = simsM6.2, dat = smallfriends2, w = 2, sd = 12345, modelNum = 2)
+sims_to_lineup(sims = simsM6.3, dat = smallfriends2, w = 2, sd = 12345, modelNum = 3)
+sims_to_lineup(sims = simsM12, dat = smallfriends2, w = 2, sd = 12345, modelNum = 1)
+sims_to_lineup(sims = simsM12.2, dat = smallfriends2, w = 2, sd = 12345, modelNum = 2)
+sims_to_lineup(sims = simsM12.3, dat = smallfriends2, w = 2, sd = 12345, modelNum = 3)
+sims_to_lineup(sims = simsM16, dat = smallfriends2, w = 2, sd = 12345, modelNum = 1)
+sims_to_lineup(sims = simsM16.2, dat = smallfriends2, w = 2, sd = 12345, modelNum = 2)
+sims_to_lineup(sims = simsM16.3, dat = smallfriends2, w = 2, sd = 12345, modelNum = 3)
+sims_to_lineup(sims = simsM20, dat = smallfriends2, w = 2, sd = 12345, modelNum = 1)
+sims_to_lineup(sims = simsM20.2, dat = smallfriends2, w = 2, sd = 12345, modelNum = 2)
+sims_to_lineup(sims = simsM20.3, dat = smallfriends2, w = 2, sd = 12345, modelNum = 3)
