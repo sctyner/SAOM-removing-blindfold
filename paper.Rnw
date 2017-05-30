@@ -170,21 +170,22 @@ The second primary method for network visualization uses the adjacency matrix of
 <<toyplots, fig.show='hold', fig.cap="On the left, a node-link diagram of our undirected toy network, with nodes placed using the Kamada-Kawai algorithm. On the right, the adjacency matrix visualization for that same network.", out.width='.49\\linewidth'>>=
 toynetdat <- fortify(as.edgedf(toynet$edges), toynet$nodes)
 ggplot(data = toynetdat) + 
-  geom_net(aes(from_id=from_id, to_id=to_id, shape =group, color = group), labelon = T, size = 7, labelcolour = 'white', ecolour = 'black', vjust = .5, hjust = .5, arrowgap = .02) +
+  geom_net(aes(from_id=from_id, to_id=to_id, shape =group, color = group), labelon = T, size = 10, labelcolour = 'white', ecolour = 'black', vjust = .5, hjust = .5, arrowgap = .02) +
   scale_color_manual(values = c("red", "blue")) + 
   theme_net() + 
   labs(title = "Node-Link Diagram")
 
 ggplot(data = toynet$edges) +
-  geom_tile(aes(x = from, y = to), color = 'black', fill = 'black') +
-  geom_tile(aes(x = to, y = from), color = 'black', fill = 'black') +
-  geom_vline(xintercept = 0:5+.5) + 
-  geom_hline(yintercept = 0:5+.5) + 
+  geom_tile(aes(x = from, y = to), color = 'grey20', fill = 'black') +
+  geom_tile(aes(x = to, y = from), color = 'grey20', fill = 'black') +
+  geom_segment(aes(x = x, xend = xend), y = 0.5, yend=5.5, colour="grey30", data = data.frame(x = 0:5+.5, xend= 0:5+.5)) + 
+  geom_segment(aes(y=y, yend=yend), x = 0.5, xend=5.5, colour="grey30", data = data.frame(y = 0:5+.5, yend= 0:5+.5)) + 
   scale_x_continuous(breaks = 1:5, labels = 1:5, limits = c(0.5,5.5)) +
   scale_y_continuous(breaks = 1:5, labels = 1:5, limits = c(0.5,5.5)) +
   theme_bw() + 
+  theme(panel.grid = element_blank()) +
   labs(title = "Adjacency Matrix Visualization") + 
-  theme(aspect.ratio = 1)
+  theme(aspect.ratio = 1) 
 @
  \hh{XXX Explain each of these visualizations and either comment on the differences in the visualizations (colors) or don't show them. }
 
