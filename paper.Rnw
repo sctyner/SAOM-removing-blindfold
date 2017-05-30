@@ -213,7 +213,10 @@ In this paper, the term \textit{dynamic network} refers to a network consisting 
 
 \subsubsection{The Rate Function}
 
-For the network $x$ and each actor $i$ in the network, the rate function dictates how often the actor $i$ gets to change its ties, $x_{ij}$, to other nodes $j \neq i$ in the network. For this paper, we assume a simple rate function, $\alpha_m$ that is constant for all actors between observations at time $t_m$ to $t_{m+1}$. In other modelling scenarios, this rate can be a function that depends on the time period of observation, some actor-level covariates or some actor-level network statistics. The rate parameter determines how quickly actor $i$ gets an opportunity to change one of its ties, $x_{ij}$ in the time period $t_{m} \leq T < t_{m+1}$. We assume that the actors $i$ are conditionally independent given their current ties, $x_{i1}, \dots, x_{in}$. This assumption leads to the rate for the whole network, $n\alpha$. In order to achieve the memorylessness property of a Markov process, for any time point, $T$, where $t_{m} \leq T < t_{m+1}$, the waiting time to the next change opportunity by actor $i$ is exponentially distributed with expected value $\frac{1}{\alpha_m}$. Thus, the waiting time to the next change opportunity by \textit{any} actor in the network is also exponentially distributed with expected value $\frac{1}{n\alpha_m}$
+For the network $x$ and each actor $i$ in the network, the rate function dictates how often the actor $i$ gets to change its ties, $x_{ij}$, to other nodes $j \neq i$ in the network. For this paper, we assume a simple rate function, $\alpha_m$ that is constant for all actors between observations at time $t_m$ to $t_{m+1}$. In other modelling scenarios, this rate can be a function that depends on the time period of observation, some actor-level covariates or some actor-level network statistics. The rate parameter determines how quickly actor $i$ gets an opportunity to change one of its ties, $x_{ij}$ in the time period $t_{m} \leq T < t_{m+1}$. We assume that the actors $i$ are conditionally independent given their current ties, $x_{i1}, \dots, x_{in}$. This assumption leads to the rate for the whole network, $n\alpha$. In order to achieve the memorylessness property of a Markov process, for any time point, $T$, where $t_{m} \leq T < t_{m+1}$, the waiting time to the next change opportunity by actor $i$ is exponentially distributed with expected value $\alpha_m^{-1}$. Thus, the waiting time to the next change opportunity by \textit{any} actor in the network is also exponentially distributed with expected value $(n\alpha_m)^{-1}$
+
+\hh{XXX we tried to estimate the rate based on the simulations - you could include a histogram of the number of changes for the 1000 simulations in the viz part XXX}
+
  
 \subsubsection{The Objective Function} 
 
@@ -224,14 +227,15 @@ The parameters, $\boldsymbol{\beta}$, are attached to various actor-level networ
 
 \begin{table}
 \centering
-\begin{tabular}{lll}
-\textbf{Structural Effects} \\
-outdegree  & $s_{i1}(x) = \sum_j x_{ij}$ & \includegraphics[width=2cm]{img/outdegree}\\
-reciprocity  & $s_{i2}(x) = \sum_j x_{ij}x_{ji}$ & \includegraphics[width=2cm]{img/reciprocity}\\
+\begin{tabular}{m{4.5cm}m{4.5cm}m{3cm}}
+\multicolumn{3}{l}{\textbf{Structural Effects}} \\ \hline\hline
+outdegree  & $s_{i1}(x) = \sum_j x_{ij}$ & \includegraphics[width=2cm]{img/outdegree}\\ \hline
+reciprocity  & $s_{i2}(x) = \sum_j x_{ij}x_{ji}$ & \includegraphics[width=2cm]{img/reciprocity}\\ \hline
 transitive triplets  & $s_{i3}(x) = \sum_{j,h} x_{ij}x_{jh}x_{ih}$ & \includegraphics[width=1.5cm]{img/transtrip}  \\
-\textbf{Covariate Effects}\\
-covariate-alter  & $s_{i4}(x) = \sum_j x_{ij}z_j$ & \includegraphics[width=3cm]{img/covaralter} \\
-covariate-ego  & $s_{i5}(x) = z_i\sum_j x_{ij}$ & \includegraphics[width=3cm]{img/covarego} \\
+\\
+\multicolumn{3}{l}{\textbf{Covariate Effects}}\\  \hline \hline
+covariate-alter  & $s_{i4}(x) = \sum_j x_{ij}z_j$ & \includegraphics[width=3cm]{img/covaralter} \\  \hline
+covariate-ego  & $s_{i5}(x) = z_i\sum_j x_{ij}$ & \includegraphics[width=3cm]{img/covarego} \\  \hline
 same covariate & $s_{i6}(x) = \sum_j x_{ij} \mathbb{I}(z_i = z_j)$ & \includegraphics[width=3cm]{img/covarsim}%\\
 %jumping transitive triplets  & $s_{i7}(x) = \sum_{j \neq h} x_{ij}x_{ih}x_{hj} \mathbb{I}(z_i = z_h \neq z_j)$
 \end{tabular}
@@ -286,7 +290,7 @@ gridExtra::grid.arrange(p1, p2)
 
 \subsection{Example Data}
 
-To guide our visual exploration of stochastic actor-oriented models, we used a subset of the 50 actor dataset from the ``Teenage Friends and Lifestyle Study" that is provided on the \texttt{RSiena} webpage. These data come from \citet{friendsdata}, and we chose to only work with a subset of the data to make network visualizations less busy, with changes that are more noticeable. The subset contained actors 20 through 35 and the ties between them, as well as the drinking behavior of each actor at each of the three waves. This specific subset was chosen because it showed somewhat higher connectivity than other subsets, as we've emphasized in the visualizations of the three network adjacency matrices in Figure~\ref{fig:adjmatviz}. For model fitting, we condition on wave 1 and estimate the parameters of the models from the second and third waves. We will also be working with one actor level categorical covariate, drinking behavior. This variable has five values in the original data: (1) does not drink, (2) drinks once or twice a year, (3) drinks once a month, (4) drinks once a week, and (5) drinks more than once a week. The actor covariates adn networks are visualized in Figure~\ref{fig:alldataviz}. 
+To guide our visual exploration of stochastic actor-oriented models, we used a subset of the 50 actor dataset from the ``Teenage Friends and Lifestyle Study" that is provided on the \texttt{RSiena} webpage. These data come from \citet{friendsdata}, and we chose to only work with a subset of the data to make network visualizations less busy, with changes that are more noticeable. The subset contained actors 20 through 35 and the ties between them, as well as the drinking behavior of each actor at each of the three waves. This specific subset was chosen because it showed somewhat higher connectivity than other subsets, as we've emphasized in the visualizations of the three network adjacency matrices in Figure~\ref{fig:adjmatviz}. For model fitting, we condition on wave 1 and estimate the parameters of the models from the second and third waves. We will also be working with one actor level categorical covariate, drinking behavior. This variable has five values in the original data: (1) does not drink, (2) drinks once or twice a year, (3) drinks once a month, (4) drinks once a week, and (5) drinks more than once a week. The actor covariates and networks are visualized in Figures~\ref{fig:adjmatviz} and~\ref{fig:alldataviz}. 
 <<adjmatviz, fig.align='center', fig.cap="A visualization of the adjacency matrices of the three waves of network observations in the ``Teenage Friends and Lifestyle Study'' data. The subset we will be using is outlined in red.", fig.width=8>>=
 source("code/00e_small_friends.R")
 view_rs2$wave <- factor(view_rs2$wave)
