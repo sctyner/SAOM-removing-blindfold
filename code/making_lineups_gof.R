@@ -134,3 +134,8 @@ sims_to_lineup(sims = simsM16.3, dat = smallfriends2, w = 2, sd = 12345, modelNu
 sims_to_lineup(sims = simsM20, dat = smallfriends2, w = 2, sd = 12345, modelNum = 1)
 sims_to_lineup(sims = simsM20.2, dat = smallfriends2, w = 2, sd = 12345, modelNum = 2)
 sims_to_lineup(sims = simsM20.3, dat = smallfriends2, w = 2, sd = 12345, modelNum = 3)
+
+
+library(netvizinf)
+
+M2sims <- sims_to_df(ests_test$sims)
