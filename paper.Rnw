@@ -121,7 +121,7 @@ library(cowplot)
 % \end{itemize}
 % %also talk about other dynamic network models briefly to put SAOMs in context.
 % }
-\hh{XXX - talk a bit about social networks first, why we want to model them, and that usually the models are not dynamic.}
+%\hh{XXX - talk a bit about social networks first, why we want to model them, and that usually the models are not dynamic.}
 
 Social networks have been studied for decades, beginning with a few foundational works, the most well known of which is the 1967 study, "The Small World Problem" by Stanley Milgram \citep{goldenberg09}. Examples of social networks include collaboration networks between academic researchers, friendship networks in a school or university, and trade networks between nations. In recent years, the study of social networks has grown in popularity due to an increase in the availability and access to social network data. There are many kinds of social networks, but there are not as many statistical models for social network data. Some network models that have been applied to social networks include the exponential random graph model and latent space models. These models, however, are only for single instance networks. If we only care about one network observation, that is not a problem, but if we have many observations of social network over time, these models may not be appropriate. When studying a network over time, which is referred to as a \textit{dynamic network}, we need a model that can take time into account. 
 Models for dynamic social networks are extremely important because of how realistic they are. Social networks do not form spontaneously; they evolve over time. Ties are added and removed, and new actors join the network. Modeling the underlying mechanisms that create network changes over time is very complex but also has the potential to uncover hidden truths. 
@@ -150,17 +150,13 @@ The multiple layers of network data structures create unique struggles to networ
 
 Network visualization, also called network mapping, is a prominent subfield of network analysis. Visualizing network data is uniquely difficult because of the structure of the data itself.  Most, if not all, data visualizations rely on well-defined axes inherited from the data. If variables are numerical, histograms, scatterplots, or time series plots are straightforward to construct. If the variables are categorical, bar charts and mosaic plots are available to to the researcher. If the data are spatial, there is a well-defined region in which to view information. Network data, however, are much less cut-and-dried.
 
-There are two primary methods used to visualize networks: node-link diagrams and matrix visualization. XX INSERT REFS XX
-%\hh{As a toy example, let us assume that we have five nodes, $\{1,2,3,4,5\}$, connected by some edges: XXX list edges as $1 \mapto 2, 2 \mapto 4, ...$ }
-We will use the toy data set shown below to demonstrate these two methods.
+There are two primary methods used to visualize networks: node-link diagrams and matrix visualization \citep{knuth2000, adjmatpro}. As a toy example, let us assume that we have five nodes, $\{1,2,3,4,5\}$, connected by five edges:  $\{2 \mapto 4, 3 \mapto 4, 1 \mapto 5, 3 \mapto 5, 5 \mapto 4\}$ We use this toy data set to demonstrate the two visualization methods in Figure~\ref{fig:toyplots}.
 
-\hh{XXX describe the dataset in words, but not with the code. }
-<<toyex>>=
+<<toyex, echo = FALSE>>=
 set.seed(81393)
 nodes <- data.frame(id = 1:5, group = sample(LETTERS[1:2], size = 5, replace = T), stringsAsFactors = F)
 g <- igraph::as_data_frame(igraph::random.graph.game(n = 5, p = .4))
 toynet <- list(nodes = nodes, edges = rbind(g, c(5,4)))
-toynet
 @
 
 The first method, the node-link diagram, represents nodes with points in 2D Euclidean space and then represents edges by connecting the points with lines when there is an edge between the two nodes. But because there is no natural placement of the points, a random placement is used, then adjusted iteratively via a layout algorithm, of which there are many. The node-link diagram for our toy network is shown in Figure~\ref{fig:toyplots}.
