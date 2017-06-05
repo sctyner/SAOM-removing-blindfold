@@ -150,7 +150,7 @@ The multiple layers of network data structures create unique struggles to networ
 
 Network visualization, also called network mapping, is a prominent subfield of network analysis. Visualizing network data is uniquely difficult because of the structure of the data itself.  Most, if not all, data visualizations rely on well-defined axes inherited from the data. If variables are numerical, histograms, scatterplots, or time series plots are straightforward to construct. If the variables are categorical, bar charts and mosaic plots are available to to the researcher. If the data are spatial, there is a well-defined region in which to view information. Network data, however, are much less cut-and-dried.
 
-There are two primary methods used to visualize networks: node-link diagrams and matrix visualization \citep{knuth2000, adjmatpro}. As a toy example, let us assume that we have five nodes, $\{1,2,3,4,5\}$, connected by five edges:  $\{2 \mapto 4, 3 \mapto 4, 1 \mapto 5, 3 \mapto 5, 5 \mapto 4\}$ We use this toy data set to demonstrate the two visualization methods in Figure~\ref{fig:toyplots}.
+There are two primary methods used to visualize networks: node-link diagrams and matrix visualization \citep{knuth2000, adjmatpro}. As a toy example, let us assume that we have five nodes, $\{1,2,3,4,5\}$, connected by five directed edges:  $\{2 \to 4, 3 \to 4, 1 \to 5, 3 \to 5, 5 \to 4\}$ We use this toy data set to demonstrate the two visualization methods in Figure~\ref{fig:toyplots}.
 
 <<toyex, echo = FALSE>>=
 set.seed(81393)
@@ -159,34 +159,45 @@ g <- igraph::as_data_frame(igraph::random.graph.game(n = 5, p = .4))
 toynet <- list(nodes = nodes, edges = rbind(g, c(5,4)))
 @
 
-The first method, the node-link diagram, represents nodes with points in 2D Euclidean space and then represents edges by connecting the points with lines when there is an edge between the two nodes. But because there is no natural placement of the points, a random placement is used, then adjusted iteratively via a layout algorithm, of which there are many. The node-link diagram for our toy network is shown in Figure~\ref{fig:toyplots}.
+The first method, the node-link diagram, represents nodes with markers in 2D Euclidean space and then represents edges by connecting the markers with lines when there is an edge between the two nodes. But because there is no natural placement of the points, a random placement is used, then adjusted via a layout algorithm, of which there are many \citep{drawingalgs}. 
 
 Some layout algorithms were designed to mimic physical systems, drawing the graphs based on the ``forces" connecting them. The network's edges act as springs pushing and pulling the nodes in a lower dimensional (usually two-dimensional) space. %Other algorithms use properties of the network's adjaceny matrix in order to place the nodes. \hh{XXX how does the adjacency matrix feature here? The adjacency matrix is  a different mathematical representation of a network, but describes the same network as a node-link diagram.} 
-Some commonly used layout algorithms, such as  the Kamada-Kawai layout \citep{kamadakawai} and the Fruchterman-Reingold layout \citep{fruchterman-reingold}, treat networks like physical systems. Other algorithms are based on multi-dimensional scaling, which relies on a defined distance matrix, or an eigen value, which depends on the eigenvalues of the network's adjacency matrix. 
+Some commonly used layout algorithms, such as  the Kamada-Kawai layout \citep{kamadakawai} and the Fruchterman-Reingold layout \citep{fruchterman-reingold}, treat networks like physical systems. Other algorithms are based on multi-dimensional scaling, which relies on a defined distance matrix, or an eigen value, which depends on the eigenvalues of the network's adjacency matrix \citep{drawingalgs}. The node-link diagram for our toy network is shown in Figure~\ref{fig:toyplots}.
 
-The second primary method for network visualization uses the adjacency matrix of the network. \hh{XXX what is an adjacency matrix? - explain at this point in mathematical terms} An example of this type of visualization is also shown in Figure~\ref{fig:toyplots} for our toy example. This method is particularly useful when the network is very complex, dense, or large. Experimental studies have shown this to be true. For example, with seven basic perceptual tasks on networks, including things like node and edge count, adjacency matrix visualizations outperform node-link diagrams as the size and density of the network increases \citep{adjmatviz}. One drawback of the adjacency matrix visualization that \citeauthor{adjmatviz} found was that edges are overrepresented for undirected graphs. \hh{XXX What is the exact logic here that Ghoniem used to come to the conclusion that edges in undirected graphs are over-represented? Why would directed graphs make that better? wouldn't that just add to the number of edges? } This, however, may actually be an advantage for \emph{directed} graphs, where exactly the correct number of edges is represented in a matrix visualization, but a node-link diagram may underrepresent the edge count with overlapping edges.  
+The second primary method for network visualization uses the adjacency matrix of the network. The adjaceny matrix of a network, $\mathbf{A}$, describes the edges of a network in matrix form. An entry $A_{ij}$ of $\mathbf{A}$, for two nodes $i\neq j$ in the network is defined as 
+\[
+  A_{ij} =
+  \begin{cases}
+                                   1 &  \text{if an edge exists} i\to j \\
+                                   0 & otherwise
+  \end{cases}
+\]
+In an undirected network, $A_{ij} = A_{ji}$, but in a directed graph this is only true if there is an edge from $i$ to $j$ and from $j$ to $i$. Thus, $\mathbf{A}$ is always symmetric for undirected networks, and is symmetric for directed networks only if every edge between two nodes is reciprocated.
+%\hh{XXX what is an adjacency matrix? - explain at this point in mathematical terms} 
+This type of visualization is also shown in Figure~\ref{fig:toyplots} for our toy example.  %\hh{XXX What is the exact logic here that Ghoniem used to come to the conclusion that edges in undirected graphs are over-represented? Why would directed graphs make that better? wouldn't that just add to the number of edges? } This, however, may actually be an advantage for \emph{directed} graphs, where exactly the correct number of edges is represented in a matrix visualization, but a node-link diagram may underrepresent the edge count with overlapping edges.  
 
-<<toyplots, fig.show='hold', fig.cap="On the left, a node-link diagram of our undirected toy network, with nodes placed using the Kamada-Kawai algorithm. On the right, the adjacency matrix visualization for that same network.", out.width='.49\\linewidth'>>=
+<<toyplots, fig.show='hold', fig.cap="On the left, a node-link diagram of our directed toy network, with nodes placed using the Kamada-Kawai algorithm. On the right, the adjacency matrix visualization for that same network.", out.width='.49\\linewidth'>>=
 toynetdat <- fortify(as.edgedf(toynet$edges), toynet$nodes)
 ggplot(data = toynetdat) + 
-  geom_net(aes(from_id=from_id, to_id=to_id, shape =group, color = group), labelon = T, size = 10, labelcolour = 'white', ecolour = 'black', vjust = .5, hjust = .5, arrowgap = .02) +
-  scale_color_manual(values = c("red", "blue")) + 
+  geom_net(aes(from_id=from_id, to_id=to_id), labelon = T, size = 10, labelcolour = 'white', ecolour = 'black', vjust = .5, hjust = .5, arrowgap = .05, directed = T) +
   theme_net() + 
   labs(title = "Node-Link Diagram")
 
 ggplot(data = toynet$edges) +
-  geom_tile(aes(x = from, y = to), color = 'grey20', fill = 'black') +
-  geom_tile(aes(x = to, y = from), color = 'grey20', fill = 'black') +
-  geom_segment(aes(x = x, xend = xend), y = 0.5, yend=5.5, colour="grey30", data = data.frame(x = 0:5+.5, xend= 0:5+.5)) + 
-  geom_segment(aes(y=y, yend=yend), x = 0.5, xend=5.5, colour="grey30", data = data.frame(y = 0:5+.5, yend= 0:5+.5)) + 
-  scale_x_continuous(breaks = 1:5, labels = 1:5, limits = c(0.5,5.5)) +
-  scale_y_continuous(breaks = 1:5, labels = 1:5, limits = c(0.5,5.5)) +
+  geom_tile(aes(x = from, y = -to), color = 'grey20', fill = 'black') +
+  #geom_tile(aes(x = to, y = from), color = 'grey20', fill = 'black') +
+  geom_segment(aes(x = x, xend = xend), y = -0.5, yend=-5.5, colour="grey30", data = data.frame(x = 0:5+.5, xend= 0:5+.5)) + 
+  geom_segment(aes(y=-y, yend=-yend), x = 0.5, xend=5.5, colour="grey30", data = data.frame(y = -0:5+.5, yend= -0:5+.5)) + 
+  scale_x_continuous(breaks = 1:5, labels = 1:5, limits = c(0.5,5.5), position = "top") +
+  scale_y_continuous(breaks = (-5):(-1), labels = 5:1, limits = c(-5.5,-.5)) +
   theme_bw() + 
   theme(panel.grid = element_blank()) +
-  labs(title = "Adjacency Matrix Visualization") + 
+  labs(title = "Adjacency Matrix Visualization", y = "to") + 
   theme(aspect.ratio = 1) 
 @
- \hh{XXX Explain each of these visualizations and either comment on the differences in the visualizations (colors) or don't show them. }
+% \hh{XXX Explain each of these visualizations and either comment on the differences in the visualizations (colors) or don't show them. }
+
+Each type of visualization comes with its own advantages and disadvantages. Paths between nodes are easier to determine with node-link diagrams than with adjacency matrix visualizations. In node-link diagrams, node information can be incorporated into the visualization by coloring or changing the shape of the points representing the nodes. This is not necessarily possible in matrix representation, which is more focused on edges. Adjacency matrix visualization is particularly useful, however, when the network is very complex, dense, or large. Experimental studies have shown this to be true. For example, with seven basic perceptual tasks on networks, including things like node and edge count, adjacency matrix visualizations outperform node-link diagrams as the size and density of the network increases \citep{adjmatviz}. One drawback of the adjacency matrix visualization that \citeauthor{adjmatviz} found was that edges are overrepresented for undirected graphs, due to the symmetry of $\mathbf{A}$. There is not one correct way to visualize network information, and we will be using both of the methods throughout this paper.
 
 \section{Stochastic Actor-Oriented Models for Longitudinal Social Networks} \label{sec:saoms}
 
