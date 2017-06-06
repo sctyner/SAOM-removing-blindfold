@@ -280,12 +280,16 @@ same covariate & $s_{i6}(x) = \sum_j x_{ij} \mathbb{I}(z_i = z_j)$ & \includegra
 \caption{\label{tab:effects} Some of the possible effects to be included in the stochastic actor-oriented models in RSiena. There are many more possible effects, but we only consider a select few here. For a complete list, see the RSiena manual \citep{RSiena}.}
 \end{table}
 
-When node $i$ is given the chance to change a tie, \hh{`we assume that they wish' sounds strange - don't assume wishes, state assumptions} we assume that they wish to maximize the value of their objective function $f_i(\boldsymbol{\beta}, x)$ plus a random element, $U_i(x)$, where the $U_i(x)$ are from \hh{XXX don't quote here - just state that Snijder suggest the use of a type 1 extreme value distribution on top of the objective function. XX What is the thought behind that? } ``the type 1 extreme value distribution (or Gumbel distribution) with mean 0 and scale parameter 1" \citep[p. 368]{snijders01}. This distribution, which is also known as the log-Weibull distribution, has probability distribution function, using $\mu$ for the mean parameter and $\sigma$ for the scale parameter, of
+When node $i$ is given the chance to change a tie, %\hh{`we assume that they wish' sounds strange - don't assume wishes, state assumptions}
+it attempts to maximize the value of its objective function $f_i(\boldsymbol{\beta}, x)$ plus a random element, $U_i(x)$, to account for unknown attraction between nodes. In \citet{modelsSnijders}, the author recommends that the $U_i(x)$ be random draws from a type 1 extreme value distribution on top of the objective function. % XX What is the thought behind that? } ``the type 1 extreme value distribution (or Gumbel distribution) with mean 0 and scale parameter 1" \citep[p. 368]{snijders01}. 
+This distribution, which is also known as the log-Weibull distribution, has probability distribution function, using $\mu$ for the mean parameter and $\sigma$ for the scale parameter, of
 
-$$f(u|\mu, \sigma) = \frac{1}{\sigma}\exp\left\{-\left(\frac{u-\mu}{\sigma} + e^{-\frac{u-\mu}{\sigma}}\right)\right\}.$$
+\begin{equation} \label{eq:dist1}
+f(u|\mu, \sigma) = \frac{1}{\sigma}\exp\left\{-\left(\frac{u-\mu}{\sigma} + e^{-\frac{u-\mu}{\sigma}}\right)\right\}.
+\end{equation}
 
-
-Using this distribution \hh{XXX I'm not following - which distribution do you mean by `this' distribution? The density above is the type 1 extreme value density. I got lost at the  ``objective function $f_i(\boldsymbol{\beta}, x)$ plus a random element, $U_i(x)$"} is convenient because it allows the probability the actor $i$ chooses to change its tie to actor $j$ in terms of the objective function alone. Let $p_{ij}(\boldsymbol{\beta}, x)$ be this probability. Next, write the network $x$ in its potential future state, where the tie $x_{ij}$ has changed to $1-x_{ij}$, as $x(i \leadsto j)$. Then, the probility that the tie $x_{ij}$ changes is 
+Using the distribution given in Equation~\ref{dist1} with mean $\mu = 0$ and scale $\sigma = 1$ as \citet{modelsSnijders} suggests %\hh{XXX I'm not following - which distribution do you mean by `this' distribution? The density above is the type 1 extreme value density. I got lost at the  ``objective function $f_i(\boldsymbol{\beta}, x)$ plus a random element, $U_i(x)$"} 
+is convenient because it allows the probability the actor $i$ chooses to change its tie to actor $j$ in terms of the objective function alone. Let $p_{ij}(\boldsymbol{\beta}, x)$ be this probability. Next, write the network $x$ in its potential future state, where the tie $x_{ij}$ has changed to $1-x_{ij}$, as $x(i \leadsto j)$. Then, the probility that the tie $x_{ij}$ changes is 
 
 $$p_{ij}(\boldsymbol{\beta}, x) = \dfrac{\exp\left\{f_i(\boldsymbol{\beta}, x(i\leadsto j))\right\}}{\sum_{h \neq i} \exp\left\{f_i(\boldsymbol{\beta}, x(i \leadsto h))\right\}}$$
 
