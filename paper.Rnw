@@ -251,7 +251,7 @@ In our model with the simple rate function, the rate parameter determines how qu
  
 \subsubsection{The Objective Function} 
 
-\hh{shouldn't that be independence? - make the conditional independence assumption above a labelled formula (e.g. C1) and then call it here }
+%\hh{shouldn't that be independence? - make the conditional independence assumption above a labelled formula (e.g. C1) and then call it here }
 Because of the conditional independence assumptions in Equation~\ref{eq:c1}, we can consider the objective function for each node separately, since only one tie from one node is changing at a time. The objective function is then written as 
 \begin{equation} \label{eq:of1}
 f_i(\boldsymbol{\beta}, x) = \sum_k \beta_k s_{ik}(x, \mathbf{Z}),
@@ -445,7 +445,7 @@ create_net_animate(static_pall) +
   theme(panel.background = element_rect(color = 'black'))
 @
 
-The top row of Figure~\ref{makinggif} shows an edge being removed, and the bottom row shows one being added. In both cases, the ego nodes chosen to act change color from black to red, and they also increase greatly in size. In the case of an edge being removed, the edge that currently exists is emphasized with the color and size change that the node also gets, and as the animation proceeds the edge shrinks to disappearing, while the node shrinks and changes color back to the original black. If the edge is being added, it appears colored red from nothing and grows to a large size, then changes color to match the rest of the edges, while the node shrinks and changes color to match the other nodes.  
+The top row of Figure~\ref{fig:makinggif} shows an edge being removed, and the bottom row shows one being added. In both cases, the ego nodes chosen to act change color from black to red, and they also increase greatly in size. In the case of an edge being removed, the edge that currently exists is emphasized with the color and size change that the node also gets, and as the animation proceeds the edge shrinks to disappearing, while the node shrinks and changes color back to the original black. If the edge is being added, it appears colored red from nothing and grows to a large size, then changes color to match the rest of the edges, while the node shrinks and changes color to match the other nodes.  
 
 We also use animation to view the changing structure of the adjacency matrix the microsteps. The adjacency matrices for the three waves of friendship data as shown in Figure~\ref{fig:alldataviz} are ordered by node id. There are 16 nodes in the data, numbered 1-16, and that order is used on the $x$ and $y$ axes for the matrix visualization. Viewing the adjacency matrices with this arbitrary ordering does not provide much information to the viewer about the underlying structure of the network. This lack of perceived structure would be exacerbated in an animation. So, we adjust the ordering so that the viewer can perceive more of the structure of the graph. This process is known as matrix seriation \citep{seriation}. 
 
