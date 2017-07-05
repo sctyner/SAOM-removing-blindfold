@@ -461,12 +461,13 @@ numordersf <- data.frame(fd2.w1) %>%
 pcaordersf <- numordersf
 
 numordersf$from <- factor(numordersf$from, levels = paste0("V", 1:16))
-numordersf$to <- factor(numordersf$to, levels = paste0("V", 1:16))
+numordersf$to <- factor(numordersf$to, levels = rev(paste0("V", 1:16)))
 
 p1 <- ggplot(data = numordersf, aes(x = from, y = to)) + geom_tile(color = 'black', aes(fill = as.factor(value))) + 
   scale_fill_manual(values = c('white', 'black')) +
   theme(legend.position = 'none', axis.text = element_text(size = 8)) + 
-  coord_fixed()
+  scale_x_discrete(position = "top") + 
+  coord_fixed() 
 
 sfmsall <- read_csv("data/smallfriendsmicrosteps.csv")
 
@@ -489,12 +490,13 @@ order1 <- names(sort(pca1$rotation[,1], decreasing = T))
 order2 <- names(sort(abs(pca1$rotation[,1]), decreasing = T))
 
 pcaordersf$from <- factor(pcaordersf$from, levels = order1)
-pcaordersf$to <- factor(pcaordersf$to, levels = order1)
+pcaordersf$to <- factor(pcaordersf$to, levels = rev(order1))
 
 p2 <- ggplot(data = pcaordersf, aes(x = from, y = to)) + geom_tile(color = 'black', aes(fill = as.factor(value))) + 
   scale_fill_manual(values = c('white', 'black')) +
   theme(legend.position = 'none', axis.text = element_text(size = 8)) + 
-  coord_fixed()
+  scale_x_discrete(position = "top") + 
+  coord_fixed() 
 
 grid.arrange(p1,p2, nrow = 1)
 @
