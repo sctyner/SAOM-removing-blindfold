@@ -30,7 +30,7 @@ Section 4
 -   \[ \] Add histogram of number of tie changes from *t*<sub>1</sub> to *t*<sub>2</sub> in simulations
 -   \[ \] Make gif available online
 -   \[ \] Insert link to full gif in paper
--   \[ \] Figure 6: reverse order of adjacency matrix y-axis
+-   \[X\] Figure 6: reverse order of adjacency matrix y-axis
 -   \[ \] Figure 7 not showing up??
 -   \[ \] Fix error on p. 21 (probably related to above)
 -   \[ \] Heatmap p 23 missing caption
