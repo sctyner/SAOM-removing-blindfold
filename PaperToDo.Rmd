@@ -19,7 +19,8 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Section 2
 
 - [ ] Proof read
-- [ ] Make sure I've defined ego/alter nodes
+- [X] Make sure I've defined ego/alter nodes
+- [ ] Need to talk about the CTMC, rest of the SAOM model definition after the objective function discussion. 
 
 ## Section 3 
 
