@@ -96,7 +96,7 @@
 <<setup, echo = FALSE, message = FALSE, warning = FALSE>>=
 options(replace.assign=TRUE,width=70, digits=3)
 require(knitr)
-opts_chunk$set(fig.path='figure/', cache.path='cache/', fig.align='center', fig.width=5, fig.height=5, par=TRUE, cache=TRUE, concordance=TRUE, autodep=TRUE, message=F, warning=F, echo = FALSE, root.dir = "~/Desktop/Dissertation - LETS GO/SAOM-removing-blindfold/")
+opts_chunk$set(fig.path='figure/', cache.path='cache/', fig.align='center', fig.pos='h', fig.width=5, fig.height=5, par=TRUE, cache=TRUE, concordance=TRUE, autodep=TRUE, message=F, warning=F, echo = FALSE, root.dir = "~/Desktop/Dissertation - LETS GO/SAOM-removing-blindfold/")
 @
 
 <<pkgs>>=
@@ -199,7 +199,6 @@ ggplot(data = toynet$edges) +
   theme(aspect.ratio = 1) +
   xlab("from (ego)") +
   ylab("to (alter)")
-
 @
 \hh{XXX Explain each of these visualizations and either comment on the differences in the visualizations (colors) or don't show them. }
 
@@ -289,7 +288,7 @@ This distribution, which is also known as the log-Weibull distribution, has prob
 f(u|\mu, \sigma) = \frac{1}{\sigma}\exp\left\{-\left(\frac{u-\mu}{\sigma} + e^{-\frac{u-\mu}{\sigma}}\right)\right\}.
 \end{equation}
 
-Using the distribution given in Equation~\ref{dist1} with mean $\mu = 0$ and scale $\sigma = 1$ as \citet{modelsSnijders} suggests \hh{XXX I'm not following - which distribution do you mean by `this' distribution? The density above is the type 1 extreme value density. I got lost at the  ``objective function $f_i(\boldsymbol{\beta}, x)$ plus a random element, $U_i(x)$"} \st{XXX I hope it is clearer now above}
+Using the distribution given in Equation~\ref{eq:dist1} with mean $\mu = 0$ and scale $\sigma = 1$ as \citet{modelsSnijders} suggests \hh{XXX I'm not following - which distribution do you mean by `this' distribution? The density above is the type 1 extreme value density. I got lost at the  ``objective function $f_i(\boldsymbol{\beta}, x)$ plus a random element, $U_i(x)$"} \st{XXX I hope it is clearer now above}
 is convenient because its \st{properties lead to a probability formula for} the probability that actor $i$ chooses to change its tie to actor $j$ \st{that can be written only} in terms of the objective function. Let $p_{ij}(\boldsymbol{\beta}, x)$ be the probability that actor $i$ chooses to change its tie to actor $j$. Next, we write the network $x$ in its potential future state, where the tie $x_{ij}$ has changed to $1-x_{ij}$, as $x(i \leadsto j)$. Then, the probility that the tie $x_{ij}$ changes is 
 
 $$p_{ij}(\boldsymbol{\beta}, x) = \dfrac{\exp\left\{f_i(\boldsymbol{\beta}, x(i\leadsto j))\right\}}{\sum_{h \neq i} \exp\left\{f_i(\boldsymbol{\beta}, x(i \leadsto h))\right\}}$$
@@ -417,6 +416,7 @@ friendshipData <- array(c(fd2.w1, fd2.w2,fd2.w3), dim = c(16, 16, 3))
 #myeffnull <- getEffects(mydata)
 #myalgorithm <- sienaAlgorithmCreate(projname = 's16_3')
 set.seed(823746)
+.libPaths(new = c("/Library/Frameworks/R.framework/Versions/3.4/Resources/library", "/Library/Frameworks/R.framework/Versions/3.4/Resources/oldpkgs/"))
 ansnullchains <- get_chain_info(ansnull)
 ansnullchains %>%
   filter(period == 1) %>%  #only look at chains from wave 1 to wave 2
@@ -511,7 +511,7 @@ Using the principal component analysis on $\mathbf{A}^{cum}$ to order the rows a
 
 We also attempt to better understand the microstep process by visualizing all transition probabilites for the first microstep in the process. We only do the first step of many for now because the \texttt{RSiena} transition probabilities after the first step are only comparable for identical steps due to the conditioning on the current network state in the model. Thus we have one step for each of the 1,000 repititions to visualize. In Figure ~\ref{histogramalters}, we present each acting node, (ego node) and the resulting probabilities of change. The probability shown by the bars is the theoretical probability according to the objective function of the ego node changing the tie to the alter node. The probability shown by the points is the empirical probability of that change being made, calculated by counting all instances of the ego node first, then computing the proprotion of each change. In most cases, they are almost identical, showing that the algorithm is performing as expected. 
 
-<<histogramalters, fig.width = 8, fig.height=11, fig.cap="Each panel shows the theoretical (as bars) and empirical (as points) probabilities of the chosen ego node changing its tie to each of the other nodes.">>=
+<<histogramalters, fig.width = 8, fig.height=11, fig.cap="Each panel shows the theoretical (as lines) and empirical (as points) probabilities of the chosen ego node changing its tie to each of the other nodes. The color of the line indicates whether the tie from the ego to the alter node is being added, removed, or if there is no change to the network in this step.">>=
 ansnullchains %>% group_by(period, rep) %>% 
   mutate(ms = row_number()) %>% 
   filter(ms == 1, period == 1) %>% 
@@ -539,12 +539,19 @@ changes2 <- left_join(changes, wave1friends2, c("ego" = "from", "alter" = "to"))
 
 changes2$type[is.na(changes2$type)] <- ifelse(changes2$ego[is.na(changes2$type)] == changes2$alter[is.na(changes2$type)], "noChange", "add")
 
-cumprobs %>% left_join(changes2) %>% ggplot() + 
-  geom_histogram(
-    aes(x = alter, weight = alterProb, fill = type), 
-    color = 'black', fill = 'white', binwidth = 1) + 
-  geom_point(aes(x = alter, y = empprob), color = 'red') + 
-  scale_x_continuous(labels = paste0("V",1:16), breaks = 0:15) + coord_flip() + facet_wrap(~ego, labeller = "label_both") + theme_gray()
+cumprobs %>% left_join(changes2) -> changes3
+
+changes3$ego <- factor(changes3$ego, levels = paste0("V", 1:16), labels = 1:16) 
+changes3$alter <- factor(changes3$alter, levels = paste0("V", 1:16), labels = 1:16) 
+
+ggplot(data = changes3) + 
+  geom_segment(
+    aes(x = alter , xend = alter, y = 0, yend = alterProb, color=type)) + 
+  geom_point(aes(x = alter, y = empprob), shape = 4, size = 1, alpha = .5) + 
+  labs(x = "alter node", y = "probability of alter node") + 
+  coord_flip() + 
+  facet_wrap(~ego, labeller = "label_both") + 
+  theme_bw()
 # 
 # cumprobs %>% ggplot() + geom_histogram(aes(x = alter, weight = count), color = 'black', fill = 'white', binwidth = 1) + scale_x_continuous(labels = paste0("V",1:16), breaks = 0:15) + coord_flip() + facet_wrap(~ego, labeller = "label_both") + theme_gray()
 
@@ -576,19 +583,22 @@ cumprobs %>% left_join(changes2) %>% ggplot() +
 @
 
 Another way to view the transition probabilities is through the adjacency matrix visualization. In Figure~\ref{fig:heatmap}, we build on the concept of the ordered adjacency matrix of Figure~\ref{fig:adjmatorder}. This heatmap shows the transition probabilities of all ties that are changed in the first microstep of the 1,000 simulations. The heatmap is noticeably sparse, showing the lack of coverage in the model.  Of the 256 possible steps, only 81, or about 32\%, are taken in the 1,000 simulated chains. XXX Check this again.... XXX
-<<heatmap>>=
+<<heatmap, fig.align='center', fig.cap='A heatmap showing the empirical transition probabilities for the first microstep in 1,000 simulations. The acting node is on the x-axis, and the receiving node is on the y-axis. Missing squares represent ties that did not occur.'>>=
 ansnullchains %>% 
   filter(rep == 1, period == 1) %>% 
   mutate(ego = paste0("V",as.numeric(as.character(ego))+1),
          alter = paste0("V",as.numeric(as.character(alter))+1), 
-         prob = exp(logAlterProb)) %>% 
-  ggplot(aes(x = factor(ego, levels = order1), 
+         prob = exp(logAlterProb)) -> probsDat
+
+ggplot(data = probsDat, 
+       aes(x = factor(ego, levels = order1), 
              y = factor(alter, levels = rev(order1)), 
              fill = prob)) + 
   geom_tile(color = 'black') + 
   scale_fill_gradient(low = 'white', high = 'blue', limits = c(0,1)) +
   theme(panel.background = element_rect(fill = 'white')) + 
   labs(x = "ego", y = "alter")+
+  scale_x_discrete(position = 'top') + 
   coord_fixed()
 @
 
@@ -714,7 +724,8 @@ These visual connections between the node, edge, and time data spaces are themse
 
 Another way to view the model in the data space is through simulation from the model. Since no single simulation from a model is going to look like the data, it's better to visualize many simulations together. For network data, one way to do this is through the traditional node-link diagram. In Figure~\ref{fig:summnetM1}, we show a summary network created with 1000 simulations from Model 1. Only edges that appear in at least 51 of the 1000 simulations are included in the visualization, with edges that appear more frequently emphasized by thicker linewidths and a bright red color. On either side of the summary network, we show the actual data, wave 1 on the left, and wave 2 on the right. Comparing the three visualizations side-by-side shows us that the summary network of simulations of wave 2 looks more like the true wave 2 than wave 1, which is a good indication that the model is capturing the true data structure. It's not ideal, however, because there appear to be too many reciprocated ties in the summary network, far more than there are in the data. This could indicate that we should remove the reciprocity parameter from the model. 
 
-<<summnetM1>>=
+% below chunk contains some repetitive stuff. Haven't figured out what it's purpose is yet. 
+<<summnetM1, message=FALSE>>=
 friendshipData <- array(c(fd2.w1, fd2.w2, fd2.w3), dim = c(16, 16, 3))
 drink1 <- s50a[20:35,1]
 drink2 <- s50a[20:35,2]
@@ -725,6 +736,7 @@ mydata <- sienaDataCreate(friendship, alcohol)
 M1eff <- getEffects(mydata)
 M2eff <- includeEffects(M1eff, jumpXTransTrip, interaction1 = "alcohol")
 M3eff <- includeEffects(M1eff, nbrDist2twice)
+simu2 <- read.csv("data/simulation-1000-M1-M2-M3.csv")
 means <- simu2 %>% group_by(Model, parameter) %>% summarize(
   means = mean(estimate)
 )
@@ -732,15 +744,15 @@ M1parms <- (means %>% filter(Model == "M1"))$means
 M2parms <- (means %>% filter(Model == "M2"))$means
 M3parms <- (means %>% filter(Model == "M3"))$means
 set.seed(4231352)
-M1sims1000 <- saom_simulate(dat = mydata, 
+M1sims1000 <- netvizinf::saom_simulate(dat = mydata, 
                             struct = M1eff,
                        parms = as.numeric(M1parms), 
                        N = 1000)
-M2sims1000 <- saom_simulate(dat = mydata, 
+M2sims1000 <- netvizinf::saom_simulate(dat = mydata, 
                             struct = M2eff,
                        parms = as.numeric(M2parms), 
                        N = 1000)
-M3sims1000 <- saom_simulate(dat = mydata, 
+M3sims1000 <- netvizinf::saom_simulate(dat = mydata, 
                             struct = M3eff,
                        parms = as.numeric(M3parms), 
                        N = 1000)
@@ -801,21 +813,21 @@ t1 %>% arrange(logweight) -> t1
 t1$color <- NA
 t1$color[1:26] <- colors[[1]]
 
-p1 <- ggplot(data = t1) + 
+p1 <- ggplot(data = t1) +
   geom_net(aes(from_id = from, to_id = to, linewidth= linewidth),
            directed = T, curvature = .2, labelon=T, size = 5,
            arrow = arrow(angle = 20, type = "open", length = unit(.1, "inches")), ecolour = t1$color,
            color = "#252525", hjust = .5, vjust = .5, labelcolour = 'white', fontsize = 3, arrowgap = .02,
            singletons = T) +
   theme_net() + labs(title = "Summary Network: M1") + theme(plot.background = element_rect(color = 'black'))
-p2 <- ggplot(data = filter(combinedavgs, cat == "First Observation")) + 
+p2 <- ggplot(data = filter(combinedavgs, cat == "First Observation")) +
   geom_net(aes(from_id = from, to_id = to, linewidth= linewidth),
            directed = T, curvature = .2, labelon=T, size = 5,
            arrow = arrow(angle = 20, type = "open", length = unit(.1, "inches")), ecolour = "#969696",
            color = "#252525", hjust = .5, vjust = .5, labelcolour = 'white', fontsize = 3, arrowgap = .02,
            singletons = T) +
   theme_net() + labs(title = "Wave 1") + theme(plot.background = element_rect(color = 'black'))
-p3 <- ggplot(data = filter(combinedavgs, cat == "Second Observation")) + 
+p3 <- ggplot(data = filter(combinedavgs, cat == "Second Observation")) +
   geom_net(aes(from_id = from, to_id = to, linewidth= linewidth),
            directed = T, curvature = .2, labelon=T, size = 5,
            arrow = arrow(angle = 20, type = "open", length = unit(.1, "inches")), ecolour = "#969696",
@@ -918,7 +930,7 @@ ggplot(data = simu2) +
 
 <<corplots, fig.cap="A matrix of plots demonstrating the strong correlations between parameter estimate in our SAOMs. The strongest correlation within each model is between $\\beta_1$ and $\\beta_2$.", fig.width=8>>=
 
-simu2 <- read.csv("data/simulation-1000-M1-M2-M3.csv")
+#simu2 <- read.csv("data/simulation-1000-M1-M2-M3.csv")
 
 simu_spread <- simu2 %>% spread(parameter, estimate)
 ggpairs(simu_spread, columns = 3:8, ggplot2::aes(colour=Model, alpha = .5)) + theme_bw()
