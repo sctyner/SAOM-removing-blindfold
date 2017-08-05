@@ -96,7 +96,7 @@
 <<setup, echo = FALSE, message = FALSE, warning = FALSE>>=
 options(replace.assign=TRUE,width=70, digits=3)
 require(knitr)
-opts_chunk$set(fig.path='figure/', cache.path='cache/', fig.align='center', fig.pos='h', fig.width=5, fig.height=5, par=TRUE, cache=TRUE, concordance=TRUE, autodep=TRUE, message=F, warning=F, echo = FALSE, root.dir = "~/Desktop/Dissertation - LETS GO/SAOM-removing-blindfold/")
+opts_chunk$set(fig.path='figure/', cache.path='cache/', fig.align='center', fig.pos='h', out.width='.8\\linewidth', par=TRUE, cache=TRUE, concordance=TRUE, autodep=TRUE, message=F, warning=F, echo = FALSE, root.dir = "~/Desktop/Dissertation - LETS GO/SAOM-removing-blindfold/")
 @
 
 <<pkgs>>=
@@ -131,7 +131,7 @@ Models for dynamic social networks are extremely important because of how realis
 \st{
 %\par In order to estimate the parameters of  SAOMs the software SIENA, and its \texttt{R} implementation \texttt{RSiena}, was developed \cite{RSiena}. This software marks a huge contribution to the field of social network analysis., and when we began working with it we were eager to understand how it works. HH: we are still interested in this.
 \hh{The next sentence is very vague - make it more specific: what aspect of SAOMs is not well understood? I think what you want is something like ``SAOMs are not very tractable analytically with traditional methods, e.g. likelihood functions turn into very complex objects because of the sheer number of parameters involved. Therefore, computationally more tractable solutions are used to fit estimators, in particular, SAOMs are fit using ... }
-Unlike other network models, SAOMs are not very well understood. \st{They are relatively new, especially compared to the classic exponential random graph models, and they are not very tractable analytically with traditional methods. Likelihood functions turn into very complex objects due to the dependency structure inherent in the data. Therefore, computationally more tractable solutions are used to fit estimators, in particular, % Traditional modeling steps, like determining the likelihood function, are very complex. Because of this, 
+Unlike other network models, SAOMs are not very well understood. \st{They are relatively new, especially compared to the classic exponential random graph models, and they are not very tractable analytically. Likelihood functions turn into very complex objects due to the dependency structure inherent in the data. Therefore, computationally more tractable solutions are used to fit estimators, in particular, % Traditional modeling steps, like determining the likelihood function, are very complex. Because of this, 
 SAOMs are fit to data using a series of MCMC phases for finding method of moments estimators.} Rather than treat SAOM fits and the fitting process as black boxes, we combine the principals of network visualization with those of model visualization as discussed in \citet{modelvis}. %Here, we explore RSiena and SAOMs with innovative network visualizations, both static and dynamic.
 By bringing some light to the underlying methods and structures ``behind the scenes" of SAOMs, we help researchers working with the models better understand the implications and analysis of these models.
 }
@@ -399,7 +399,12 @@ This simulation process follows the steps of the continuous-time Markov chain. F
 
 The first vizualization we present here is an animation of microsteps simulated to emulate the transition steps from wave 1 to wave 2 the subset of the friends data shown in Figure ~\ref{fig:alldataviz}. Movies similar to our animation were used to visualize the changes of dynamic networks in \citet{dynnetviz}. When each ego node is selected in a microstep, it is emphasized in the animation, then the associated edge either appears or disappears. If there are no changes at a particular microstep, no changes are seen. Some frames of the animations are shown in Figure~\ref{fig:makinggif}, and the full movie can be viewed at INSERT LINK TO GIF. 
 
-<<makinggif, fig.cap='A selection of images in the microstep animation. The selected edges and nodes are emphasized by changing the size and the color, then when edges are removed, they fade out, shrinking in size, while the nodes change color and shrink to blend in with the other nodes.', fig.width=8, cache=TRUE>>=
+<<makinggif, fig.cap='A selection of images in the microstep animation. The selected edges and nodes are emphasized by changing the size and the color, then when edges are removed, they fade out, shrinking in size, while the nodes change color and shrink to blend in with the other nodes.', fig.width=8, cache=TRUE, message = FALSE, warning = FALSE>>=
+# Need old version of dplyr to get this to work: 
+if (!require("dplyr050",character.only = TRUE)) {
+      devtools::install_github("sctyner/dplyr050")
+}
+
 friend.data.w1 <- as.matrix(read.table("data/s50_data/s50-network1.dat"))
 friend.data.w2 <- as.matrix(read.table("data/s50_data/s50-network2.dat"))
 friend.data.w3 <- as.matrix(read.table("data/s50_data/s50-network3.dat"))
@@ -416,7 +421,7 @@ friendshipData <- array(c(fd2.w1, fd2.w2,fd2.w3), dim = c(16, 16, 3))
 #myeffnull <- getEffects(mydata)
 #myalgorithm <- sienaAlgorithmCreate(projname = 's16_3')
 set.seed(823746)
-.libPaths(new = c("/Library/Frameworks/R.framework/Versions/3.4/Resources/library", "/Library/Frameworks/R.framework/Versions/3.4/Resources/oldpkgs/"))
+
 ansnullchains <- get_chain_info(ansnull)
 ansnullchains %>%
   filter(period == 1) %>%  #only look at chains from wave 1 to wave 2
@@ -457,10 +462,11 @@ We also use animation to view the changing structure of the adjacency matrix the
 
 To reorder the vertices for the matrix visualization, we first constructed a cumulative adjaceny matrix, $\mathbf{A}^{cum}$, for the series of microsteps simulating the network from $x(t_m)$ to $x(t_{m+1})$. A single entry in the cumulative adjacency matrix, $\mathbf{A}^{cum}_{ij}$, is the total number of times the edge from node $i$ to node $j$ appears in the network from the initial observation, $x(t_m) \equiv X(0)$ to the final reult of the last microstep, $X(C)$: 
 $$ \mathbf{A}^{cum}_{ij} = \sum_{c = 0}^C X_{ij}(c). $$
-We then performed a principal component analysis on $\mathbf{A}^{cum}$, and used the values of the first principal component to order the vertices on the $x$ and $y$ axes for the adjacency matrix animation. For one such series of microsteps simulated by \texttt{RSiena}, we present the adjacency matrix ordered by the (arbitrary) vertex id alongside the seriated adjacency microsteps using the first principal component loading on the cumulative adjacency matrix, $\mathbf{A}^{cum}$, in Figure~\ref{adjmatorder}. 
+We then performed a principal component analysis on $\mathbf{A}^{cum}$, and used the values of the first principal component to order the vertices on the $x$ and $y$ axes for the adjacency matrix animation. For one such series of microsteps simulated by \texttt{RSiena}, we present the adjacency matrix ordered by the (arbitrary) vertex id alongside the seriated adjacency microsteps using the first principal component loading on the cumulative adjacency matrix, $\mathbf{A}^{cum}$, in Figure~\ref{fig:adjmatorder}. 
 
-<<adjmatorder, fig.cap="On the left, the starting friendship network represented in adjacency matrix form, ordered by vertex id. On the right, the same adjacency matrix is presented after ordering the vertices by one repitition of the microstep simulation process from wave one to wave two.", fig.width=8>>=
+<<adjmatorder, message = FALSE, warning = FALSE, fig.cap="On the left, the starting friendship network represented in adjacency matrix form, ordered by vertex id. On the right, the same adjacency matrix is presented after ordering the vertices by one repitition of the microstep simulation process from wave one to wave two.", fig.width=8>>=
 # first present the original wave 1 adj mat, then present the adj mat after being ordered by the 1st pc of the big adjmat A. 
+# reinstall new dplyr
 numordersf <- data.frame(fd2.w1) %>% 
   mutate(from = rownames(fd2.w1)) %>% 
   gather(key = to ,value = value, -from)
@@ -722,10 +728,10 @@ XXX INSERT AN EXAMPLE OF DATA WITH LOTS OF EDGE, NODE VARS OF INTEREST XXX
 
 These visual connections between the node, edge, and time data spaces are themselves part of the data space, because they can be viewed in different ways. Another way to connect the node and the edge data, as discussed in Section~\ref{sec:netvizintro}, is through the network's adjaceny matrix. The time dimension can also be incorporated with side-by-side adjacency matrix visualizations. 
 
-Another way to view the model in the data space is through simulation from the model. Since no single simulation from a model is going to look like the data, it's better to visualize many simulations together. For network data, one way to do this is through the traditional node-link diagram. In Figure~\ref{fig:summnetM1}, we show a summary network created with 1000 simulations from Model 1. Only edges that appear in at least 51 of the 1000 simulations are included in the visualization, with edges that appear more frequently emphasized by thicker linewidths and a bright red color. On either side of the summary network, we show the actual data, wave 1 on the left, and wave 2 on the right. Comparing the three visualizations side-by-side shows us that the summary network of simulations of wave 2 looks more like the true wave 2 than wave 1, which is a good indication that the model is capturing the true data structure. It's not ideal, however, because there appear to be too many reciprocated ties in the summary network, far more than there are in the data. This could indicate that we should remove the reciprocity parameter from the model. 
+Another way to view the model in the data space is through simulation from the model. Since no single simulation from a model is going to look like the data, it's better to visualize many simulations together. For network data, one way to do this is through the traditional node-link diagram. In Figure~\ref{fig:summnetM1}, we show a summary network created with 1,000 simulations of the second wave of the network from Model 1. Only edges that appear in more than 5\% of the simulations (in at least 51 of the 1000 simulations) are included in the visualization, with edges that appear more frequently emphasized by thicker linewidths and a brighter red color. On either side of the summary network, we show the actual data, wave 1 on the left, and wave 2 on the right. \st{We can see that the structure of the summary network is much more similar to the first network observation than to the second network observation. The simulations, however, are supposed to represent the second wave of data, which is shown on the right in Figure~\ref{fig:summnetM1}. This is an indication that our simple model, $M1$ is doing a very poor job of capturing the change mechanism from the first to the second wave of observation.} % XXX ST - I was looking at the wrong one. I had wave == 2 instead of wave == 1 in the code. This means I was looking at the wrong simulations, so they really do look more like the first data obs than the second obs. XXX Comparing the three visualizations side-by-side shows us that the summary network of simulations of wave 2 looks more like the true wave 2 than wave 1, which is a good indication that the model is capturing the true data structure. It's not ideal, however, because there appear to be too many reciprocated ties in the summary network, far more than there are in the data. This could indicate that we should remove the reciprocity parameter from the model. 
 
 % below chunk contains some repetitive stuff. Haven't figured out what it's purpose is yet. 
-<<summnetM1, message=FALSE>>=
+<<summnetM1, message=FALSE, fig.cap='On the left, the first wave of observed data that is conditioned on in the model. On the right, the second wave of observed data. In the middle, a summary network from the first model fit to the data. This summary network represents 1,000 simulations of wave 2 using the values from the simple fitted model $M1$.',results='hide'>>=
 friendshipData <- array(c(fd2.w1, fd2.w2, fd2.w3), dim = c(16, 16, 3))
 drink1 <- s50a[20:35,1]
 drink2 <- s50a[20:35,2]
@@ -759,15 +765,15 @@ M3sims1000 <- netvizinf::saom_simulate(dat = mydata,
 M1simsdf <- sims_to_df(M1sims1000)
 M2simsdf <- sims_to_df(M2sims1000)
 M3simsdf <- sims_to_df(M3sims1000)
-M1avgW2 <- M1simsdf %>% filter(!is.na(to) & wave == 2) %>%
+M1avgW2 <- M1simsdf %>% filter(!is.na(to) & wave == 1) %>%
   group_by(from, to) %>% 
   summarise(count = n()) %>% 
   mutate(weight = ifelse(from == to, 0, count))
-M2avgW2 <- M2simsdf %>% filter(!is.na(to) & wave == 2) %>%
+M2avgW2 <- M2simsdf %>% filter(!is.na(to) & wave == 1) %>%
   group_by(from, to) %>% 
   summarise(count = n()) %>% 
   mutate(weight = ifelse(from == to, 0, count))
-M3avgW2 <- M3simsdf %>% filter(!is.na(to) & wave == 2) %>%
+M3avgW2 <- M3simsdf %>% filter(!is.na(to) & wave == 1) %>%
   group_by(from, to) %>% 
   summarise(count = n()) %>% 
   mutate(weight = ifelse(from == to, 0, count))
@@ -815,25 +821,32 @@ t1$color[1:26] <- colors[[1]]
 
 p1 <- ggplot(data = t1) +
   geom_net(aes(from_id = from, to_id = to, linewidth= linewidth),
-           directed = T, curvature = .2, labelon=T, size = 5,
+           directed = T, curvature = .2, labelon=T, size = 4,
            arrow = arrow(angle = 20, type = "open", length = unit(.1, "inches")), ecolour = t1$color,
-           color = "#252525", hjust = .5, vjust = .5, labelcolour = 'white', fontsize = 3, arrowgap = .02,
+           color = "#252525", hjust = .5, vjust = .5, labelcolour = 'white', fontsize = 2, arrowgap = .02,
            singletons = T) +
-  theme_net() + labs(title = "Summary Network: M1") + theme(plot.background = element_rect(color = 'black'))
+  theme_net() + labs(title = "Summary Network: M1") + 
+  theme(plot.background = element_rect(color = 'black'),
+        plot.title = element_text(size = rel(.5)))
+
 p2 <- ggplot(data = filter(combinedavgs, cat == "First Observation")) +
   geom_net(aes(from_id = from, to_id = to, linewidth= linewidth),
-           directed = T, curvature = .2, labelon=T, size = 5,
+           directed = T, curvature = .2, labelon=T, size = 4,
            arrow = arrow(angle = 20, type = "open", length = unit(.1, "inches")), ecolour = "#969696",
-           color = "#252525", hjust = .5, vjust = .5, labelcolour = 'white', fontsize = 3, arrowgap = .02,
+           color = "#252525", hjust = .5, vjust = .5, labelcolour = 'white', fontsize = 2, arrowgap = .02,
            singletons = T) +
-  theme_net() + labs(title = "Wave 1") + theme(plot.background = element_rect(color = 'black'))
+  theme_net() + labs(title = "Wave 1") + 
+    theme(plot.background = element_rect(color = 'black'),
+        plot.title = element_text(size = rel(.5)))
 p3 <- ggplot(data = filter(combinedavgs, cat == "Second Observation")) +
   geom_net(aes(from_id = from, to_id = to, linewidth= linewidth),
-           directed = T, curvature = .2, labelon=T, size = 5,
+           directed = T, curvature = .2, labelon=T, size = 4,
            arrow = arrow(angle = 20, type = "open", length = unit(.1, "inches")), ecolour = "#969696",
-           color = "#252525", hjust = .5, vjust = .5, labelcolour = 'white', fontsize = 3, arrowgap = .02,
+           color = "#252525", hjust = .5, vjust = .5, labelcolour = 'white', fontsize = 2, arrowgap = .02,
            singletons = T) +
-  theme_net() + labs(title = "Wave 2")  + theme(plot.background = element_rect(color = 'black'))
+  theme_net() + labs(title = "Wave 2")  + 
+  theme(plot.background = element_rect(color = 'black'),
+        plot.title = element_text(size = rel(.5))) 
 grid.arrange(p2, p1, p3, nrow = 1)
 @
 
@@ -936,10 +949,9 @@ simu_spread <- simu2 %>% spread(parameter, estimate)
 ggpairs(simu_spread, columns = 3:8, ggplot2::aes(colour=Model, alpha = .5)) + theme_bw()
 @
 
-We also explore simulations from these different models given parameter values. Using the means from the 1,000 fitted parameter values, we simulated 1,000 observations from each of our three models. We condition on the first friendship network observation, and the second and third observations are simulated from the SAOM models estimated previously. From these simulations, we first create a visualization that represents an ``average" network. To do this, we count occurences of each possible edge in the simulations, resulting in a summary network with weighted edges representing the number of times an edge appeared in the simulated wave 2 when simulating from the SAOM 1000 times. In Figure~\ref{averagenet}, we show the first wave, the ``average'' network from the three models we fit, and the second wave. Comparing the three averages to waves 1 and 2, we see that they have very similar structure to wave 2. Model 2, which included the transitive triplet parameter, seems to have created more group strucutre overall than models 1 and 3. This could be an indication that, despite the highly significant nature of the parameter $\beta_3$ according to the $t$-tests in \texttt{RSiena}, the transitive triplet parameter should not be included because it does not result in a structure similar to the data. 
+We also explore simulations from these different models given parameter values. Using the means from the 1,000 fitted parameter values, we simulated 1,000 observations from each of our three models. We condition on the first friendship network observation, and the second and third observations are simulated from the SAOM models estimated previously. From these simulations, we first create a visualization that represents an ``average" network. To do this, we count occurences of each possible edge in the simulations, resulting in a summary network with weighted edges representing the number of times an edge appeared in the simulated wave 2 when simulating from the SAOM 1000 times. In Figure~\ref{fig:averagenet}, we show the first wave, the ``average'' network from the three models we fit, and the second wave. \st{Comparing the three averages to waves 1 and 2, we see that they have very similar structure to wave 1. Model 2, which included the transitive triplet parameter, seems to have created more group structure overall than models 1 and 3. In particular, if we look at the group of nodes $\{10,11,14\}$, we see they are very strongly connected within the three average networks, and they are completely separate from the other nodes in the true wave 2. None of the three average networks show node 16 gaining ties as it does in wave two, nor do they show nodes 4 and 7 becoming isolated. In Model 2, however, the ties to node 7 appear much weaker than in Model 1 or Model 2, suggesting that of the three, Model 2 is the best fit for our data.}  %XXXX ST commented out after I realized I had made the same mistake as figure 7. XX This could be an indication that, despite the highly significant nature of the parameter $\beta_3$ according to the $t$-tests in \texttt{RSiena}, the transitive triplet parameter should not be included because it does not result in a structure similar to the data. 
 
-
-<<averagenet>>=
+<<averagenet, results='hide', out.width='99%',fig.cap='The three "average" networks in the middle, with the actual network observations oon either side. There is some difference between the three models, but overall, these three models cannot capture the structure in the true second wave of data. '>>=
 #friend.data.w1 <- as.matrix(read.table("s50_data/s50-network1.dat"))
 #friend.data.w2 <- as.matrix(read.table("s50_data/s50-network2.dat"))
 #friend.data.w3 <- as.matrix(read.table("s50_data/s50-network3.dat"))
@@ -955,21 +967,21 @@ data(M1ests_bigfriends)
 M1parms <- (means %>% filter(Model == "M1"))$means
 M2parms <- (means %>% filter(Model == "M2"))$means
 M3parms <- (means %>% filter(Model == "M3"))$means
-M1sims1000 <- saom_simulate(dat = mydata, 
-                            struct = M1eff,
-                       parms = as.numeric(M1parms), 
-                       N = 1000)
-M2sims1000 <- saom_simulate(dat = mydata, 
-                            struct = M2eff,
-                       parms = as.numeric(M2parms), 
-                       N = 1000)
-M3sims1000 <- saom_simulate(dat = mydata, 
-                            struct = M3eff,
-                       parms = as.numeric(M3parms), 
-                       N = 1000)
-M1simsdf <- sims_to_df(M1sims1000)
-M2simsdf <- sims_to_df(M2sims1000)
-M3simsdf <- sims_to_df(M3sims1000)
+# M1sims1000 <- saom_simulate(dat = mydata, 
+#                             struct = M1eff,
+#                        parms = as.numeric(M1parms), 
+#                        N = 1000)
+# M2sims1000 <- saom_simulate(dat = mydata, 
+#                             struct = M2eff,
+#                        parms = as.numeric(M2parms), 
+#                        N = 1000)
+# M3sims1000 <- saom_simulate(dat = mydata, 
+#                             struct = M3eff,
+#                        parms = as.numeric(M3parms), 
+#                        N = 1000)
+# M1simsdf <- sims_to_df(M1sims1000)
+# M2simsdf <- sims_to_df(M2sims1000)
+# M3simsdf <- sims_to_df(M3sims1000)
 M1avg <- M1simsdf %>% filter(!is.na(to) & wave == 1) %>%
   group_by(from, to) %>% 
   summarise(count = n()) %>% 
@@ -1025,15 +1037,15 @@ M3avg2 <- M3simsdf %>% filter(!is.na(to)) %>%
 # M3avgW2$to <- paste0("V", M3avgW2$to)
 # M3avg2$from <- paste0("V", M3avg2$from)
 # M3avg2$to <- paste0("V", M3avg2$to)
-
+combinedavgs$linewidth[combinedavgs$cat %in% c("First Observation", "Second Observation")] <- .5
 ggplot(data = combinedavgs) + 
   geom_net(aes(from_id = from, to_id = to, linewidth= linewidth),
-           directed = T, curvature = .2, labelon=T, size = 5,
-           arrow = arrow(angle = 20, type = "open", length = unit(.1, "inches")), ecolour = "#969696", fiteach = T, 
-           color = "#252525", hjust = .5, vjust = .5, labelcolour = 'white', fontsize = 3, arrowgap = .02,
-           singletons = F) + 
+           directed = T, curvature = .2, labelon=T, size = 4,
+           arrow = arrow(angle = 20, type = "open", length = unit(.2, "cm")), ecolour = "#969696", fiteach = T, 
+           color = "#252525", hjust = .5, vjust = .5, labelcolour = 'white', fontsize = 2, arrowgap = .02,
+           singletons = T) + 
   theme_net() + theme(panel.background = element_rect(color = 'black')) + 
-  facet_wrap(~cat)
+  facet_wrap(~cat, nrow = 1)
 
 # wave2drink <- drink2[,2]
 # wave2drink <- as.data.frame(wave2drink)
@@ -1245,7 +1257,6 @@ ggplot(data = combinedavgs) +
 #            #directed = TRUE,
 #            layout.alg = "mds", 
 #            layout.par = list(var = 'user', dist = 'none', exp = 3,vm = distmat))
-
 @
 
 

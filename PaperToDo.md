@@ -32,9 +32,9 @@ Section 4
 -   \[ \] Make gif available online
 -   \[ \] Insert link to full gif in paper
 -   \[X\] Figure 6: reverse order of adjacency matrix y-axis
--   \[ \] Figure 7 not showing up??
--   \[ \] Fix error on p. 21 (probably related to above)
--   \[ \] Heatmap p 23 missing caption
+-   \[X\] Figure 7 not showing up??
+-   \[X\] Fix error on p. 21 (probably related to above)
+-   \[X\] Heatmap p 23 missing caption
 -   \[ \] Describe Figure 8 more. What is going on??
 -   \[ \] Add geomnet example in 4.2
 -   \[ \] p. 26-28 figure refs & code is broken
