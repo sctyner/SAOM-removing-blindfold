@@ -6,6 +6,7 @@ Broadly
 
 -   \[ \] Write an abstract
 -   \[ \] Submit to journal
+-   \[ \] Spacing around figures WAY to large above/below captions
 
 Introduction
 ------------
@@ -29,6 +30,7 @@ Section 4
 ---------
 
 -   \[ \] Add histogram of number of tie changes from *t*<sub>1</sub> to *t*<sub>2</sub> in simulations
+-   \[ \] Add another example of a data set for M-in-DS (Sect 4.1) (GoT?)
 -   \[ \] Make gif available online
 -   \[ \] Insert link to full gif in paper
 -   \[X\] Figure 6: reverse order of adjacency matrix y-axis
@@ -37,9 +39,9 @@ Section 4
 -   \[X\] Heatmap p 23 missing caption
 -   \[ \] Describe Figure 8 more. What is going on??
 -   \[ \] Add geomnet example in 4.2
--   \[ \] p. 26-28 figure refs & code is broken
--   \[ \] Get rid of repeated plot p 29
--   \[ \] p. 34 code is broken
+-   \[X\] p. 26-28 figure refs & code is broken
+-   \[X\] Get rid of repeated plot p 29
+-   \[X\] p. 34 code is broken
 -   \[ \] General proof reading
 
 Discussion

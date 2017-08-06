@@ -341,7 +341,7 @@ gridExtra::grid.arrange(p1, p2)
 \subsection{Example Data}
 
 To guide our visual exploration of stochastic actor-oriented models, we used a subset of the 50 actor dataset from the ``Teenage Friends and Lifestyle Study" that is provided on the \texttt{RSiena} webpage. These data come from \citet{friendsdata}, and we chose to only work with a subset of the data to make network visualizations less busy, with changes that are more noticeable. The subset contained actors 20 through 35 and the ties between them, as well as the drinking behavior of each actor at each of the three waves. This specific subset was chosen because it showed somewhat higher connectivity than other subsets, as we've emphasized in the visualizations of the three network adjacency matrices in Figure~\ref{fig:adjmatviz}. For model fitting, we condition on wave 1 and estimate the parameters of the models from the second and third waves. We will also be working with one actor level categorical covariate, drinking behavior. This variable has five values in the original data: (1) does not drink, (2) drinks once or twice a year, (3) drinks once a month, (4) drinks once a week, and (5) drinks more than once a week. The actor covariates and networks are visualized in Figures~\ref{fig:adjmatviz} and~\ref{fig:alldataviz}. 
-<<adjmatviz, fig.align='center', fig.cap="A visualization of the adjacency matrices of the three waves of network observations in the ``Teenage Friends and Lifestyle Study'' data. The subset we will be using is outlined in red.", fig.width=8>>=
+<<adjmatviz, fig.align='center', fig.cap="A visualization of the adjacency matrices of the three waves of network observations in the ``Teenage Friends and Lifestyle Study'' data. The subset we will be using is outlined in red.", fig.width=8, results='hide',fig.show='asis'>>=
 source("code/00e_small_friends.R")
 view_rs2$wave <- factor(view_rs2$wave)
 levels(view_rs2$wave) <- c("Wave 1", "Wave 2", "Wave 3")
@@ -841,7 +841,7 @@ p2 <- ggplot(data = filter(combinedavgs, cat == "First Observation")) +
 p3 <- ggplot(data = filter(combinedavgs, cat == "Second Observation")) +
   geom_net(aes(from_id = from, to_id = to, linewidth= linewidth),
            directed = T, curvature = .2, labelon=T, size = 4,
-           arrow = arrow(angle = 20, type = "open", length = unit(.1, "inches")), ecolour = "#969696",
+           arrow = arrow(angle = 20, type = "open", length = unit(.2, "cm")), ecolour = "#969696",
            color = "#252525", hjust = .5, vjust = .5, labelcolour = 'white', fontsize = 2, arrowgap = .02,
            singletons = T) +
   theme_net() + labs(title = "Wave 2")  + 
@@ -917,7 +917,7 @@ We these three models using \texttt{RSiena} 1,000 times each. We then looked at 
 
 To further investigate this relationship between the parameter values, we look at correlations between each of the parameter estimates in each model. In Figure~\ref{fig:corplots}, we examine correlations between each of pair of parameters within each model and overall.\nocite{ggally} The strongest correlation within each model is between $\beta_1$ and $\beta_2$, with absolute value of correlation between those two parameter values greater than 0.90 in all three models. The $\beta_1$ parameter is also highly correlated with the $\beta_3$ parameter within model M2, but it is not as highly correlated with the $\beta_4$ parameter in model M3. 
 
-<<getdata, results='asis'>>=
+<<getdata>>=
 nulls <- read.csv("data/distribution_null_model.csv")
 alt <- read.csv("data/distribution_jumpTT_model.csv")
 alt2nd <- read.csv("data/distribution_dblpairs_model.csv")

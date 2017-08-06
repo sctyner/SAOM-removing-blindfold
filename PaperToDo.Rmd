@@ -11,6 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 - [ ] Write an abstract
 - [ ] Submit to journal
+- [ ] Spacing around figures WAY to large above/below captions
 
 ## Introduction
 
@@ -30,6 +31,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Section 4 
 
 - [ ] Add histogram of number of tie changes from $t_1$ to $t_2$ in simulations 
+- [ ] Add another example of a data set for M-in-DS (Sect 4.1) (GoT?)
 - [ ] Make gif available online
 - [ ] Insert link to full gif in paper
 - [X] Figure 6: reverse order of adjacency matrix y-axis
@@ -38,9 +40,9 @@ knitr::opts_chunk$set(echo = TRUE)
 - [X] Heatmap p 23 missing caption
 - [ ] Describe Figure 8 more. What is going on??
 - [ ] Add geomnet example in 4.2
-- [ ] p. 26-28 figure refs & code is broken
-- [ ] Get rid of repeated plot p 29
-- [ ] p. 34 code is broken
+- [X] p. 26-28 figure refs & code is broken
+- [X] Get rid of repeated plot p 29
+- [X] p. 34 code is broken
 - [ ] General proof reading
 
 ## Discussion
