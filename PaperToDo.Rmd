@@ -7,11 +7,15 @@ output: github_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+Don't spend any time placing the figures!!!!! Place figure just in front of the paragraph of text describing it. 
+
 ## Broadly
 
-- [ ] Write an abstract
+- [ ] Write an abstract - Gelman method/sanity check. First sentence of every paragraph of the intro & the very last sentence of intro. 
 - [ ] Submit to journal
-- [ ] Spacing around figures WAY to large above/below captions
+- [ ] Spacing around figures WAY to large above/below captions - change fig.height for coord_fixed figures 
+- [ ] Make axes labels and text larger in figures
+- [ ] Make labels of points larger
 
 ## Introduction
 
@@ -31,10 +35,11 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Section 4 
 
 - [ ] Add histogram of number of tie changes from $t_1$ to $t_2$ in simulations 
-- [ ] Add another example of a data set for M-in-DS (Sect 4.1) (GoT?)
+- [ ] Add another example of a data set for M-in-DS (Sect 4.1) (Congress)
 - [ ] Make gif available online
 - [ ] Insert link to full gif in paper
 - [X] Figure 6: reverse order of adjacency matrix y-axis
+- [ ] Figure 5: get rid of Vs on node labels, make font bigger
 - [X] Figure 7 not showing up??
 - [X] Fix error on p. 21 (probably related to above)
 - [X] Heatmap p 23 missing caption
