@@ -96,7 +96,7 @@
 <<setup, echo = FALSE, message = FALSE, warning = FALSE>>=
 options(replace.assign=TRUE,width=70, digits=3)
 require(knitr)
-opts_chunk$set(fig.path='figure/', cache.path='cache/', fig.align='center', fig.pos='h', out.width='.8\\linewidth', par=TRUE, cache=TRUE, concordance=TRUE, autodep=TRUE, message=F, warning=F, echo = FALSE, root.dir = "~/Desktop/Dissertation/SAOM-removing-blindfold/")
+opts_chunk$set(fig.path='figure/', cache.path='cache/', fig.align='center', fig.pos='h', out.width='.99\\linewidth', par=TRUE, cache=FALSE, concordance=TRUE, autodep=TRUE, message=F, warning=F, echo = FALSE)#, root.dir = "~/Desktop/Dissertation/SAOM-removing-blindfold/")
 @
 
 <<pkgs>>=
@@ -110,6 +110,38 @@ library(netvizinf)
 library(RColorBrewer)
 library(gridExtra)
 library(cowplot)
+
+ThemeNoNet <- theme_bw() %+replace% 
+            theme(plot.title = element_text(size = rel(2),
+                                            face = 'bold', angle = 0), 
+                  axis.title.x = element_text(size = rel(2),
+                                            face = 'plain', angle = 0),
+                  axis.title.y = element_text(size = rel(2),
+                                            face = 'plain', angle = 90),
+                  axis.text.x.top = element_text(size = rel(1.5),
+                                            face = 'plain', angle = 0), 
+                  axis.text.x.bottom = element_text(size = rel(1.5),
+                                            face = 'plain', angle = 0), 
+                  axis.text.y.left = element_text(size = rel(1.5),
+                                            face = 'plain', angle = 0),
+                  axis.text.y.right = element_text(size = rel(1.5),
+                                            face = 'plain', angle = 0),
+                  strip.text.x = element_text(size = rel(2),
+                                            face = 'plain', angle = 0, 
+                                            margin = margin(t = 3, r = 0, b = 3, l = 0, unit = "pt")),
+                  strip.text.y =element_text(size = rel(2),
+                                            face = 'plain', angle = 90,margin = margin(t = 3, r = 3, b = 3, l = 3, unit = "pt")),
+                  strip.background = element_rect(colour = "black", fill = "white")
+                    )
+ThemeNet <- theme_net() %+replace% 
+            theme(plot.title = element_text(size = rel(2),
+                                            face = 'bold', angle = 0), 
+                  strip.text.x = element_text(size = rel(2),
+                                            face = 'plain', angle = 0, 
+                                            margin = margin(t = 3, r = 0, b = 3, l = 0, unit = "pt")),
+                  strip.text.y =element_text(size = rel(2),
+                                            face = 'plain', angle = 0,margin = margin(t = 3, r = 0, b = 3, l = 0, unit = "pt")),
+                  strip.background = element_rect(colour = "black", fill = "white"))
 @
 
 \section{Introduction} 
@@ -182,8 +214,8 @@ This type of visualization is also shown in Figure~\ref{fig:toyplots} for our to
 <<toyplots, fig.show='hold', fig.cap="On the left, a node-link diagram of our directed toy network, with nodes placed using the Kamada-Kawai algorithm. On the right, the adjacency matrix visualization for that same network.", out.width='.49\\linewidth'>>=
 toynetdat <- fortify(as.edgedf(toynet$edges), toynet$nodes)
 ggplot(data = toynetdat) + 
-  geom_net(aes(from_id=from_id, to_id=to_id), labelon = T, size = 10, labelcolour = 'white', ecolour = 'black', vjust = .5, hjust = .5, arrowgap = .05, directed = T) +
-  theme_net() + 
+  geom_net(aes(from_id=from_id, to_id=to_id), labelon = T, size = 11, labelcolour = 'white', ecolour = 'black', vjust = .5, hjust = .5, fontsize = 4, arrowgap = .05, directed = T) +
+  ThemeNet + 
   labs(title = "Node-Link Diagram")
 
 ggplot(data = toynet$edges) +
@@ -193,10 +225,9 @@ ggplot(data = toynet$edges) +
   geom_segment(aes(y=-y, yend=-yend), x = 0.5, xend=5.5, colour="grey30", data = data.frame(y = -0:5+.5, yend= -0:5+.5)) + 
   scale_x_continuous(breaks = 1:5, labels = 1:5, limits = c(0.5,5.5), position = "top") +
   scale_y_continuous(breaks = (-5):(-1), labels = 5:1, limits = c(-5.5,-.5)) +
-  theme_bw() + 
-  theme(panel.grid = element_blank()) +
+  ThemeNoNet + 
+  theme(panel.grid = element_blank(), aspect.ratio = 1) +
   labs(title = "Adjacency Matrix Visualization") + 
-  theme(aspect.ratio = 1) +
   xlab("from (ego)") +
   ylab("to (alter)")
 @
@@ -328,7 +359,7 @@ The \texttt{RSiena} software that fits the models to data also comes equipped wi
 
 The \texttt{plot.sienaGOF()} function allows us to visualize this fit. Below is an example of what the goodness-of-fit plot output looks like for indegree and outdegree statistics for a small model. Box plots and violin plots are drawn on top of each other in Figure~\ref{fig:sienagof} in order to show the distribution of the simulated network observations compared to the true data shown in red points connected by red lines. If the red points lie "well within" the simulated values, the model is a good fit to the data. The model examined in Figure~\ref{fig:sienagof} appears to do a better job of capturing the outdegree distribution than the indegree distribution of the data. 
 
-<<sienagof, fig.cap="Goodness of fit measures for two network statistics: indegree and outdegree cumulative distributions. On the x-axis is the degree value, and on the y-axis is the number of times that degree value occurs in the data. \st{The p-value shown on the x-axis is .... }", cache = TRUE, message = FALSE, warning = FALSE>>=
+<<sienagof, fig.cap="Goodness of fit measures for two network statistics: indegree and outdegree cumulative distributions. On the x-axis is the degree value, and on the y-axis is the number of times that degree value occurs in the data. \\st{The p-value shown on the x-axis is .... }", cache = TRUE, message = FALSE, warning = FALSE>>=
 load("data/ansnullpaper.rda")
 library(lattice)
 gof1 <- sienaGOF(ansnull, OutdegreeDistribution, varName ="friendship")
@@ -353,6 +384,7 @@ ggplot(data= view_rs2, aes(x = x, y=y)) +
             aes(xmin = 19.5, xmax = 35.5, ymin = 19.5, ymax = 35.5, fill =NA)) + 
   facet_wrap(~wave) + theme_bw() +
   labs(x = "i", y = "j") + 
+  ThemeNoNet + 
   theme(aspect.ratio=1, axis.text = element_blank(), axis.ticks = element_blank()) 
 @
 
@@ -377,9 +409,9 @@ alldat$X2 <- as.factor(alldat$X2)
 #write_csv(alldat, "smallfriends4Geomnet.csv")
 alldataviz <- ggplot(data = alldat, 
        aes(from_id = X1, to_id = X2, color = as.ordered(drink), group = as.ordered(drink))) +
-  geom_net(fiteach = FALSE, directed=TRUE, layout.alg = 'fruchtermanreingold', size = 4, arrowsize = .25, arrowgap = .03, ecolour = 'grey40', labelon=T, labelcolour = 'black', fontsize = 3, vjust = .5) +
+  geom_net(fiteach = FALSE, directed=TRUE, layout.alg = 'fruchtermanreingold', size = 4, arrowsize = .25, arrowgap = .03, ecolour = 'grey40', labelon=T, labelcolour = 'black', fontsize = 4, vjust = .5) +
   scale_color_brewer(palette = "YlOrRd", name = "Drinking\nBehavior") + 
-  theme_net() +
+  ThemeNet +
   facet_wrap(~Wave, labeller = "label_both") + 
   theme(legend.position = 'bottom', panel.background = element_rect(fill = NA, color = "grey30"))
 alldataviz
@@ -453,6 +485,7 @@ static_pall$type[which(static_pall$.frame %in% c(71:73, 75, 79, 81, 84))] <- "Ad
 set.seed(34569234)
 create_net_animate(static_pall) + 
   facet_wrap(~.frame, nrow=2, labeller = 'label_both') + 
+  ThemeNet + 
   theme(panel.background = element_rect(color = 'black'))
 @
 
@@ -464,7 +497,7 @@ To reorder the vertices for the matrix visualization, we first constructed a cum
 $$ \mathbf{A}^{cum}_{ij} = \sum_{c = 0}^C X_{ij}(c). $$
 We then performed a principal component analysis on $\mathbf{A}^{cum}$, and used the values of the first principal component to order the vertices on the $x$ and $y$ axes for the adjacency matrix animation. For one such series of microsteps simulated by \texttt{RSiena}, we present the adjacency matrix ordered by the (arbitrary) vertex id alongside the seriated adjacency microsteps using the first principal component loading on the cumulative adjacency matrix, $\mathbf{A}^{cum}$, in Figure~\ref{fig:adjmatorder}. 
 
-<<adjmatorder, message = FALSE, warning = FALSE, fig.cap="On the left, the starting friendship network represented in adjacency matrix form, ordered by vertex id. On the right, the same adjacency matrix is presented after ordering the vertices by one repitition of the microstep simulation process from wave one to wave two.", fig.width=8>>=
+<<adjmatorder, message = FALSE, warning = FALSE, fig.cap="On the left, the starting friendship network represented in adjacency matrix form, ordered by vertex id. On the right, the same adjacency matrix is presented after ordering the vertices by one repitition of the microstep simulation process from wave one to wave two.", fig.width=8, fig.height=3>>=
 # first present the original wave 1 adj mat, then present the adj mat after being ordered by the 1st pc of the big adjmat A. 
 # reinstall new dplyr
 numordersf <- data.frame(fd2.w1) %>% 
@@ -477,8 +510,10 @@ numordersf$to <- factor(numordersf$to, levels = rev(paste0("V", 1:16)))
 
 p1 <- ggplot(data = numordersf, aes(x = from, y = to)) + geom_tile(color = 'black', aes(fill = as.factor(value))) + 
   scale_fill_manual(values = c('white', 'black')) +
-  theme(legend.position = 'none', axis.text = element_text(size = 8)) + 
-  scale_x_discrete(position = "top") + 
+  scale_x_discrete(position = "top", labels = as.character(1:16)) +
+  scale_y_discrete(labels = rev(as.character(1:16)))  + 
+  ThemeNoNet + 
+  theme(legend.position = 'none') + 
   coord_fixed() 
 
 sfmsall <- read_csv("data/smallfriendsmicrosteps.csv")
@@ -506,8 +541,10 @@ pcaordersf$to <- factor(pcaordersf$to, levels = rev(order1))
 
 p2 <- ggplot(data = pcaordersf, aes(x = from, y = to)) + geom_tile(color = 'black', aes(fill = as.factor(value))) + 
   scale_fill_manual(values = c('white', 'black')) +
-  theme(legend.position = 'none', axis.text = element_text(size = 8)) + 
-  scale_x_discrete(position = "top") + 
+  scale_x_discrete(position = "top", labels = str_replace(order1, "V", "")) + 
+  scale_y_discrete(labels = rev(str_replace(order1, "V", ""))) + 
+  ThemeNoNet + 
+  theme(legend.position = 'none') +
   coord_fixed() 
 
 grid.arrange(p1,p2, nrow = 1)
@@ -552,12 +589,12 @@ changes3$alter <- factor(changes3$alter, levels = paste0("V", 1:16), labels = 1:
 
 ggplot(data = changes3) + 
   geom_segment(
-    aes(x = alter , xend = alter, y = 0, yend = alterProb, color=type)) + 
-  geom_point(aes(x = alter, y = empprob), shape = 4, size = 1, alpha = .5) + 
+    aes(x = alter , xend = alter, y = 0, yend = alterProb, color=type), size = 2) + 
+  geom_point(aes(x = alter, y = empprob), shape = 4, size = 2, alpha = .5) + 
   labs(x = "alter node", y = "probability of alter node") + 
   coord_flip() + 
   facet_wrap(~ego, labeller = "label_both") + 
-  theme_bw()
+  ThemeNoNet
 # 
 # cumprobs %>% ggplot() + geom_histogram(aes(x = alter, weight = count), color = 'black', fill = 'white', binwidth = 1) + scale_x_continuous(labels = paste0("V",1:16), breaks = 0:15) + coord_flip() + facet_wrap(~ego, labeller = "label_both") + theme_gray()
 
@@ -589,7 +626,7 @@ ggplot(data = changes3) +
 @
 
 Another way to view the transition probabilities is through the adjacency matrix visualization. In Figure~\ref{fig:heatmap}, we build on the concept of the ordered adjacency matrix of Figure~\ref{fig:adjmatorder}. This heatmap shows the transition probabilities of all ties that are changed in the first microstep of the 1,000 simulations. The heatmap is noticeably sparse, showing the lack of coverage in the model.  Of the 256 possible steps, only 81, or about 32\%, are taken in the 1,000 simulated chains. XXX Check this again.... XXX
-<<heatmap, fig.align='center', fig.cap='A heatmap showing the empirical transition probabilities for the first microstep in 1,000 simulations. The acting node is on the x-axis, and the receiving node is on the y-axis. Missing squares represent ties that did not occur.'>>=
+<<heatmap, fig.align='center', fig.cap='A heatmap showing the empirical transition probabilities for the first microstep in 1,000 simulations. The acting node is on the x-axis, and the receiving node is on the y-axis. Missing squares represent ties that did not occur.', fig.height=3>>=
 ansnullchains %>% 
   filter(rep == 1, period == 1) %>% 
   mutate(ego = paste0("V",as.numeric(as.character(ego))+1),
@@ -602,15 +639,16 @@ ggplot(data = probsDat,
              fill = prob)) + 
   geom_tile(color = 'black') + 
   scale_fill_gradient(low = 'white', high = 'blue', limits = c(0,1)) +
-  theme(panel.background = element_rect(fill = 'white')) + 
   labs(x = "ego", y = "alter")+
-  scale_x_discrete(position = 'top') + 
+  scale_x_discrete(position = 'top', labels = str_replace(order1, "V", "")) +
+  scale_y_discrete(labels = rev(str_replace(order1, "V", ""))) +
+  ThemeNoNet + theme(panel.grid = element_blank()) + 
   coord_fixed()
 @
 
 We also wanted to view the complete microstep process from the first wave, which we condition on, to the second wave. The number of steps taken from wave 1 to wave 2 varies. In the simulations from Model 1, the smallest number of steps taken was 58, and the longest was 248, with a mean of 106 and a median of 103. The standard deviation of the 1000 simulations' number of microsteps was 22.8. In Figure~\ref{fig:allsteps}, we see three simulations of the process from wave 1 to wave 2, with wave 1 shown on the left, and wave 2 shown on the right. In each of the three plots, the $y$-axis contains the edges sorted by how often they appear in the networks along the way. We can see that some edges are there in the beginning, but disappear and never come back, while others appear a few steps in, only to dispappear again. There are also some edges that exist in wave 2 that don't appear at all in the microstep process in a given repitition. 
 
-<<allsteps, fig.cap="Three repetitions of the microstep process from wave 1 to wave 2. The $x$ axis is the microstep number, with step 0 representing the first wave of data and the final step representing the second wave of data.">>=
+<<allsteps, fig.cap="Three simulations (out of 1,000) of the microstep process from wave 1 to wave 2. The $x$ axis is the microstep number, with step 0 representing the first wave of data and the final step representing the second wave of data. We can see that many edges are underrepresented in this process: they are in the second wave, but never appear in the microsteps.">>=
 smallfriends <- read_csv("data/smallfriends4Geomnet.csv")
 names(smallfriends)[1:2] <- c("from", "to")
 msall1 <- netvizinf::listMicrosteps(dat = wave1friends,
@@ -636,6 +674,7 @@ p1 <- ggplot(data = msall1_df2) +
   geom_tile(aes(x = ms, y = -eid, fill = ms)) + 
   geom_vline(xintercept = c(0.5,81.5)) + 
   scale_fill_continuous(low = "red", high = "blue") + 
+  ThemeNoNet + 
   theme(legend.position = 'none', axis.ticks.y = element_blank(),
         axis.text.y = element_blank(), axis.title = element_blank()) +
   labs(x = "Microstep")
@@ -665,6 +704,7 @@ p2 <- ggplot(data = msall2_df2) +
   geom_tile(aes(x = ms, y = -eid, fill = ms)) + 
   geom_vline(xintercept = c(0.5,49.5)) + 
   scale_fill_continuous(low = "red", high = "blue") +
+  ThemeNoNet + 
   theme(legend.position = 'none', axis.ticks.y = element_blank(),
         axis.text.y = element_blank(), axis.title = element_blank()) #+
   #labs(x = "Microstep", y = "Edges (most frequent at top)")
@@ -693,6 +733,7 @@ p3 <- ggplot(data = msall3_df2) +
   geom_tile(aes(x = ms, y = -eid, fill = ms)) + 
   geom_vline(xintercept = c(0.5,106.5)) + 
   scale_fill_continuous(low = "red", high = "blue") +
+  ThemeNoNet + 
   theme(legend.position = 'none', axis.ticks.y = element_blank(),
         axis.text.y = element_blank(), axis.title = element_blank()) #+
   #labs(x = "Microstep", y = "Edges (most frequent at top)")
@@ -731,7 +772,7 @@ These visual connections between the node, edge, and time data spaces are themse
 Another way to view the model in the data space is through simulation from the model. Since no single simulation from a model is going to look like the data, it's better to visualize many simulations together. For network data, one way to do this is through the traditional node-link diagram. In Figure~\ref{fig:summnetM1}, we show a summary network created with 1,000 simulations of the second wave of the network from Model 1. Only edges that appear in more than 5\% of the simulations (in at least 51 of the 1000 simulations) are included in the visualization, with edges that appear more frequently emphasized by thicker linewidths and a brighter red color. On either side of the summary network, we show the actual data, wave 1 on the left, and wave 2 on the right. \st{We can see that the structure of the summary network is much more similar to the first network observation than to the second network observation. The simulations, however, are supposed to represent the second wave of data, which is shown on the right in Figure~\ref{fig:summnetM1}. This is an indication that our simple model, $M1$ is doing a very poor job of capturing the change mechanism from the first to the second wave of observation.} % XXX ST - I was looking at the wrong one. I had wave == 2 instead of wave == 1 in the code. This means I was looking at the wrong simulations, so they really do look more like the first data obs than the second obs. XXX Comparing the three visualizations side-by-side shows us that the summary network of simulations of wave 2 looks more like the true wave 2 than wave 1, which is a good indication that the model is capturing the true data structure. It's not ideal, however, because there appear to be too many reciprocated ties in the summary network, far more than there are in the data. This could indicate that we should remove the reciprocity parameter from the model. 
 
 % below chunk contains some repetitive stuff. Haven't figured out what it's purpose is yet. 
-<<summnetM1, message=FALSE, fig.cap='On the left, the first wave of observed data that is conditioned on in the model. On the right, the second wave of observed data. In the middle, a summary network from the first model fit to the data. This summary network represents 1,000 simulations of wave 2 using the values from the simple fitted model $M1$.',results='hide'>>=
+<<summnetM1, message=FALSE, fig.cap='On the left, the first wave of observed data that is conditioned on in the model. On the right, the second wave of observed data. In the middle, a summary network from the first model fit to the data. This summary network represents 1,000 simulations of wave 2 using the values from the simple fitted model $M1$.',results='hide', fig.height=3>>=
 friendshipData <- array(c(fd2.w1, fd2.w2, fd2.w3), dim = c(16, 16, 3))
 drink1 <- s50a[20:35,1]
 drink2 <- s50a[20:35,2]
@@ -821,32 +862,29 @@ t1$color[1:26] <- colors[[1]]
 
 p1 <- ggplot(data = t1) +
   geom_net(aes(from_id = from, to_id = to, linewidth= linewidth),
-           directed = T, curvature = .2, labelon=T, size = 4,
-           arrow = arrow(angle = 20, type = "open", length = unit(.1, "inches")), ecolour = t1$color,
-           color = "#252525", hjust = .5, vjust = .5, labelcolour = 'white', fontsize = 2, arrowgap = .02,
+           directed = T, curvature = .2, labelon=T, size = 5,
+           arrow = arrow(angle = 20, type = "open", length = unit(.2, "cm")), ecolour = t1$color,
+           color = "#252525", hjust = .5, vjust = .5, labelcolour = 'white', fontsize = 4, arrowgap = .02,
            singletons = T) +
-  theme_net() + labs(title = "Summary Network: M1") + 
-  theme(plot.background = element_rect(color = 'black'),
-        plot.title = element_text(size = rel(.5)))
+  labs(title = "Summary: M1") + ThemeNet +
+  theme(plot.background = element_rect(color = 'black'))
 
 p2 <- ggplot(data = filter(combinedavgs, cat == "First Observation")) +
-  geom_net(aes(from_id = from, to_id = to, linewidth= linewidth),
-           directed = T, curvature = .2, labelon=T, size = 4,
-           arrow = arrow(angle = 20, type = "open", length = unit(.1, "inches")), ecolour = "#969696",
-           color = "#252525", hjust = .5, vjust = .5, labelcolour = 'white', fontsize = 2, arrowgap = .02,
-           singletons = T) +
-  theme_net() + labs(title = "Wave 1") + 
-    theme(plot.background = element_rect(color = 'black'),
-        plot.title = element_text(size = rel(.5)))
-p3 <- ggplot(data = filter(combinedavgs, cat == "Second Observation")) +
-  geom_net(aes(from_id = from, to_id = to, linewidth= linewidth),
-           directed = T, curvature = .2, labelon=T, size = 4,
+  geom_net(aes(from_id = from, to_id = to, linewidth= linewidth/3),
+           directed = T, curvature = .2, labelon=T, size = 5,
            arrow = arrow(angle = 20, type = "open", length = unit(.2, "cm")), ecolour = "#969696",
-           color = "#252525", hjust = .5, vjust = .5, labelcolour = 'white', fontsize = 2, arrowgap = .02,
+           color = "#252525", hjust = .5, vjust = .5, labelcolour = 'white', fontsize = 4, arrowgap = .03,
            singletons = T) +
-  theme_net() + labs(title = "Wave 2")  + 
-  theme(plot.background = element_rect(color = 'black'),
-        plot.title = element_text(size = rel(.5))) 
+   labs(title = "Wave 1") + ThemeNet + 
+    theme(plot.background = element_rect(color = 'black'))
+p3 <- ggplot(data = filter(combinedavgs, cat == "Second Observation")) +
+  geom_net(aes(from_id = from, to_id = to, linewidth= linewidth/3),
+           directed = T, curvature = .2, labelon=T, size = 5,
+           arrow = arrow(angle = 20, type = "open", length = unit(.2, "cm")), ecolour = "#969696",
+           color = "#252525", hjust = .5, vjust = .5, labelcolour = 'white', fontsize = 4, arrowgap = .03,
+           singletons = T) +
+  labs(title = "Wave 2")  +  ThemeNet + 
+  theme(plot.background = element_rect(color = 'black')) 
 grid.arrange(p2, p1, p3, nrow = 1)
 @
 
@@ -878,7 +916,7 @@ f_i(x)^{M3} & = \beta_1s_{i1} + \beta_2s_{i2} + \beta_4s_{i4},
 \begin{figure}\label{fig:structures}
 \begin{subfigure}[t]{.45\textwidth}
 \caption{\label{fig:jtt}Realization of a jumping transitive triplet, where $i$ is the focal actor, $j$ is the target actor, and $h$ is the intermediary. The group of the actors is represented by the shape of the node.}
-<<jtt, echo=FALSE, fig.width=2, fig.height=2, message = FALSE, warning = FALSE, fig.align='center'>>=
+<<jtt, echo=FALSE, fig.width=2, fig.height=2, message = FALSE, warning = FALSE, fig.align='center',out.width='.49\\linewidth'>>=
 jTTe <- data.frame(from = c('i', 'i', 'h'), to = c('h', 'j', 'j'))
 jTTn <- data.frame(id = letters[8:10], group = c(1,1,2))
 
@@ -888,16 +926,16 @@ set.seed(12345)
 ggplot(data = jTT, aes(from_id = from, to_id = to)) + 
   geom_net(aes(shape = as.factor(group)), directed = T, labelon = T, 
            labelcolour='grey80',vjust = 0.5, hjust =0.5, arrowgap = .15, 
-           colour = 'black', size=10, 
+           colour = 'black', size=10, fontsize = 4,
            ecolour = c("red", "grey40", "grey40", "grey40")) + 
   expand_limits(x=c(-0.1,1.1), y=c(-0.1,1.1)) +
-  theme_net() +
+  ThemeNet +
   theme(legend.position = "none")
 @
 \end{subfigure}\hfill
 \begin{subfigure}[t]{.45\textwidth}
 \caption{\label{fig:dad}Doubly achieved distance between actors $i$ and $k$.}
-<<dab, echo=FALSE, fig.width=2, fig.height=2, message = FALSE, warning = FALSE, fig.align='center'>>=
+<<dab, echo=FALSE, fig.width=2, fig.height=2, message = FALSE, warning = FALSE, fig.align='center', out.width='.49\\linewidth'>>=
 dade <- data.frame(from = c('i', 'i', 'h', 'j'), to = c('h', 'j', 'k', 'k'))
 dadn <- data.frame(id = letters[8:11], group = c(1,1,1,1))
 
@@ -905,9 +943,9 @@ dad <- merge(dade, dadn, by.x = 'from', by.y = "id", all = T)
 
 set.seed(12345) 
 ggplot(data = dad, aes(from_id = from, to_id = to)) + 
-  geom_net(aes(shape = as.factor(group)), directed = T, labelon = T, labelcolour='grey80',vjust = 0.5, hjust =0.5, arrowgap = .15, colour = 'black', size=10) + 
+  geom_net(aes(shape = as.factor(group)), directed = T, labelon = T, labelcolour='grey80',vjust = 0.5, hjust =0.5, arrowgap = .15, colour = 'black', size=10, fontsize = 4) + 
   expand_limits(x=c(-0.1,1.1), y=c(-0.1,1.1)) +
-  theme_net() +
+  ThemeNet +
   theme(legend.position = "none")
 @
 \end{subfigure}
@@ -937,7 +975,7 @@ alt_mod2_sv <- as.numeric(alt2nd[,-c(1,7,8)] %>% summarise_each(funs(mean)))
 ggplot(data = simu2) + 
   geom_density(aes(x = estimate, fill = Model), alpha = .5) + 
   facet_wrap(~parameter, scales = 'free') + 
-  theme_bw()
+  ThemeNoNet
 @
 
 
@@ -946,12 +984,12 @@ ggplot(data = simu2) +
 #simu2 <- read.csv("data/simulation-1000-M1-M2-M3.csv")
 
 simu_spread <- simu2 %>% spread(parameter, estimate)
-ggpairs(simu_spread, columns = 3:8, ggplot2::aes(colour=Model, alpha = .5)) + theme_bw()
+ggpairs(simu_spread, columns = 3:8, ggplot2::aes(colour=Model, alpha = .5)) + ThemeNoNet
 @
 
 We also explore simulations from these different models given parameter values. Using the means from the 1,000 fitted parameter values, we simulated 1,000 observations from each of our three models. We condition on the first friendship network observation, and the second and third observations are simulated from the SAOM models estimated previously. From these simulations, we first create a visualization that represents an ``average" network. To do this, we count occurences of each possible edge in the simulations, resulting in a summary network with weighted edges representing the number of times an edge appeared in the simulated wave 2 when simulating from the SAOM 1000 times. In Figure~\ref{fig:averagenet}, we show the first wave, the ``average'' network from the three models we fit, and the second wave. \st{Comparing the three averages to waves 1 and 2, we see that they have very similar structure to wave 1. Model 2, which included the transitive triplet parameter, seems to have created more group structure overall than models 1 and 3. In particular, if we look at the group of nodes $\{10,11,14\}$, we see they are very strongly connected within the three average networks, and they are completely separate from the other nodes in the true wave 2. None of the three average networks show node 16 gaining ties as it does in wave two, nor do they show nodes 4 and 7 becoming isolated. In Model 2, however, the ties to node 7 appear much weaker than in Model 1 or Model 2, suggesting that of the three, Model 2 is the best fit for our data.}  %XXXX ST commented out after I realized I had made the same mistake as figure 7. XX This could be an indication that, despite the highly significant nature of the parameter $\beta_3$ according to the $t$-tests in \texttt{RSiena}, the transitive triplet parameter should not be included because it does not result in a structure similar to the data. 
 
-<<averagenet, results='hide', out.width='99%',fig.cap='The three "average" networks in the middle, with the actual network observations oon either side. There is some difference between the three models, but overall, these three models cannot capture the structure in the true second wave of data. '>>=
+<<averagenet, results='hide', out.width='99%',fig.cap='The three "average" networks in the middle, with the actual network observations oon either side. There is some difference between the three models, but overall, these three models cannot capture the structure in the true second wave of data.', fig.height=3>>=
 #friend.data.w1 <- as.matrix(read.table("s50_data/s50-network1.dat"))
 #friend.data.w2 <- as.matrix(read.table("s50_data/s50-network2.dat"))
 #friend.data.w3 <- as.matrix(read.table("s50_data/s50-network3.dat"))
@@ -1040,11 +1078,11 @@ M3avg2 <- M3simsdf %>% filter(!is.na(to)) %>%
 combinedavgs$linewidth[combinedavgs$cat %in% c("First Observation", "Second Observation")] <- .5
 ggplot(data = combinedavgs) + 
   geom_net(aes(from_id = from, to_id = to, linewidth= linewidth),
-           directed = T, curvature = .2, labelon=T, size = 4,
+           directed = T, curvature = .2, labelon=T, size = 5,
            arrow = arrow(angle = 20, type = "open", length = unit(.2, "cm")), ecolour = "#969696", fiteach = T, 
-           color = "#252525", hjust = .5, vjust = .5, labelcolour = 'white', fontsize = 2, arrowgap = .02,
+           color = "#252525", hjust = .5, vjust = .5, labelcolour = 'white', fontsize = 4, arrowgap = .02,
            singletons = T) + 
-  theme_net() + theme(panel.background = element_rect(color = 'black')) + 
+  ThemeNet + theme(panel.background = element_rect(color = 'black')) + 
   facet_wrap(~cat, nrow = 1)
 
 # wave2drink <- drink2[,2]
