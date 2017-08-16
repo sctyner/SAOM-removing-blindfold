@@ -11,6 +11,7 @@ Broadly
 -   \[X\] Spacing around figures WAY to large above/below captions - change fig.height for coord\_fixed figures
 -   \[X\] Make axes labels and text larger in figures
 -   \[X\] Make labels of points larger
+-   \[ \] Reverse order of x-y axes on adjmat vizs
 
 Introduction
 ------------
