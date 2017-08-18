@@ -324,7 +324,7 @@ This distribution, which is also known as the log-Weibull distribution, has prob
 g(u|\mu, \sigma) = \frac{1}{\sigma}\exp\left\{-\left(\frac{u-\mu}{\sigma} + \exp^{-\frac{u-\mu}{\sigma}}\right)\right\}.
 \end{equation}
 
-<<logweibull, fig.align='center', out.width = '.5\\linewidth', fig.cap='The probability distribution function for the type 1 extreme value distribution, also known as the log-weibull or Gumbel distribution with location parameter \$\\mu = 0\$ and scale parameter \$\\sigma = 0\$.'>>=
+<<logweibull, fig.align='center', out.width = '.5\\linewidth', fig.cap='The probability distribution function for the type 1 extreme value distribution, also known as the log-weibull or Gumbel distribution with location parameter $ \\mu = 0$ and scale parameter $ \\sigma = 0$.'>>=
 library(reliaR)
 x <- seq(-3,10,.01)
 y <- dgumbel(x = seq(-3,10,.01), sigma = 1, mu=0)
@@ -344,8 +344,21 @@ When $i = j$ in $p_{ij}$, the numerator represents the exponential of the value 
 
 
 \subsubsection{Continuous Time Markov Chain}
+\st{
+In the continuous-time Markov chain literature, see for instance \citet{ctmc}, the chains are characterized by their \textit{generator} or \textit{intensity} matrix $\mathbf{Q}$. This matrix describes the rate of change between two states of the CTMC process, and the rows of this matrix always add to zero. For directed networks with binary edge variables like the ones we will be working with, there are a very large number of possible states, $2^{n(n-1)}$: there are two possible states for an edge, and there are $n(n-1)$ edge relationships because self-ties are not allowed.  The intensity matrix for a CTMC in a SAOM is then a square matrix of dimension $2^{n(n-1)} \times 2^{n(n-1)}$. Since only one tie changes at a time in the CTMC, there are only $n(n-1)$ reachable states from the current network state. Thus, the intensity matrix $\mathbf{Q}$ is very sparse, with only $n(n-1) + 1$ non-zero entries in each row. Note that $n(n-1)$ of these represent the possible states that are one edge different from a given state, and the additional non-zero entry is for the state to remain unchanged. All other entries in a row are zero because those network states cannot be reached from the current state by just one change. 
 
-In the continuous time Markov chain literature, the intensity function... see \citet{ctmc}
+The two pieces of a SAOM, the rate function/parameter and the objective function, each contribute to the entries of the intensity matrix to describe the rate of change between two network states. The entries of $\mathbf{Q}$ are defined as follows: let $b \neq c \in \{1, 2, \dots, 2^{n(n-1)} \}$ be indices of two different possible states of the network, $x^b, x^c \in \mathcal{X}$.  Then the $bc^{th}$ entry of $Q$ is:
+\[ q_{bc} = \begin{cases} 
+     q_{ij}= \alpha_m p_{ij}(\boldsymbol{\beta}, x^b) & \text{if } x^c \in \{x^b(i \leadsto j) | \text{ any } i \neq j \in \{1, \dots, n\}\} \\
+      0 & \text{if } \sum_i \sum_j |x_{ij}^c -x_{ij}^b | > 1 \\
+      -\sum_{i\neq j} q_{ij} & \text{if } x^b = x^c 
+   \end{cases}
+\]
+
+Thus, the rate of change between any two states, $x^b$ and $x^c$, that differ by only one tie $x_{ij}$, is the product of the rate at which actor $i$ gets to change a tie and the probability that the tie that will change is the tie to node $j$. 
+
+XXX Need a transistion to next section XXX 
+}
 
 %### A SAOM as a CTMC {#saomctmc}
 
@@ -363,11 +376,13 @@ In the continuous time Markov chain literature, the intensity function... see \c
 
 \subsection{Fitting Models to Data}
 
-To fit a SAOM to longitudinal network data, we use the package \texttt{RSiena} \citep{RSiena}. This package uses simulation methods to estimate parameter values using either the method of moments or maximum likelihood estimation. In this paper, we focus of the method of moments estimation because the theory behind it was established in \citet{saompaper}, while the maximum likelihood estimation methods were not fully established until \citet{saomsml2010}. We also focus on the score function method for estimating the derivatives of the expected values, as opposed to the finite differences method, both of which are outlined in detail in \citet{SienaAlgs}.
+To fit a SAOM to observations of a dynamic network, we use the package \texttt{RSiena} \citep{RSiena}. This package uses simulation methods to estimate parameter values using either the method of moments or maximum likelihood estimation. In this paper, use the method of moments estimation because the theory behind it was established in \citet{saompaper}, while the maximum likelihood estimation methods were not fully established until \citet{saomsml2010}, though \texttt{RSiena} contains capabilities to use maximum likelihood estimation. We also use the score function method for estimating the derivatives of the expected values, as opposed to the finite differences method, both of which are outlined in detail in \citet{SienaAlgs}.
 
 \par For the score function method, the SIENA software uses a Robbins-Monro algorithm (see \citet{robbinsmonro}) to estimate the solution of the moment equation
 $$ E_{\theta}S = s_{obs}$$
-where $\theta$ is the vector of rate and objective function parameters, and $s_{obs}$ is the observed vector of model statistics, $S$. The entire algorithm is provided in \citet{SienaAlgs}. \par There are three phases in the the SIENA algorithm, as described in \citet{RSienamanual, SienaAlgs}. The first phase performs initial estimation of the score functions used in the Robbins-Monro procedure. The second phase carries out the Robbins-Monro algorithm and obtains iterative estimates of the parameter values. The third phase uses the parameter vector estimated in phase two to estimate the score functions and the covariance matrix of the parameters, as well as performs convergence checks. In each of the the first two phases, the estimation procedure also relies on ``microsteps" that simulate from the model as it exists in its current state in order to update either the score functions or the parameter estimates. These microsteps become observed instances of the continuous-time Markov chain that is the backbone of the stochastic actor-oriented model. In Section~\ref{sec:ModelVis}, we visualize the parts of the SIENA method-of-moments algorithm, bringing them out of the ``black-box" and into the light. 
+where $\theta$ is the vector of rate and objective function parameters, and $s_{obs}$ is the observed vector of model statistics, $S$. The entire algorithm is provided in \citet{SienaAlgs}.
+
+There are three phases in the the SIENA algorithm, as described in \citet{RSienamanual, SienaAlgs}. The first phase performs initial estimation of the score functions for use in the Robbins-Monro procedure for method-of-moments estimation. The second phase carries out the Robbins-Monro algorithm and obtains estimates of the parameter values through iterative updates and simulation from the CTMC at current parameter values. The third phase uses the parameter vector estimated in phase two to estimate the score functions and covariance matrix of the parameter estimate, and also carries out convergence checks. In each of the the first two phases, the estimation procedure also uses ``microsteps" that simulate from the model as it exists in its current state in order to update either the score functions or the parameter estimates. These simulated microsteps are observed instances of the continuous-time Markov chain that is the backbone of the stochastic actor-oriented model. In Section~\ref{sec:ModelVis}, we further explore these phases in the SIENA method-of-moments algorithm through visualization, bringing them out of the ``black-box" and into the light. 
 
 \subsection{Model Goodness-of-Fit}
 
