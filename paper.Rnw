@@ -396,7 +396,7 @@ The \texttt{RSiena} software that fits the models to data also includes a goodne
 \end{enumerate}
  %\st{XX more detail about mahalanobis distance and calculating p-value XX}
  
-<<sienagof, fig.cap="Goodness of fit measures for two network statisticscomputed on the first simulated wave of a SAOM: indegree and outdegree cumulative distributions. On the x-axis is the degree value, and on the y-axis is the number of times that degree value occurs in the network. \\st{The p-value shown on the x-axis is the proportion of observations simulated from the model that have observed statistic values as large or larger than the values observed in the data.}", cache = TRUE, message = FALSE, warning = FALSE, fig.height=3>>=
+<<sienagof, fig.cap="Goodness of fit measures for two network statisticscomputed on the first simulated wave of a SAOM: indegree and outdegree cumulative distributions. On the x-axis is the degree value, and on the y-axis is the number of times that degree value occurs in the network. \\st{The p-value shown on the x-axis is the proportion of observations simulated from the model that have observed statistic values as large or larger than the values observed in the data.}", cache = TRUE, message = FALSE, warning = FALSE, fig.height=5>>=
 load("data/ansnullpaper.rda")
 library(lattice)
 gof1 <- sienaGOF(ansnull, OutdegreeDistribution, varName ="friendship", join = FALSE)
@@ -419,16 +419,16 @@ The \texttt{plot.sienaGOF()} function allows us to visualize this fit. In Figure
 source("code/00e_small_friends.R")
 view_rs2$wave <- factor(view_rs2$wave)
 levels(view_rs2$wave) <- c("Wave 1", "Wave 2", "Wave 3")
-ggplot(data= view_rs2, aes(x = x, y=y)) + 
+ggplot(data= view_rs2, aes(x = y, y=-x)) + 
   geom_tile(aes(fill = as.factor(value))) + 
   scale_fill_manual("i likes j", labels=c("no", "yes"), 
                     values = c('white', 'black')) +
   geom_rect(data= NULL, inherit.aes = FALSE, color = 'red',
-            aes(xmin = 19.5, xmax = 35.5, ymin = 19.5, ymax = 35.5, fill =NA)) + 
+            aes(xmin = 19.5, xmax = 35.5, ymax = -19.5, ymin = -35.5, fill =NA)) + 
   facet_wrap(~wave) + theme_bw() +
-  labs(x = "i", y = "j") + 
+  labs(x = "j", y = "i") + 
   ThemeNoNet + 
-  theme(aspect.ratio=1, axis.text = element_blank(), axis.ticks = element_blank()) 
+  theme(aspect.ratio=1, axis.text = element_blank(), axis.ticks = element_blank(), panel.grid = element_blank()) 
 @
 
 <<alldataviz, fig.cap="The smaller friendship network data we will be modelling throughout the paper.", fig.width=8, fig.height=3>>=
