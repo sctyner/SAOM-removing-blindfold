@@ -494,6 +494,57 @@ The networks we constructed for the four senates during President Obama's admini
 
 Every good data analysis includes both numerical and visual summaries of the data, so why restrict model description and diagnostics to numerical summaries? The concept of model visualization was developed to complement traditional model diagnostic tools. Typically, numerical summaries such as $R^2$ are used to assess model fit, and the occasional visualization, like a residual plot, are used to determine how well the model fits the data. \citeauthor{modelvis} outline three separate ideas, each of which are can be referred to simply as the "model": the model family, the model form, and the fitted model. The latter is primarily what one thinks of first when considering a model in a data analysis, where specified a model is fit to data, and parameter estimates and other numerical summaries, such as $R^2$ are reported. In the context of SAOMs, the fitted model contains the form of the rate and objective functions, the estimated rate parameters, and the estimated objective function parameters. The model form describes the the model \textit{before} the fitting process, defining which parameters are in the model within the context of the larger model family. In SAOMs, the model form includes description of the rate and objective functions and the variables therein that describe how the network evolves over time. Finally, the model family is the broadest description of the model. This is the type of model that you wish to fit to the data, and is chosen based on the problem, data, and knowledge at hand. For example, we chose to use a SAOM to model network data over an exponential random graph model (ERGM) because we believe that actor-level variables effect network structure and formation, and we wanted to model the network changes over time. These three uses of the term ``model" can each be visualized according to the three principals of model visualization: display the model in the data space, look at a collection of models, and explore the process of fitting the model, not just the end result. We turn our focus to the fitted model and the model form. Specifically, we want to know how the model form affects the fitted model. Using our example data sets and our visualization toolbox, we hope to answer this question for SAOMs.
 
+\subsection{The Models}
+
+We first consider the 16 actor subset of the teenage friends and lifestyle data available on the \texttt{RSiena} website \citep{RSiena}. To this data, we fit three different SAOMs. Each SAOM used a simple rate function, $\alpha_m$, and an objective function with two or three parameters. The first model, $M1$, contains the absolute minimum number of parameters in the objective function $f_i(x)$:  $$f_i(x)^{M1} = \beta_1s_{i1} + \beta_2s_{i2},$$ where $s_{i1}$ is the density network statistic and $s_{i2}$ is the reciprocity network statistic for actor $i$ at the current network state $x$. The second and third models, $M2$ and $M3$, contain one additional parameter each in the objective function which were determined by a Wald-type test provided in the \texttt{RSiena} software to be significant, with $p$-values less than 0.05 \citep{RSienaTest}. The $M2$ model contains an actor-level covariate parameter, and the $M3$ model contains an additional strutural effect in the objective function.
+\begin{align*}
+f_i(x)^{M2} & = \beta_1s_{i1} + \beta_2s_{i2} + \beta_3s_{i3} \\
+f_i(x)^{M3} & = \beta_1s_{i1} + \beta_2s_{i2} + \beta_4s_{i4}, 
+\end{align*} 
+
+\begin{figure}\label{fig:structures}
+\begin{subfigure}[t]{.45\textwidth}
+<<jtt, echo=FALSE, fig.width=2, fig.height=2, message = FALSE, warning = FALSE, fig.align='center',out.width='.49\\linewidth'>>=
+jTTe <- data.frame(from = c('i', 'i', 'h'), to = c('h', 'j', 'j'))
+jTTn <- data.frame(id = letters[8:10], group = c(1,1,2))
+
+jTT <- merge(jTTe, jTTn, by.x = 'from', by.y = "id", all = T)
+
+set.seed(12345) 
+ggplot(data = jTT, aes(from_id = from, to_id = to)) + 
+  geom_net(aes(shape = as.factor(group)), directed = T, labelon = T, 
+           labelcolour='grey80',vjust = 0.5, hjust =0.5, arrowgap = .15, 
+           colour = 'black', size=10, fontsize = 4,
+           ecolour = c("red", "grey40", "grey40", "grey40")) + 
+  expand_limits(x=c(-0.1,1.1), y=c(-0.1,1.1)) +
+  ThemeNet +
+  theme(legend.position = "none")
+@
+\caption{\label{fig:jtt}Realization of a jumping transitive triplet, where $i$ is the focal actor, $j$ is the target actor, and $h$ is the intermediary. The group of the actors is represented by the shape of the node.}
+\end{subfigure}\hfill
+\begin{subfigure}[t]{.45\textwidth}
+<<dab, echo=FALSE, fig.width=2, fig.height=2, message = FALSE, warning = FALSE, fig.align='center', out.width='.49\\linewidth'>>=
+dade <- data.frame(from = c('i', 'i', 'h', 'j'), to = c('h', 'j', 'k', 'k'))
+dadn <- data.frame(id = letters[8:11], group = c(1,1,1,1))
+
+dad <- merge(dade, dadn, by.x = 'from', by.y = "id", all = T)
+
+set.seed(12345) 
+ggplot(data = dad, aes(from_id = from, to_id = to)) + 
+  geom_net(aes(shape = as.factor(group)), directed = T, labelon = T, labelcolour='grey80',vjust = 0.5, hjust =0.5, arrowgap = .15, colour = 'black', size=10, fontsize = 4) + 
+  expand_limits(x=c(-0.1,1.1), y=c(-0.1,1.1)) +
+  ThemeNet +
+  theme(legend.position = "none")
+@
+\caption{\label{fig:dad}Doubly achieved distance between actors $i$ and $k$.}
+\end{subfigure}
+\caption{The additional network effects included in our models fit to the friends data. On the left, a jumping transitive triplet (JTT). On the right, a doubly achieved distance between $i$ and $k$.}
+\end{figure}
+
+where $s_{i3} = \sum_{j \neq h} x_{ij}x_{ih}x_{hj} \mathbb{I}(z_i = z_h \neq z_j)$, and $s_{i4} =  |\{j : x_{ij} = 0, \sum\limits_h x_{ih}x_{hj} \geq 2\}|$. These statistics are known as the number of jumping transitive triplets and the number of doubly achieved distances two effect, respectively. The first statistic emphasizes triad relationships that are formed between actors from different covariate groups, while the other emphasizes indirect ties between actors. These two effects are visually represented and further described in in Figure~\ref{fig:structures}
+
+
+
 \subsection{Explore algorithms, not just end result}
 
 The model fitting process in \texttt{RSiena} involves several simulation steps that are hidden from the user. This is practical and efficient if a researcher is primarily interested in fitting one model to a set of longitudinal network data and obtaining parameter estimates. We are more interested in how the models are fit, so we extracted and explored the different steps of that process. 
@@ -980,50 +1031,7 @@ The second principle of Wickham et al states that ``collections are more informa
 
 A classical problem with statistical network models generally is the lack of an ``average network" measure. Statisticians frequently rely on averages and expected values, but statistical network models, especially those as complex as SAOMs, lack an intuitive expected value measure. We could talk about expected values of parameters, but there is no way to talk about the expected value of the network based on the model. How then, can we arrive at an ``average" network? We propose to answer this question through visualization.
 
-We first consider the 16 actor subset of the teenage friends and lifestyle data available on the \texttt{RSiena} website \citep{RSiena}. To this data, we fit three different SAOMs. Each SAOM used a simple rate function, $\alpha_m$, and an objective function with two or three parameters. The first model, $M1$, contains the absolute minimum number of parameters in the objective function $f_i(x)$:  $$f_i(x)^{M1} = \beta_1s_{i1} + \beta_2s_{i2}$$, where $s_{i1}$ is the density network statistic and $s_{i2}$ is the reciprocity network statistic for actor $i$. The second and third models, $M2$ and $M3$, contain a third parameter in the objective function that was determined in the\texttt{RSienaTest} software to be significant, with $p$-values less than 0.05 \citep{RSienaTest}. The $M2$ model contains an actor-level covariate parameter, and the $M3$ model contains an additional strutural effect in the objective function.
-\begin{align*}
-f_i(x)^{M2} & = \beta_1s_{i1} + \beta_2s_{i2} + \beta_3s_{i3} \\
-f_i(x)^{M3} & = \beta_1s_{i1} + \beta_2s_{i2} + \beta_4s_{i4}, 
-\end{align*} where $s_{i3} = \sum_{j \neq h} x_{ij}x_{ih}x_{hj} \mathbb{I}(z_i = z_h \neq z_j)$, and $s_{i4} =  |\{j : x_{ij} = 0, \sum\limits_h x_{ih}x_{hj} \geq 2\}|$. These statistics are known as the number of jumping transitive triplets and the number of doubly achieved distances two effect, respectively. The first statistic emphasizes triad relationships that are formed between actors from different covariate groups, while the other emphasizes indirect ties between actors. These two effects are visually represented in Figure~\ref{fig:jtt} and ~\ref{fig:dad}, respectively. 
 
-\begin{figure}\label{fig:structures}
-\begin{subfigure}[t]{.45\textwidth}
-\caption{\label{fig:jtt}Realization of a jumping transitive triplet, where $i$ is the focal actor, $j$ is the target actor, and $h$ is the intermediary. The group of the actors is represented by the shape of the node.}
-<<jtt, echo=FALSE, fig.width=2, fig.height=2, message = FALSE, warning = FALSE, fig.align='center',out.width='.49\\linewidth'>>=
-jTTe <- data.frame(from = c('i', 'i', 'h'), to = c('h', 'j', 'j'))
-jTTn <- data.frame(id = letters[8:10], group = c(1,1,2))
-
-jTT <- merge(jTTe, jTTn, by.x = 'from', by.y = "id", all = T)
-
-set.seed(12345) 
-ggplot(data = jTT, aes(from_id = from, to_id = to)) + 
-  geom_net(aes(shape = as.factor(group)), directed = T, labelon = T, 
-           labelcolour='grey80',vjust = 0.5, hjust =0.5, arrowgap = .15, 
-           colour = 'black', size=10, fontsize = 4,
-           ecolour = c("red", "grey40", "grey40", "grey40")) + 
-  expand_limits(x=c(-0.1,1.1), y=c(-0.1,1.1)) +
-  ThemeNet +
-  theme(legend.position = "none")
-@
-\end{subfigure}\hfill
-\begin{subfigure}[t]{.45\textwidth}
-\caption{\label{fig:dad}Doubly achieved distance between actors $i$ and $k$.}
-<<dab, echo=FALSE, fig.width=2, fig.height=2, message = FALSE, warning = FALSE, fig.align='center', out.width='.49\\linewidth'>>=
-dade <- data.frame(from = c('i', 'i', 'h', 'j'), to = c('h', 'j', 'k', 'k'))
-dadn <- data.frame(id = letters[8:11], group = c(1,1,1,1))
-
-dad <- merge(dade, dadn, by.x = 'from', by.y = "id", all = T)
-
-set.seed(12345) 
-ggplot(data = dad, aes(from_id = from, to_id = to)) + 
-  geom_net(aes(shape = as.factor(group)), directed = T, labelon = T, labelcolour='grey80',vjust = 0.5, hjust =0.5, arrowgap = .15, colour = 'black', size=10, fontsize = 4) + 
-  expand_limits(x=c(-0.1,1.1), y=c(-0.1,1.1)) +
-  ThemeNet +
-  theme(legend.position = "none")
-@
-\end{subfigure}
-\caption{Structural newtwork effects. On the left, a jumping transitive triplet (JTT). On the right, a doubly achieved distance between $i$ and $k$.}
-\end{figure}
 We these three models using \texttt{RSiena} 1,000 times each. We then looked at the distribution of the fitted values, which are shown in Figure~\ref{fig:distests}. We can see from these distributions that the inclusion of the jumping transitive triplet parameter, $\beta_3$ is obviously affecting the distributions of the other four parameters included in all models, $\alpha_1$, $\alpha_2$, $\beta_1$, and $\beta2$. In comparison with models M1 and M3, model M2 typically has higher estimates of the rate parameter, meaning that the inclusion of the covariate statistic in the model leads to higher estimates of the number of times, on average, a node gets to change its ties. This seems problematic: it is not clear that the addition of a parameter to the objective function \textit{should} effect the estimation of the rate parameters. 
 
 To further investigate this relationship between the parameter values, we look at correlations between each of the parameter estimates in each model. In Figure~\ref{fig:corplots}, we examine correlations between each of pair of parameters within each model and overall.\nocite{ggally} The strongest correlation within each model is between $\beta_1$ and $\beta_2$, with absolute value of correlation between those two parameter values greater than 0.90 in all three models. The $\beta_1$ parameter is also highly correlated with the $\beta_3$ parameter within model M2, but it is not as highly correlated with the $\beta_4$ parameter in model M3. 
