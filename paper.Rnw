@@ -543,345 +543,14 @@ ggplot(data = dad, aes(from_id = from, to_id = to)) +
 
 where $s_{i3} = \sum_{j \neq h} x_{ij}x_{ih}x_{hj} \mathbb{I}(z_i = z_h \neq z_j)$, and $s_{i4} =  |\{j : x_{ij} = 0, \sum\limits_h x_{ih}x_{hj} \geq 2\}|$. These statistics are known as the number of jumping transitive triplets and the number of doubly achieved distances two effect, respectively. The first statistic emphasizes triad relationships that are formed between actors from different covariate groups, while the other emphasizes indirect ties between actors. These two effects are visually represented and further described in in Figure~\ref{fig:structures}
 
+For comparison, we also fit models $M1$, $M2$, and $M3$ to the senate collaboration data. In addition, we fit two more models, $M4$ and $M5$ to the senate data that were found to be significant according to the Wald-type test:
 
+\begin{align*}
+f_i(x)^{M4} & = \beta_1s_{i1} + \beta_2s_{i2} + \beta_5s_{i5} \\
+f_i(x, z)^{M5} & = \beta_1s_{i1} + \beta_2s_{i2} + \beta_6s_{i6}.
+\end{align*}
 
-\subsection{Explore algorithms, not just end result}
-
-The model fitting process in \texttt{RSiena} involves several simulation steps that are hidden from the user. This is practical and efficient if a researcher is primarily interested in fitting one model to a set of longitudinal network data and obtaining parameter estimates. We are more interested in how the models are fit, so we extracted and explored the different steps of that process. 
-
-A key component of each step of the SIENA method of moments algorithm is the ``microstep." This step simulates from the model in its current state, $x(t_m)$ with current parameter values $\theta_{0}$, to the next state, $x(t_{m+1})$. This microstep process stops when the simulated network has acheived the same number of differences, $C$, from $x(t_m)$ as $x(t_{m+1})$, where 
-$$C = \sum_{i \neq j} |x_{ij}(t_{m+1}) - x_{ij}(t_{m})|.$$ 
-This simulation process follows the steps of the continuous-time Markov chain. First, an ``ego node'' is selected to make a change, and then it randomly makes one change in its ties according to the probability, $p_{ij}$, determined by its objective function. The options for change are (1) removing a current tie, (2) adding a new tie, or (3) making no change at all. Saving all of these steps is not efficient if you're only interested in estimating parameter values, but they can be saved and extracted using options in \texttt{RSiena}, which is exactly what we did to create our visualizations. Between two network observations $x(t_m)$ and $x(t_{m+1})$, there can be dozens, hundreds, or even thousands of microsteps, depending on the size of the network. We wanted to see these in-between steps in order to better understand the behavior of the underlying continuous-time Markov chain. 
-
-The first vizualization we present here is an animation of microsteps simulated to emulate the transition steps from wave 1 to wave 2 the subset of the friends data shown in Figure ~\ref{fig:alldataviz}. Movies similar to our animation were used to visualize the changes of dynamic networks in \citet{dynnetviz}. When each ego node is selected in a microstep, it is emphasized in the animation, then the associated edge either appears or disappears. If there are no changes at a particular microstep, no changes are seen. Some frames of the animations are shown in Figure~\ref{fig:makinggif}, and the full movie can be viewed at INSERT LINK TO GIF. 
-
-<<makinggif, fig.cap='A selection of images in the microstep animation. The selected edges and nodes are emphasized by changing the size and the color, then when edges are removed, they fade out, shrinking in size, while the nodes change color and shrink to blend in with the other nodes.', fig.width=8, cache=TRUE, message = FALSE, warning = FALSE>>=
-# Need old version of dplyr to get this to work: 
-if (!require("dplyr050",character.only = TRUE)) {
-      devtools::install_github("sctyner/dplyr050")
-}
-
-friend.data.w1 <- as.matrix(read.table("data/s50_data/s50-network1.dat"))
-friend.data.w2 <- as.matrix(read.table("data/s50_data/s50-network2.dat"))
-friend.data.w3 <- as.matrix(read.table("data/s50_data/s50-network3.dat"))
-drink <- as.matrix(read.table("data/s50_data/s50-alcohol.dat"))
-fd2.w1 <- friend.data.w1[20:35,20:35]
-fd2.w2 <- friend.data.w2[20:35,20:35]
-fd2.w3 <- friend.data.w3[20:35,20:35]
-friendshipData <- array(c(fd2.w1, fd2.w2,fd2.w3), dim = c(16, 16, 3))
-
-# running Siena
-#friendship <- sienaDependent(friendshipData)
-#alcohol <- varCovar(drink[20:35,])
-#mydata <- sienaDataCreate(friendship, alcohol)
-#myeffnull <- getEffects(mydata)
-#myalgorithm <- sienaAlgorithmCreate(projname = 's16_3')
-set.seed(823746)
-
-ansnullchains <- get_chain_info(ansnull)
-ansnullchains %>%
-  filter(period == 1) %>%  #only look at chains from wave 1 to wave 2
-  group_by(rep) %>%
-  dplyr::select(rep, from = ego, to = alter) %>%
-  mutate(val = as.numeric(!from == to),
-         from = paste0("V", parse_number(from)+1), # make the chains
-         to = paste0("V", parse_number(to)+1)) -> ansnullchainsw1w2
-colnames(fd2.w1) <- paste0("V", 1:16)
-rownames(fd2.w1) <- paste0("V", 1:16)
-wave1friends <- fortify(as.adjmat(fd2.w1))
-ms1 <- listMicrosteps(dat = wave1friends,
-                      microsteps = filter(ansnullchainsw1w2, rep == 1))
-microsteps <- ms1[1:20]
-
-microsteps_df <- getMicrostepsDF(microsteps)
-pte <- pretween_edges(microsteps = microsteps)
-ptv <- pretween_vertices(pte = pte, layoutparams = list(n = 16))
-# step 1 is remove, step 9 is add. 
-# get tweened data for all microsteps
-pall <- tween_microsteps(ptv, pte, microsteps_df)
-
-static_pall <- filter(pall, .frame %in% c(15,20,22,24,26:28, 71:73, 75, 79, 81, 84))
-
-static_pall$type <- NA
-static_pall$type[which(static_pall$.frame %in% c(15,20,22,24,26:28))] <- "Remove Edge"
-static_pall$type[which(static_pall$.frame %in% c(71:73, 75, 79, 81, 84))] <- "Add Edge"
-
-set.seed(34569234)
-create_net_animate(static_pall) + 
-  facet_wrap(~.frame, nrow=2, labeller = 'label_both') + 
-  ThemeNet + 
-  theme(panel.background = element_rect(color = 'black'))
-@
-
-The top row of Figure~\ref{fig:makinggif} shows an edge being removed, and the bottom row shows one being added. In both cases, the ego nodes chosen to act change color from black to red, and they also increase greatly in size. In the case of an edge being removed, the edge that currently exists is emphasized with the color and size change that the node also gets, and as the animation proceeds the edge shrinks to disappearing, while the node shrinks and changes color back to the original black. If the edge is being added, it appears colored red from nothing and grows to a large size, then changes color to match the rest of the edges, while the node shrinks and changes color to match the other nodes.  
-
-We also use animation to view the changing structure of the adjacency matrix the microsteps. The adjacency matrices for the three waves of friendship data as shown in Figure~\ref{fig:alldataviz} are ordered by node id. There are 16 nodes in the data, numbered 1-16, and that order is used on the $x$ and $y$ axes for the matrix visualization. Viewing the adjacency matrices with this arbitrary ordering does not provide much information to the viewer about the underlying structure of the network. This lack of perceived structure would be exacerbated in an animation. So, we adjust the ordering so that the viewer can perceive more of the structure of the graph. This process is known as matrix seriation \citep{seriation}. 
-
-To reorder the vertices for the matrix visualization, we first constructed a cumulative adjaceny matrix, $\mathbf{A}^{cum}$, for the series of microsteps simulating the network from $x(t_m)$ to $x(t_{m+1})$. A single entry in the cumulative adjacency matrix, $\mathbf{A}^{cum}_{ij}$, is the total number of times the edge from node $i$ to node $j$ appears in the network from the initial observation, $x(t_m) \equiv X(0)$ to the final reult of the last microstep, $X(C)$: 
-$$ \mathbf{A}^{cum}_{ij} = \sum_{c = 0}^C X_{ij}(c). $$
-We then performed a principal component analysis on $\mathbf{A}^{cum}$, and used the values of the first principal component to order the vertices on the $x$ and $y$ axes for the adjacency matrix animation. For one such series of microsteps simulated by \texttt{RSiena}, we present the adjacency matrix ordered by the (arbitrary) vertex id alongside the seriated adjacency microsteps using the first principal component loading on the cumulative adjacency matrix, $\mathbf{A}^{cum}$, in Figure~\ref{fig:adjmatorder}. 
-
-<<adjmatorder, message = FALSE, warning = FALSE, fig.cap="On the left, the starting friendship network represented in adjacency matrix form, ordered by vertex id. On the right, the same adjacency matrix is presented after ordering the vertices by one repitition of the microstep simulation process from wave one to wave two.", fig.width=8, fig.height=3>>=
-# first present the original wave 1 adj mat, then present the adj mat after being ordered by the 1st pc of the big adjmat A. 
-# reinstall new dplyr
-numordersf <- data.frame(fd2.w1) %>% 
-  mutate(from = rownames(fd2.w1)) %>% 
-  gather(key = to ,value = value, -from)
-pcaordersf <- numordersf
-
-numordersf$from <- factor(numordersf$from, levels = paste0("V", 1:16))
-numordersf$to <- factor(numordersf$to, levels = rev(paste0("V", 1:16)))
-
-p1 <- ggplot(data = numordersf, aes(x = from, y = to)) + geom_tile(color = 'black', aes(fill = as.factor(value))) + 
-  scale_fill_manual(values = c('white', 'black')) +
-  scale_x_discrete(position = "top", labels = as.character(1:16)) +
-  scale_y_discrete(labels = rev(as.character(1:16)))  + 
-  ThemeNoNet + 
-  theme(legend.position = 'none') + 
-  coord_fixed() 
-
-sfmsall <- read_csv("data/smallfriendsmicrosteps.csv")
-
-sfmsall %>% 
-  group_by(from, to) %>% 
-  filter(rep == 1) %>% 
-  summarise(count = n()) -> sfmsall_summ
-sfmsall_summ$from <- factor(sfmsall_summ$from, levels = paste0('V', 1:16))
-sfmsall_summ$to <- factor(sfmsall_summ$to, levels = paste0('V', 1:16))
-sfmsall_summ %>% 
-  spread(to, count, fill = 0) %>% 
-  data.frame -> allmsrep1_adjmat
-allmsrep1_adjmat$V16 <- 0
-allmsrep1_adjmat <- allmsrep1_adjmat[,-1]
-allmsrep1_adjmat <- as.matrix(allmsrep1_adjmat)
-rownames(allmsrep1_adjmat) <- paste0("V", 1:16)
-
-pca1 <- prcomp(allmsrep1_adjmat)
-order1 <- names(sort(pca1$rotation[,1], decreasing = T))
-order2 <- names(sort(abs(pca1$rotation[,1]), decreasing = T))
-
-pcaordersf$from <- factor(pcaordersf$from, levels = order1)
-pcaordersf$to <- factor(pcaordersf$to, levels = rev(order1))
-
-p2 <- ggplot(data = pcaordersf, aes(x = from, y = to)) + geom_tile(color = 'black', aes(fill = as.factor(value))) + 
-  scale_fill_manual(values = c('white', 'black')) +
-  scale_x_discrete(position = "top", labels = str_replace(order1, "V", "")) + 
-  scale_y_discrete(labels = rev(str_replace(order1, "V", ""))) + 
-  ThemeNoNet + 
-  theme(legend.position = 'none') +
-  coord_fixed() 
-
-grid.arrange(p1,p2, nrow = 1)
-@
-
-Using the principal component analysis on $\mathbf{A}^{cum}$ to order the rows and columns of the adjacency matrix visualization clearly shows the two distinct connected components in the first wave of the network, which are difficult to find in the arbitrarily ordered visualization. 
-
-We also attempt to better understand the microstep process by visualizing all transition probabilites for the first microstep in the process. We only do the first step of many for now because the \texttt{RSiena} transition probabilities after the first step are only comparable for identical steps due to the conditioning on the current network state in the model. Thus we have one step for each of the 1,000 repititions to visualize. In Figure ~\ref{histogramalters}, we present each acting node, (ego node) and the resulting probabilities of change. The probability shown by the bars is the theoretical probability according to the objective function of the ego node changing the tie to the alter node. The probability shown by the points is the empirical probability of that change being made, calculated by counting all instances of the ego node first, then computing the proprotion of each change. In most cases, they are almost identical, showing that the algorithm is performing as expected. 
-
-<<histogramalters, fig.width = 8, fig.height=11, fig.cap="Each panel shows the theoretical (as lines) and empirical (as points) probabilities of the chosen ego node changing its tie to each of the other nodes. The color of the line indicates whether the tie from the ego to the alter node is being added, removed, or if there is no change to the network in this step.">>=
-ansnullchains %>% group_by(period, rep) %>% 
-  mutate(ms = row_number()) %>% 
-  filter(ms == 1, period == 1) %>% 
-  mutate(alterProb = exp(logAlterProb),
-         ego = as.numeric(as.character(ego)),
-         alter = as.numeric(as.character(alter))) %>% 
-  ungroup() %>% 
-  group_by(ego, alter) %>% 
-  summarize(count = n(), alterProb = unique(alterProb)) %>% ungroup() %>% 
-  group_by(ego) %>% 
-  mutate(csum = cumsum(alterProb)) %>% 
-  arrange(ego, csum) %>% 
-  mutate(totego = sum(count), 
-         empprob = count / totego) -> cumprobs 
-cumprobs$ego <- factor(paste0("V",cumprobs$ego+1), levels = paste0("V", 1:16))
-cumprobs$alter <- factor(paste0("V",cumprobs$alter+1), levels = paste0("V", 1:16))
-
-# is the tie that's added new, removed, or does the network stay the same 
-
-changes <- cumprobs %>% dplyr::select(ego, alter) %>% unique 
-
-wave1friends2 <- wave1friends[,-3]
-wave1friends2$type <- "remove"
-changes2 <- left_join(changes, wave1friends2, c("ego" = "from", "alter" = "to"))
-
-changes2$type[is.na(changes2$type)] <- ifelse(changes2$ego[is.na(changes2$type)] == changes2$alter[is.na(changes2$type)], "noChange", "add")
-
-cumprobs %>% left_join(changes2) -> changes3
-
-changes3$ego <- factor(changes3$ego, levels = paste0("V", 1:16), labels = 1:16) 
-changes3$alter <- factor(changes3$alter, levels = paste0("V", 1:16), labels = 1:16) 
-
-ggplot(data = changes3) + 
-  geom_segment(
-    aes(x = alter , xend = alter, y = 0, yend = alterProb, color=type), size = 2) + 
-  geom_point(aes(x = alter, y = empprob), shape = 4, size = 2, alpha = .5) + 
-  labs(x = "alter node", y = "probability of alter node") + 
-  coord_flip() + 
-  facet_wrap(~ego, labeller = "label_both") + 
-  ThemeNoNet
-# 
-# cumprobs %>% ggplot() + geom_histogram(aes(x = alter, weight = count), color = 'black', fill = 'white', binwidth = 1) + scale_x_continuous(labels = paste0("V",1:16), breaks = 0:15) + coord_flip() + facet_wrap(~ego, labeller = "label_both") + theme_gray()
-
-# cprobslist <- split(cumprobs, cumprobs$ego)
-# plots <- list()
-# for(i in 1:length(cprobslist)){
-#   cprobslist[[i]] %>%
-#   ggplot() + 
-#   geom_histogram(aes(x = as.numeric(as.character(alter)),
-#                      y = alterProb), stat = 'identity', fill = 'white', color = 'black') + 
-#   geom_line(aes(x = as.numeric(as.character(alter)), 
-#                 y = csum)) + 
-#   geom_point(aes(x = as.numeric(as.character(alter)), 
-#                 y = csum)) +
-#   scale_x_continuous(limits = c(-.5, 15), breaks = 0:15, labels = 0:15) +   
-#   geom_hline(yintercept = 1, color = 'red', linetype = 'dashed') + 
-#   labs(x = "alter", y = expression(p[ij]), title = paste("Ego node:", names(cprobslist)[i])) + # ylab(expression(p[ij])) + 
-#   theme_gray() + 
-#     theme(plot.title = element_text(size = 10), 
-#           axis.title = element_text(size = 8), 
-#           plot.margin = unit(rep(0,4),"pt")) -> p
-#   plots[[i]] <- p
-# }
-# grid.arrange(plots[[1]], plots[[2]], plots[[3]], plots[[4]],
-#              plots[[5]], plots[[6]], plots[[7]], plots[[8]],
-#              #plots[[9]], plots[[10]], plots[[11]], plots[[12]],
-#              #plots[[13]], plots[[14]], plots[[15]], plots[[16]], 
-#              ncol = 2, padding = unit(0, 'line'))
-@
-
-Another way to view the transition probabilities is through the adjacency matrix visualization. In Figure~\ref{fig:heatmap}, we build on the concept of the ordered adjacency matrix of Figure~\ref{fig:adjmatorder}. This heatmap shows the transition probabilities of all ties that are changed in the first microstep of the 1,000 simulations. The heatmap is noticeably sparse, showing the lack of coverage in the model.  Of the 256 possible steps, only 81, or about 32\%, are taken in the 1,000 simulated chains. XXX Check this again.... XXX
-<<heatmap, fig.align='center', fig.cap='A heatmap showing the empirical transition probabilities for the first microstep in 1,000 simulations. The acting node is on the x-axis, and the receiving node is on the y-axis. Missing squares represent ties that did not occur.', fig.height=3>>=
-ansnullchains %>% 
-  filter(rep == 1, period == 1) %>% 
-  mutate(ego = paste0("V",as.numeric(as.character(ego))+1),
-         alter = paste0("V",as.numeric(as.character(alter))+1), 
-         prob = exp(logAlterProb)) -> probsDat
-
-ggplot(data = probsDat, 
-       aes(x = factor(ego, levels = order1), 
-             y = factor(alter, levels = rev(order1)), 
-             fill = prob)) + 
-  geom_tile(color = 'black') + 
-  scale_fill_gradient(low = 'white', high = 'blue', limits = c(0,1)) +
-  labs(x = "ego", y = "alter")+
-  scale_x_discrete(position = 'top', labels = str_replace(order1, "V", "")) +
-  scale_y_discrete(labels = rev(str_replace(order1, "V", ""))) +
-  ThemeNoNet + theme(panel.grid = element_blank()) + 
-  coord_fixed()
-@
-
-We also wanted to view the complete microstep process from the first wave, which we condition on, to the second wave. The number of steps taken from wave 1 to wave 2 varies. In the simulations from Model 1, the smallest number of steps taken was 58, and the longest was 248, with a mean of 106 and a median of 103. The standard deviation of the 1000 simulations' number of microsteps was 22.8. In Figure~\ref{fig:allsteps}, we see three simulations of the process from wave 1 to wave 2, with wave 1 shown on the left, and wave 2 shown on the right. In each of the three plots, the $y$-axis contains the edges sorted by how often they appear in the networks along the way. We can see that some edges are there in the beginning, but disappear and never come back, while others appear a few steps in, only to dispappear again. There are also some edges that exist in wave 2 that don't appear at all in the microstep process in a given repitition. 
-
-<<allsteps, fig.cap="Three simulations (out of 1,000) of the microstep process from wave 1 to wave 2. The $x$ axis is the microstep number, with step 0 representing the first wave of data and the final step representing the second wave of data. We can see that many edges are underrepresented in this process: they are in the second wave, but never appear in the microsteps.">>=
-smallfriends <- read_csv("data/smallfriends4Geomnet.csv")
-names(smallfriends)[1:2] <- c("from", "to")
-msall1 <- netvizinf::listMicrosteps(dat = wave1friends,
-                      microsteps = filter(ansnullchainsw1w2, rep == 1))
-msall1_df <- plyr::rbind.fill(lapply(X = seq_along(msall1), FUN = function(i, x) {
-        x[[i]]$ms <- i - 1
-        return(x[[i]])
-    }, msall1))
-msall1_df <- msall1_df %>% dplyr::select(from, to, ms)
-wave2 <- smallfriends %>% filter(Wave == 2) %>% na.omit %>% data.frame()
-msall1_df <- msall1_df %>% add_row(from = paste0("V",wave2$from),
-                      to = paste0("V",wave2$to), 
-                      ms = max(msall1_df$ms)+1)
-edges <- msall1_df %>% 
-  group_by(from, to) %>%
-  summarize(edgeappears = n()) %>% 
-  arrange(desc(edgeappears)) %>% ungroup() %>%
-  mutate(eid = row_number())
-
-msall1_df2 <- left_join(msall1_df, edges, by = c("from" = "from", "to" = "to"))
-
-p1 <- ggplot(data = msall1_df2) + 
-  geom_tile(aes(x = ms, y = -eid, fill = ms)) + 
-  geom_vline(xintercept = c(0.5,81.5)) + 
-  scale_fill_continuous(low = "red", high = "blue") + 
-  ThemeNoNet + 
-  theme(legend.position = 'none', axis.ticks.y = element_blank(),
-        axis.text.y = element_blank(), axis.title = element_blank()) +
-  labs(x = "Microstep")
-
-
-# rep 2 
-msall2 <- netvizinf::listMicrosteps(dat = wave1friends,
-                      microsteps = filter(ansnullchainsw1w2, rep == 2))
-msall2_df <- plyr::rbind.fill(lapply(X = seq_along(msall2), FUN = function(i, x) {
-        x[[i]]$ms <- i - 1
-        return(x[[i]])
-    }, msall2))
-msall2_df <- msall2_df %>% dplyr::select(from, to, ms)
-msall2_df <- msall2_df %>% add_row(from = paste0("V",wave2$from),
-                      to = paste0("V",wave2$to), 
-                      ms = max(msall2_df$ms)+1)
-
-edges2 <- msall2_df %>% 
-  group_by(from, to) %>%
-  summarize(edgeappears = n()) %>% 
-  arrange(desc(edgeappears)) %>% ungroup() %>%
-  mutate(eid = row_number())
-
-msall2_df2 <- left_join(msall2_df, edges2, by = c("from" = "from", "to" = "to"))
-
-p2 <- ggplot(data = msall2_df2) + 
-  geom_tile(aes(x = ms, y = -eid, fill = ms)) + 
-  geom_vline(xintercept = c(0.5,49.5)) + 
-  scale_fill_continuous(low = "red", high = "blue") +
-  ThemeNoNet + 
-  theme(legend.position = 'none', axis.ticks.y = element_blank(),
-        axis.text.y = element_blank(), axis.title = element_blank()) #+
-  #labs(x = "Microstep", y = "Edges (most frequent at top)")
-
-# rep 3 
-msall3 <- netvizinf::listMicrosteps(dat = wave1friends,
-                      microsteps = filter(ansnullchainsw1w2, rep == 3))
-msall3_df <- plyr::rbind.fill(lapply(X = seq_along(msall3), FUN = function(i, x) {
-        x[[i]]$ms <- i - 1
-        return(x[[i]])
-    }, msall3))
-msall3_df <- msall3_df %>% dplyr::select(from, to, ms)
-msall3_df <- msall3_df %>% add_row(from = paste0("V",wave2$from),
-                      to = paste0("V",wave2$to), 
-                      ms = max(msall3_df$ms)+1)
-
-edges3 <- msall3_df %>% 
-  group_by(from, to) %>%
-  summarize(edgeappears = n()) %>% 
-  arrange(desc(edgeappears)) %>% ungroup() %>%
-  mutate(eid = row_number())
-
-msall3_df2 <- left_join(msall3_df, edges3, by = c("from" = "from", "to" = "to"))
-
-p3 <- ggplot(data = msall3_df2) + 
-  geom_tile(aes(x = ms, y = -eid, fill = ms)) + 
-  geom_vline(xintercept = c(0.5,106.5)) + 
-  scale_fill_continuous(low = "red", high = "blue") +
-  ThemeNoNet + 
-  theme(legend.position = 'none', axis.ticks.y = element_blank(),
-        axis.text.y = element_blank(), axis.title = element_blank()) #+
-  #labs(x = "Microstep", y = "Edges (most frequent at top)")
-
-grid.arrange(p1, p2, p3, nrow = 3)
-@
-
-\st{The algorithms here are many!
-\begin{enumerate}
-%\item First, the microsteps / CTMC between each time point (gifs, other animations)
-\item Phases of RSiena: phase 1 = initial parameter estimate
-\item phase 2 = iterative update of parameters - trace plots
-\item phase 3 = simulations for convergence diagnostics
-\end{enumerate}
- } 
-
-\hh{The visualizations should address most elements of structure described before, i.e. follow along in the setup (for descriptive and teaching purposes), the fitting (understanding the model and interpreting the results) and then diagnostics (how well does the model fit the data - where are the most differences to the actual data/what are the sensitive parameters?) }
-
-\hh{Some of the visualizations we talked about
-\begin{enumerate}
-\item visualization of the MCMC process:  movie of individual actors' step-by-step decisions; could be done with the ndtv package, as long as we can get individual steps out of RSiena
-\item global picture: 1000 simulated networks + alpha blending should give a pretty good idea of the most important edges
-%\item global structure + principal components (tensor pca)
-\end{enumerate}}
+In $M4$, $s_{i5} = \mathbb{I}(x_{i+} = x_{+i} = 0)$ is an indicator variable for isolated nodes, called the network-isolate effect. This parameter attempts to measure the effect of a node being completely isolated in the network. If the value of the parameter $\beta_5$ is high, nodes are encouraged to remain isolated. In $M5$,  $s_{i6} = \sum\limits_j x_{ij}x_{ji}\mathbb{I}(z_i = z_j)$ is a measure of reciprocity between senators in the same party, $z_i, z_j \in \{\text{Democrat, Independent, Republican}\}$, generally called the same covariate reciprocity effect. This parameter attempts to measure the propensity for forming reciprocal ties between nodes with the same covariate value. If the value of the parameter $\beta_6$ is high, nodes belonging to the same covariate group are encourage to reciprocate incoming ties. By exploring these models more visually, we hope to understand these effects and the model fitting process better. 
 
 \subsection{View the model in the data space}
 
@@ -1387,6 +1056,343 @@ ggplot(data = combinedavgs) +
 \end{itemize}
  }
 
+\subsection{Explore algorithms, not just end result}
+
+The model fitting process in \texttt{RSiena} involves several simulation steps that are hidden from the user. This is practical and efficient if a researcher is primarily interested in fitting one model to a set of longitudinal network data and obtaining parameter estimates. We are more interested in how the models are fit, so we extracted and explored the different steps of that process. 
+
+A key component of each step of the SIENA method of moments algorithm is the ``microstep." This step simulates from the model in its current state, $x(t_m)$ with current parameter values $\theta_{0}$, to the next state, $x(t_{m+1})$. This microstep process stops when the simulated network has acheived the same number of differences, $C$, from $x(t_m)$ as $x(t_{m+1})$, where 
+$$C = \sum_{i \neq j} |x_{ij}(t_{m+1}) - x_{ij}(t_{m})|.$$ 
+This simulation process follows the steps of the continuous-time Markov chain. First, an ``ego node'' is selected to make a change, and then it randomly makes one change in its ties according to the probability, $p_{ij}$, determined by its objective function. The options for change are (1) removing a current tie, (2) adding a new tie, or (3) making no change at all. Saving all of these steps is not efficient if you're only interested in estimating parameter values, but they can be saved and extracted using options in \texttt{RSiena}, which is exactly what we did to create our visualizations. Between two network observations $x(t_m)$ and $x(t_{m+1})$, there can be dozens, hundreds, or even thousands of microsteps, depending on the size of the network. We wanted to see these in-between steps in order to better understand the behavior of the underlying continuous-time Markov chain. 
+
+The first vizualization we present here is an animation of microsteps simulated to emulate the transition steps from wave 1 to wave 2 the subset of the friends data shown in Figure ~\ref{fig:alldataviz}. Movies similar to our animation were used to visualize the changes of dynamic networks in \citet{dynnetviz}. When each ego node is selected in a microstep, it is emphasized in the animation, then the associated edge either appears or disappears. If there are no changes at a particular microstep, no changes are seen. Some frames of the animations are shown in Figure~\ref{fig:makinggif}, and the full movie can be viewed at INSERT LINK TO GIF. 
+
+<<makinggif, fig.cap='A selection of images in the microstep animation. The selected edges and nodes are emphasized by changing the size and the color, then when edges are removed, they fade out, shrinking in size, while the nodes change color and shrink to blend in with the other nodes.', fig.width=8, cache=TRUE, message = FALSE, warning = FALSE>>=
+# Need old version of dplyr to get this to work: 
+if (!require("dplyr050",character.only = TRUE)) {
+      devtools::install_github("sctyner/dplyr050")
+}
+
+friend.data.w1 <- as.matrix(read.table("data/s50_data/s50-network1.dat"))
+friend.data.w2 <- as.matrix(read.table("data/s50_data/s50-network2.dat"))
+friend.data.w3 <- as.matrix(read.table("data/s50_data/s50-network3.dat"))
+drink <- as.matrix(read.table("data/s50_data/s50-alcohol.dat"))
+fd2.w1 <- friend.data.w1[20:35,20:35]
+fd2.w2 <- friend.data.w2[20:35,20:35]
+fd2.w3 <- friend.data.w3[20:35,20:35]
+friendshipData <- array(c(fd2.w1, fd2.w2,fd2.w3), dim = c(16, 16, 3))
+
+# running Siena
+#friendship <- sienaDependent(friendshipData)
+#alcohol <- varCovar(drink[20:35,])
+#mydata <- sienaDataCreate(friendship, alcohol)
+#myeffnull <- getEffects(mydata)
+#myalgorithm <- sienaAlgorithmCreate(projname = 's16_3')
+set.seed(823746)
+
+ansnullchains <- get_chain_info(ansnull)
+ansnullchains %>%
+  filter(period == 1) %>%  #only look at chains from wave 1 to wave 2
+  group_by(rep) %>%
+  dplyr::select(rep, from = ego, to = alter) %>%
+  mutate(val = as.numeric(!from == to),
+         from = paste0("V", parse_number(from)+1), # make the chains
+         to = paste0("V", parse_number(to)+1)) -> ansnullchainsw1w2
+colnames(fd2.w1) <- paste0("V", 1:16)
+rownames(fd2.w1) <- paste0("V", 1:16)
+wave1friends <- fortify(as.adjmat(fd2.w1))
+ms1 <- listMicrosteps(dat = wave1friends,
+                      microsteps = filter(ansnullchainsw1w2, rep == 1))
+microsteps <- ms1[1:20]
+
+microsteps_df <- getMicrostepsDF(microsteps)
+pte <- pretween_edges(microsteps = microsteps)
+ptv <- pretween_vertices(pte = pte, layoutparams = list(n = 16))
+# step 1 is remove, step 9 is add. 
+# get tweened data for all microsteps
+pall <- tween_microsteps(ptv, pte, microsteps_df)
+
+static_pall <- filter(pall, .frame %in% c(15,20,22,24,26:28, 71:73, 75, 79, 81, 84))
+
+static_pall$type <- NA
+static_pall$type[which(static_pall$.frame %in% c(15,20,22,24,26:28))] <- "Remove Edge"
+static_pall$type[which(static_pall$.frame %in% c(71:73, 75, 79, 81, 84))] <- "Add Edge"
+
+set.seed(34569234)
+create_net_animate(static_pall) + 
+  facet_wrap(~.frame, nrow=2, labeller = 'label_both') + 
+  ThemeNet + 
+  theme(panel.background = element_rect(color = 'black'))
+@
+
+The top row of Figure~\ref{fig:makinggif} shows an edge being removed, and the bottom row shows one being added. In both cases, the ego nodes chosen to act change color from black to red, and they also increase greatly in size. In the case of an edge being removed, the edge that currently exists is emphasized with the color and size change that the node also gets, and as the animation proceeds the edge shrinks to disappearing, while the node shrinks and changes color back to the original black. If the edge is being added, it appears colored red from nothing and grows to a large size, then changes color to match the rest of the edges, while the node shrinks and changes color to match the other nodes.  
+
+We also use animation to view the changing structure of the adjacency matrix the microsteps. The adjacency matrices for the three waves of friendship data as shown in Figure~\ref{fig:alldataviz} are ordered by node id. There are 16 nodes in the data, numbered 1-16, and that order is used on the $x$ and $y$ axes for the matrix visualization. Viewing the adjacency matrices with this arbitrary ordering does not provide much information to the viewer about the underlying structure of the network. This lack of perceived structure would be exacerbated in an animation. So, we adjust the ordering so that the viewer can perceive more of the structure of the graph. This process is known as matrix seriation \citep{seriation}. 
+
+To reorder the vertices for the matrix visualization, we first constructed a cumulative adjaceny matrix, $\mathbf{A}^{cum}$, for the series of microsteps simulating the network from $x(t_m)$ to $x(t_{m+1})$. A single entry in the cumulative adjacency matrix, $\mathbf{A}^{cum}_{ij}$, is the total number of times the edge from node $i$ to node $j$ appears in the network from the initial observation, $x(t_m) \equiv X(0)$ to the final reult of the last microstep, $X(C)$: 
+$$ \mathbf{A}^{cum}_{ij} = \sum_{c = 0}^C X_{ij}(c). $$
+We then performed a principal component analysis on $\mathbf{A}^{cum}$, and used the values of the first principal component to order the vertices on the $x$ and $y$ axes for the adjacency matrix animation. For one such series of microsteps simulated by \texttt{RSiena}, we present the adjacency matrix ordered by the (arbitrary) vertex id alongside the seriated adjacency microsteps using the first principal component loading on the cumulative adjacency matrix, $\mathbf{A}^{cum}$, in Figure~\ref{fig:adjmatorder}. 
+
+<<adjmatorder, message = FALSE, warning = FALSE, fig.cap="On the left, the starting friendship network represented in adjacency matrix form, ordered by vertex id. On the right, the same adjacency matrix is presented after ordering the vertices by one repitition of the microstep simulation process from wave one to wave two.", fig.width=8, fig.height=3>>=
+# first present the original wave 1 adj mat, then present the adj mat after being ordered by the 1st pc of the big adjmat A. 
+# reinstall new dplyr
+numordersf <- data.frame(fd2.w1) %>% 
+  mutate(from = rownames(fd2.w1)) %>% 
+  gather(key = to ,value = value, -from)
+pcaordersf <- numordersf
+
+numordersf$from <- factor(numordersf$from, levels = paste0("V", 1:16))
+numordersf$to <- factor(numordersf$to, levels = rev(paste0("V", 1:16)))
+
+p1 <- ggplot(data = numordersf, aes(x = from, y = to)) + geom_tile(color = 'black', aes(fill = as.factor(value))) + 
+  scale_fill_manual(values = c('white', 'black')) +
+  scale_x_discrete(position = "top", labels = as.character(1:16)) +
+  scale_y_discrete(labels = rev(as.character(1:16)))  + 
+  ThemeNoNet + 
+  theme(legend.position = 'none') + 
+  coord_fixed() 
+
+sfmsall <- read_csv("data/smallfriendsmicrosteps.csv")
+
+sfmsall %>% 
+  group_by(from, to) %>% 
+  filter(rep == 1) %>% 
+  summarise(count = n()) -> sfmsall_summ
+sfmsall_summ$from <- factor(sfmsall_summ$from, levels = paste0('V', 1:16))
+sfmsall_summ$to <- factor(sfmsall_summ$to, levels = paste0('V', 1:16))
+sfmsall_summ %>% 
+  spread(to, count, fill = 0) %>% 
+  data.frame -> allmsrep1_adjmat
+allmsrep1_adjmat$V16 <- 0
+allmsrep1_adjmat <- allmsrep1_adjmat[,-1]
+allmsrep1_adjmat <- as.matrix(allmsrep1_adjmat)
+rownames(allmsrep1_adjmat) <- paste0("V", 1:16)
+
+pca1 <- prcomp(allmsrep1_adjmat)
+order1 <- names(sort(pca1$rotation[,1], decreasing = T))
+order2 <- names(sort(abs(pca1$rotation[,1]), decreasing = T))
+
+pcaordersf$from <- factor(pcaordersf$from, levels = order1)
+pcaordersf$to <- factor(pcaordersf$to, levels = rev(order1))
+
+p2 <- ggplot(data = pcaordersf, aes(x = from, y = to)) + geom_tile(color = 'black', aes(fill = as.factor(value))) + 
+  scale_fill_manual(values = c('white', 'black')) +
+  scale_x_discrete(position = "top", labels = str_replace(order1, "V", "")) + 
+  scale_y_discrete(labels = rev(str_replace(order1, "V", ""))) + 
+  ThemeNoNet + 
+  theme(legend.position = 'none') +
+  coord_fixed() 
+
+grid.arrange(p1,p2, nrow = 1)
+@
+
+Using the principal component analysis on $\mathbf{A}^{cum}$ to order the rows and columns of the adjacency matrix visualization clearly shows the two distinct connected components in the first wave of the network, which are difficult to find in the arbitrarily ordered visualization. 
+
+We also attempt to better understand the microstep process by visualizing all transition probabilites for the first microstep in the process. We only do the first step of many for now because the \texttt{RSiena} transition probabilities after the first step are only comparable for identical steps due to the conditioning on the current network state in the model. Thus we have one step for each of the 1,000 repititions to visualize. In Figure ~\ref{histogramalters}, we present each acting node, (ego node) and the resulting probabilities of change. The probability shown by the bars is the theoretical probability according to the objective function of the ego node changing the tie to the alter node. The probability shown by the points is the empirical probability of that change being made, calculated by counting all instances of the ego node first, then computing the proprotion of each change. In most cases, they are almost identical, showing that the algorithm is performing as expected. 
+
+<<histogramalters, fig.width = 8, fig.height=11, fig.cap="Each panel shows the theoretical (as lines) and empirical (as points) probabilities of the chosen ego node changing its tie to each of the other nodes. The color of the line indicates whether the tie from the ego to the alter node is being added, removed, or if there is no change to the network in this step.">>=
+ansnullchains %>% group_by(period, rep) %>% 
+  mutate(ms = row_number()) %>% 
+  filter(ms == 1, period == 1) %>% 
+  mutate(alterProb = exp(logAlterProb),
+         ego = as.numeric(as.character(ego)),
+         alter = as.numeric(as.character(alter))) %>% 
+  ungroup() %>% 
+  group_by(ego, alter) %>% 
+  summarize(count = n(), alterProb = unique(alterProb)) %>% ungroup() %>% 
+  group_by(ego) %>% 
+  mutate(csum = cumsum(alterProb)) %>% 
+  arrange(ego, csum) %>% 
+  mutate(totego = sum(count), 
+         empprob = count / totego) -> cumprobs 
+cumprobs$ego <- factor(paste0("V",cumprobs$ego+1), levels = paste0("V", 1:16))
+cumprobs$alter <- factor(paste0("V",cumprobs$alter+1), levels = paste0("V", 1:16))
+
+# is the tie that's added new, removed, or does the network stay the same 
+
+changes <- cumprobs %>% dplyr::select(ego, alter) %>% unique 
+
+wave1friends2 <- wave1friends[,-3]
+wave1friends2$type <- "remove"
+changes2 <- left_join(changes, wave1friends2, c("ego" = "from", "alter" = "to"))
+
+changes2$type[is.na(changes2$type)] <- ifelse(changes2$ego[is.na(changes2$type)] == changes2$alter[is.na(changes2$type)], "noChange", "add")
+
+cumprobs %>% left_join(changes2) -> changes3
+
+changes3$ego <- factor(changes3$ego, levels = paste0("V", 1:16), labels = 1:16) 
+changes3$alter <- factor(changes3$alter, levels = paste0("V", 1:16), labels = 1:16) 
+
+ggplot(data = changes3) + 
+  geom_segment(
+    aes(x = alter , xend = alter, y = 0, yend = alterProb, color=type), size = 2) + 
+  geom_point(aes(x = alter, y = empprob), shape = 4, size = 2, alpha = .5) + 
+  labs(x = "alter node", y = "probability of alter node") + 
+  coord_flip() + 
+  facet_wrap(~ego, labeller = "label_both") + 
+  ThemeNoNet
+# 
+# cumprobs %>% ggplot() + geom_histogram(aes(x = alter, weight = count), color = 'black', fill = 'white', binwidth = 1) + scale_x_continuous(labels = paste0("V",1:16), breaks = 0:15) + coord_flip() + facet_wrap(~ego, labeller = "label_both") + theme_gray()
+
+# cprobslist <- split(cumprobs, cumprobs$ego)
+# plots <- list()
+# for(i in 1:length(cprobslist)){
+#   cprobslist[[i]] %>%
+#   ggplot() + 
+#   geom_histogram(aes(x = as.numeric(as.character(alter)),
+#                      y = alterProb), stat = 'identity', fill = 'white', color = 'black') + 
+#   geom_line(aes(x = as.numeric(as.character(alter)), 
+#                 y = csum)) + 
+#   geom_point(aes(x = as.numeric(as.character(alter)), 
+#                 y = csum)) +
+#   scale_x_continuous(limits = c(-.5, 15), breaks = 0:15, labels = 0:15) +   
+#   geom_hline(yintercept = 1, color = 'red', linetype = 'dashed') + 
+#   labs(x = "alter", y = expression(p[ij]), title = paste("Ego node:", names(cprobslist)[i])) + # ylab(expression(p[ij])) + 
+#   theme_gray() + 
+#     theme(plot.title = element_text(size = 10), 
+#           axis.title = element_text(size = 8), 
+#           plot.margin = unit(rep(0,4),"pt")) -> p
+#   plots[[i]] <- p
+# }
+# grid.arrange(plots[[1]], plots[[2]], plots[[3]], plots[[4]],
+#              plots[[5]], plots[[6]], plots[[7]], plots[[8]],
+#              #plots[[9]], plots[[10]], plots[[11]], plots[[12]],
+#              #plots[[13]], plots[[14]], plots[[15]], plots[[16]], 
+#              ncol = 2, padding = unit(0, 'line'))
+@
+
+Another way to view the transition probabilities is through the adjacency matrix visualization. In Figure~\ref{fig:heatmap}, we build on the concept of the ordered adjacency matrix of Figure~\ref{fig:adjmatorder}. This heatmap shows the transition probabilities of all ties that are changed in the first microstep of the 1,000 simulations. The heatmap is noticeably sparse, showing the lack of coverage in the model.  Of the 256 possible steps, only 81, or about 32\%, are taken in the 1,000 simulated chains. XXX Check this again.... XXX
+<<heatmap, fig.align='center', fig.cap='A heatmap showing the empirical transition probabilities for the first microstep in 1,000 simulations. The acting node is on the x-axis, and the receiving node is on the y-axis. Missing squares represent ties that did not occur.', fig.height=3>>=
+ansnullchains %>% 
+  filter(rep == 1, period == 1) %>% 
+  mutate(ego = paste0("V",as.numeric(as.character(ego))+1),
+         alter = paste0("V",as.numeric(as.character(alter))+1), 
+         prob = exp(logAlterProb)) -> probsDat
+
+ggplot(data = probsDat, 
+       aes(x = factor(ego, levels = order1), 
+             y = factor(alter, levels = rev(order1)), 
+             fill = prob)) + 
+  geom_tile(color = 'black') + 
+  scale_fill_gradient(low = 'white', high = 'blue', limits = c(0,1)) +
+  labs(x = "ego", y = "alter")+
+  scale_x_discrete(position = 'top', labels = str_replace(order1, "V", "")) +
+  scale_y_discrete(labels = rev(str_replace(order1, "V", ""))) +
+  ThemeNoNet + theme(panel.grid = element_blank()) + 
+  coord_fixed()
+@
+
+We also wanted to view the complete microstep process from the first wave, which we condition on, to the second wave. The number of steps taken from wave 1 to wave 2 varies. In the simulations from Model 1, the smallest number of steps taken was 58, and the longest was 248, with a mean of 106 and a median of 103. The standard deviation of the 1000 simulations' number of microsteps was 22.8. In Figure~\ref{fig:allsteps}, we see three simulations of the process from wave 1 to wave 2, with wave 1 shown on the left, and wave 2 shown on the right. In each of the three plots, the $y$-axis contains the edges sorted by how often they appear in the networks along the way. We can see that some edges are there in the beginning, but disappear and never come back, while others appear a few steps in, only to dispappear again. There are also some edges that exist in wave 2 that don't appear at all in the microstep process in a given repitition. 
+
+<<allsteps, fig.cap="Three simulations (out of 1,000) of the microstep process from wave 1 to wave 2. The $x$ axis is the microstep number, with step 0 representing the first wave of data and the final step representing the second wave of data. We can see that many edges are underrepresented in this process: they are in the second wave, but never appear in the microsteps.">>=
+smallfriends <- read_csv("data/smallfriends4Geomnet.csv")
+names(smallfriends)[1:2] <- c("from", "to")
+msall1 <- netvizinf::listMicrosteps(dat = wave1friends,
+                      microsteps = filter(ansnullchainsw1w2, rep == 1))
+msall1_df <- plyr::rbind.fill(lapply(X = seq_along(msall1), FUN = function(i, x) {
+        x[[i]]$ms <- i - 1
+        return(x[[i]])
+    }, msall1))
+msall1_df <- msall1_df %>% dplyr::select(from, to, ms)
+wave2 <- smallfriends %>% filter(Wave == 2) %>% na.omit %>% data.frame()
+msall1_df <- msall1_df %>% add_row(from = paste0("V",wave2$from),
+                      to = paste0("V",wave2$to), 
+                      ms = max(msall1_df$ms)+1)
+edges <- msall1_df %>% 
+  group_by(from, to) %>%
+  summarize(edgeappears = n()) %>% 
+  arrange(desc(edgeappears)) %>% ungroup() %>%
+  mutate(eid = row_number())
+
+msall1_df2 <- left_join(msall1_df, edges, by = c("from" = "from", "to" = "to"))
+
+p1 <- ggplot(data = msall1_df2) + 
+  geom_tile(aes(x = ms, y = -eid, fill = ms)) + 
+  geom_vline(xintercept = c(0.5,81.5)) + 
+  scale_fill_continuous(low = "red", high = "blue") + 
+  ThemeNoNet + 
+  theme(legend.position = 'none', axis.ticks.y = element_blank(),
+        axis.text.y = element_blank(), axis.title = element_blank()) +
+  labs(x = "Microstep")
+
+
+# rep 2 
+msall2 <- netvizinf::listMicrosteps(dat = wave1friends,
+                      microsteps = filter(ansnullchainsw1w2, rep == 2))
+msall2_df <- plyr::rbind.fill(lapply(X = seq_along(msall2), FUN = function(i, x) {
+        x[[i]]$ms <- i - 1
+        return(x[[i]])
+    }, msall2))
+msall2_df <- msall2_df %>% dplyr::select(from, to, ms)
+msall2_df <- msall2_df %>% add_row(from = paste0("V",wave2$from),
+                      to = paste0("V",wave2$to), 
+                      ms = max(msall2_df$ms)+1)
+
+edges2 <- msall2_df %>% 
+  group_by(from, to) %>%
+  summarize(edgeappears = n()) %>% 
+  arrange(desc(edgeappears)) %>% ungroup() %>%
+  mutate(eid = row_number())
+
+msall2_df2 <- left_join(msall2_df, edges2, by = c("from" = "from", "to" = "to"))
+
+p2 <- ggplot(data = msall2_df2) + 
+  geom_tile(aes(x = ms, y = -eid, fill = ms)) + 
+  geom_vline(xintercept = c(0.5,49.5)) + 
+  scale_fill_continuous(low = "red", high = "blue") +
+  ThemeNoNet + 
+  theme(legend.position = 'none', axis.ticks.y = element_blank(),
+        axis.text.y = element_blank(), axis.title = element_blank()) #+
+  #labs(x = "Microstep", y = "Edges (most frequent at top)")
+
+# rep 3 
+msall3 <- netvizinf::listMicrosteps(dat = wave1friends,
+                      microsteps = filter(ansnullchainsw1w2, rep == 3))
+msall3_df <- plyr::rbind.fill(lapply(X = seq_along(msall3), FUN = function(i, x) {
+        x[[i]]$ms <- i - 1
+        return(x[[i]])
+    }, msall3))
+msall3_df <- msall3_df %>% dplyr::select(from, to, ms)
+msall3_df <- msall3_df %>% add_row(from = paste0("V",wave2$from),
+                      to = paste0("V",wave2$to), 
+                      ms = max(msall3_df$ms)+1)
+
+edges3 <- msall3_df %>% 
+  group_by(from, to) %>%
+  summarize(edgeappears = n()) %>% 
+  arrange(desc(edgeappears)) %>% ungroup() %>%
+  mutate(eid = row_number())
+
+msall3_df2 <- left_join(msall3_df, edges3, by = c("from" = "from", "to" = "to"))
+
+p3 <- ggplot(data = msall3_df2) + 
+  geom_tile(aes(x = ms, y = -eid, fill = ms)) + 
+  geom_vline(xintercept = c(0.5,106.5)) + 
+  scale_fill_continuous(low = "red", high = "blue") +
+  ThemeNoNet + 
+  theme(legend.position = 'none', axis.ticks.y = element_blank(),
+        axis.text.y = element_blank(), axis.title = element_blank()) #+
+  #labs(x = "Microstep", y = "Edges (most frequent at top)")
+
+grid.arrange(p1, p2, p3, nrow = 3)
+@
+
+\st{The algorithms here are many!
+\begin{enumerate}
+%\item First, the microsteps / CTMC between each time point (gifs, other animations)
+\item Phases of RSiena: phase 1 = initial parameter estimate
+\item phase 2 = iterative update of parameters - trace plots
+\item phase 3 = simulations for convergence diagnostics
+\end{enumerate}
+ } 
+
+\hh{The visualizations should address most elements of structure described before, i.e. follow along in the setup (for descriptive and teaching purposes), the fitting (understanding the model and interpreting the results) and then diagnostics (how well does the model fit the data - where are the most differences to the actual data/what are the sensitive parameters?) }
+
+\hh{Some of the visualizations we talked about
+\begin{enumerate}
+\item visualization of the MCMC process:  movie of individual actors' step-by-step decisions; could be done with the ndtv package, as long as we can get individual steps out of RSiena
+\item global picture: 1000 simulated networks + alpha blending should give a pretty good idea of the most important edges
+%\item global structure + principal components (tensor pca)
+\end{enumerate}}
 
 
 \section{Discussion} \label{sec:discussion}
