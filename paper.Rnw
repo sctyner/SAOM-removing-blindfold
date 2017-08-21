@@ -720,6 +720,7 @@ qplot(x = log(gof1$`Period 1`$SimulatedTestStat), binwidth = .2) +
 \st{Because longitudinal network data consist of three different ``spaces" of data, viewing the model in the data space can depend on which aspect of the model and the data you are interested in viewing. The SIENA software includes a method for modelling covariate change in the network by incorporating the network structure, assuming that the ties between nodes can affect how nodes behave over time. In this instance, a time series plot of predicted covariate values for the nodes as the network evolves is viewing the model in the time and node spaces. If, as in Figure~\ref{fig:sienagof}, summary statistics computed on the network are of interest, distributions of these statistics computed on networks simulated from the model show the model in the edge data space. For an example, see Figure~\ref{fig:gof2}, where the distribution of the log of the Mahalanobis distance is shown for the outdegree distribution auxiliary statistics, and the log Mahalanobis distance for the observed data is shown as a vertical line. 
 
 \begin{figure}
+\centering
 \includegraphics[width=.75\linewidth]{img/Model1LUSmallFriends.png}
 \caption{\label{fig:lineup} A small lineup of node-link diagrams showing the second wave of our small friendship network among five networks simulated from model $M1$.}
 \end{figure}
@@ -1260,10 +1261,7 @@ plots[[i + 1]] <- ggplot(data = adjmatall3 %>% filter(ms == i)) +
 plots 
 @
 
-Using the principal component analysis on $\mathbf{A}^{cum}$ to order the rows and columns of the adjacency matrix visualization clearly shows the two distinct connected components in the first wave of the network, which are difficult to find in the arbitrarily ordered visualization. 
-
-We also attempt to better understand the microstep process by visualizing all transition probabilites for the first microstep in the process. We only do the first step of many for now because the \texttt{RSiena} transition probabilities after the first step are only comparable for identical steps due to the conditioning on the current network state in the model. Thus we have one step for each of the 1,000 repititions to visualize. In Figure ~\ref{histogramalters}, we present each acting node, (ego node) and the resulting probabilities of change. The probability shown by the bars is the theoretical probability according to the objective function of the ego node changing the tie to the alter node. The probability shown by the points is the empirical probability of that change being made, calculated by counting all instances of the ego node first, then computing the proprotion of each change. In most cases, they are almost identical, showing that the algorithm is performing as expected. 
-
+Using the principal component analysis on $\mathbf{A}^{cum}$ to order the rows and columns of the adjacency matrix visualization clearly shows the two distinct connected components in the first wave of the network, which are difficult to find in the arbitrarily ordered visualization. We use this layout to fix the layout in the animation of one of the microstep process simulations. This animation, which is shown in Figure~\ref{fig:adjmatani} is very simple: a square appears or disappears in the animation as that edge appears or disappears in the microstep process. Through this animation, we can see edges appearing, and then later on disappearing. These in-between steps are not shown when we look at the network at our discrete observation points. By viewing this animation, we gain a better understanding of the dynamics of this model. 
 <<histogramalters, fig.width = 8, fig.height=11, fig.cap="Each panel shows the theoretical (as lines) and empirical (as points) probabilities of the chosen ego node changing its tie to each of the other nodes. The color of the line indicates whether the tie from the ego to the alter node is being added, removed, or if there is no change to the network in this step.">>=
 ansnullchains %>% group_by(period, rep) %>% 
   mutate(ms = row_number()) %>% 
@@ -1335,14 +1333,20 @@ ggplot(data = changes3) +
 #              ncol = 2, padding = unit(0, 'line'))
 @
 
-Another way to view the transition probabilities is through the adjacency matrix visualization. In Figure~\ref{fig:heatmap}, we build on the concept of the ordered adjacency matrix of Figure~\ref{fig:adjmatorder}. This heatmap shows the transition probabilities of all ties that are changed in the first microstep of the 1,000 simulations. The heatmap is noticeably sparse, showing the lack of coverage in the model.  Of the 256 possible steps, only 81, or about 32\%, are taken in the 1,000 simulated chains. XXX Check this again.... XXX
-<<heatmap, fig.align='center', fig.cap='A heatmap showing the empirical transition probabilities for the first microstep in 1,000 simulations. The acting node is on the x-axis, and the receiving node is on the y-axis. Missing squares represent ties that did not occur.', fig.height=3>>=
+We also attempt to better understand the microstep process by visualizing the observed transition probabilites for the first microstep in the process. We only do the first step of many for now because the \texttt{RSiena} transition probabilities after the first step are only directly comparable for identical steps due to the conditioning on the current network state in the model. In other words, for $i \neq j \neq k \neq \ell \in \{1, \dots, n\}$, the probability of tie $x_{k\ell}$ changing in the second microstep is different in the case of $x_{ij}$ changing in the first step from the case of $x_{ij}$ not changing in the first step. Thus we have one transition probability for the first microstep taken for each of the 1,000 simulations to visualize. In Figure~\ref{fig:histogramalters}, we present each acting node, (ego node) and the resulting probabilities of tie changes. The probability shown by the bars is the theoretical probability, according to the objective function, of the ego node changing its tie to the alter node, while the probability shown by the points is the empirical probability of that change being made. The empirical probability is calculated by counting all instances of the ego node first, then computing the proportion of each different alter node change. In most cases, they are almost identical, which demonstrates that the algorithm is performing as expected. 
+
+<<heatmap, fig.align='center', fig.cap='A heatmap showing the empirical transition probabilities for the first microstep in 1,000 simulations. The acting node is on the x-axis, and the receiving node is on the y-axis. Missing squares represent ties that did not occur.', fig.height=4>>=
 ansnullchains %>% 
-  filter(rep == 1, period == 1) %>% 
+  filter(period == 1) %>% 
+  group_by(rep) %>% 
+  mutate(msno = row_number()) %>% 
+  filter(msno == 1) %>% 
   mutate(ego = paste0("V",as.numeric(as.character(ego))+1),
          alter = paste0("V",as.numeric(as.character(alter))+1), 
          prob = exp(logAlterProb)) -> probsDat
 
+# probsDat %>% group_by(ego, alter) %>% summarize(count = n()) %>% dim
+# 103, 3
 ggplot(data = probsDat, 
        aes(x = factor(ego, levels = order1), 
              y = factor(alter, levels = rev(order1)), 
@@ -1356,7 +1360,9 @@ ggplot(data = probsDat,
   coord_fixed()
 @
 
-We also wanted to view the complete microstep process from the first wave, which we condition on, to the second wave. The number of steps taken from wave 1 to wave 2 varies. In the simulations from Model 1, the smallest number of steps taken was 58, and the longest was 248, with a mean of 106 and a median of 103. The standard deviation of the 1000 simulations' number of microsteps was 22.8. In Figure~\ref{fig:allsteps}, we see three simulations of the process from wave 1 to wave 2, with wave 1 shown on the left, and wave 2 shown on the right. In each of the three plots, the $y$-axis contains the edges sorted by how often they appear in the networks along the way. We can see that some edges are there in the beginning, but disappear and never come back, while others appear a few steps in, only to dispappear again. There are also some edges that exist in wave 2 that don't appear at all in the microstep process in a given repitition. 
+
+Another way to view these transition probabilities is through the adjacency matrix visualization. In Figure~\ref{fig:heatmap}, we build on the concept of the ordered adjacency matrix of Figure~\ref{fig:adjmatorder}. This heatmap shows the transition probabilities of all ties that are changed in the first microstep of the 1,000 simulations. The heatmap is noticeably sparse: %showing the lack of coverage in the model.  
+of the 256 possible steps, only 103, or about 40\%, are taken in the 1,000 simulated chains. 
 
 <<allsteps, fig.cap="Three simulations (out of 1,000) of the microstep process from wave 1 to wave 2. The $x$ axis is the microstep number, with step 0 representing the first wave of data and the final step representing the second wave of data. We can see that many edges are underrepresented in this process: they are in the second wave, but never appear in the microsteps.">>=
 smallfriends <- read_csv("data/smallfriends4Geomnet.csv")
@@ -1439,35 +1445,69 @@ edges3 <- msall3_df %>%
 
 msall3_df2 <- left_join(msall3_df, edges3, by = c("from" = "from", "to" = "to"))
 
-p3 <- ggplot(data = msall3_df2) + 
-  geom_tile(aes(x = ms, y = -eid, fill = ms)) + 
-  geom_vline(xintercept = c(0.5,106.5)) + 
-  scale_fill_continuous(low = "red", high = "blue") +
-  ThemeNoNet + 
-  theme(legend.position = 'none', axis.ticks.y = element_blank(),
-        axis.text.y = element_blank(), axis.title = element_blank()) #+
-  #labs(x = "Microstep", y = "Edges (most frequent at top)")
+# p3 <- ggplot(data = msall3_df2) + 
+#   geom_tile(aes(x = ms, y = -eid, fill = ms)) + 
+#   geom_vline(xintercept = c(0.5,106.5)) + 
+#   scale_fill_continuous(low = "red", high = "blue") +
+#   ThemeNoNet + 
+#   theme(legend.position = 'none', axis.ticks.y = element_blank(),
+#         axis.text.y = element_blank(), axis.title = element_blank()) #+
+#   #labs(x = "Microstep", y = "Edges (most frequent at top)")
 
-grid.arrange(p1, p2, p3, nrow = 3)
+grid.arrange(p1, p2, nrow = 2)
 @
 
-\st{The algorithms here are many!
-\begin{enumerate}
-%\item First, the microsteps / CTMC between each time point (gifs, other animations)
-\item Phases of RSiena: phase 1 = initial parameter estimate
-\item phase 2 = iterative update of parameters - trace plots
-\item phase 3 = simulations for convergence diagnostics
-\end{enumerate}
- } 
+We also wanted to view the complete microstep process from the first wave, which we condition on in the model, to the second wave. The number of steps taken from wave 1 to wave 2 varies. In the simulations from Model 1, the smallest number of steps taken was 58, and the longest was 248, with a mean of 106 and a median of 103. In the 1,000 simulations, the standard deviation of the number of microsteps was 22.8. In Figure~\ref{fig:allsteps}, we see two simulations of the process from wave 1 to wave 2, with wave 1 shown on the left, and wave 2 shown on the right. In each of the three plots, the $y$-axis contains the edges sorted by how often they appear in the networks along the way. We can see that some edges are there in the beginning, but disappear and never come back, while others appear a few steps in, only to dispappear again. There are also some edges that were observed in wave 2 that don't appear at all in the microstep process in a given simulation. 
+
+<<alledgests>>=
+# get a plot of all microsteps from w1 to w2 by edge
+alledges <- expand.grid(from = paste0("V", 1:16), to = paste0("V", 1:16))
+alledges$eid <- 1:nrow(alledges)
+
+sfmsall %>% left_join(alledges) -> sfmsall2 
+
+sfmsall2 %>% group_by(rep) %>% mutate(isWave2 = (ms == max(ms))) -> sfmsall2
+
+sfmsall2 %>% group_by(from, to, eid) %>% 
+  summarize(total =n()) %>% 
+  arrange(desc(total)) %>% 
+  ungroup %>% 
+  mutate(plotorder = row_number()) -> sfmsallorder 
+
+sfmsall2 %>% group_by(ms, eid) %>% 
+  summarise(count = n()) %>%
+  mutate(alpha = count/1000) %>% 
+  arrange(ms, eid) -> sfmsall3  
+
+left_join(sfmsall3, sfmsallorder, by = "eid") -> sfmsall4 
+
+ggplot(data = sfmsall4) + 
+  geom_tile(aes(x = ms, y = reorder(eid,-plotorder), alpha = alpha), fill = 'navy') +
+  scale_alpha_continuous("occurence %") + 
+  labs(x = "Microstep No.", y = "Edges (ordered by total # occurences)") + 
+  ThemeNoNet + 
+  theme(axis.ticks.y = element_blank(), axis.text.y = element_blank(), panel.grid = element_blank())
+@
+
+\st{We also combine all 1,000 simulations into a visualization like the one shown in Figure~\ref{fig:allsteps}. We first assign each possible edge an edge ID number so that we can keep track of it throughout all the microsteps and all the simlations. Then, we count up the total number of times each edge appears in the microstep process in each of the 1,000 simulations for use as an ordering variable later. We also count up the number of times an edge occurs in each microstep number in the 1,000 simulations. Since the number of microsteps in the process varies, the number of times an edge occurs decreases as the microstep increases. Next, we compute a proportion, which we call the occurence percentage, which is the number of times the edge occurred in a microstep divided by 1,000. Finally, we visualize all this information together in Figure ~\ref{fig:alledgeests}. XX more detail tomorrow XX }
+
+% \st{The algorithms here are many!
+% \begin{enumerate}
+% %\item First, the microsteps / CTMC between each time point (gifs, other animations)
+% \item Phases of RSiena: phase 1 = initial parameter estimate
+% \item phase 2 = iterative update of parameters - trace plots
+% \item phase 3 = simulations for convergence diagnostics
+% \end{enumerate}
+%  } 
 
 \hh{The visualizations should address most elements of structure described before, i.e. follow along in the setup (for descriptive and teaching purposes), the fitting (understanding the model and interpreting the results) and then diagnostics (how well does the model fit the data - where are the most differences to the actual data/what are the sensitive parameters?) }
 
-\hh{Some of the visualizations we talked about
-\begin{enumerate}
-\item visualization of the MCMC process:  movie of individual actors' step-by-step decisions; could be done with the ndtv package, as long as we can get individual steps out of RSiena
-\item global picture: 1000 simulated networks + alpha blending should give a pretty good idea of the most important edges
-%\item global structure + principal components (tensor pca)
-\end{enumerate}}
+% \hh{Some of the visualizations we talked about
+% \begin{enumerate}
+% \item visualization of the MCMC process:  movie of individual actors' step-by-step decisions; could be done with the ndtv package, as long as we can get individual steps out of RSiena
+% \item global picture: 1000 simulated networks + alpha blending should give a pretty good idea of the most important edges
+% %\item global structure + principal components (tensor pca)
+% \end{enumerate}}
 
 
 \section{Discussion} \label{sec:discussion}
