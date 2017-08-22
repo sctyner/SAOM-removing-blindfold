@@ -81,7 +81,7 @@
 
 \bigskip
 \begin{abstract}
- \hh{XXX just a placeholder}
+Social networks have been studied for decades, beginning with a few foundational works, including the 1967 study, "The Small World Problem" by Stanley Milgram. In this paper, we concentrate on one type of model for dynamic social networks: the stochastic actor-oriented models (SAOMs), introduced by Snijders (1996). Unlike other network models, SAOMs are not very well understood. We use model visualization techniques introduced in Wickham et al (2015) in order to make them a little less murky. The SAOMs are a prime example of a set of models that can benefit greatly from application of model visualization. With the help of static and dynamic visualizations, we bring the hidden model fitting processes into the foreground, eventually leading to a better understanding and higher accessibility of stochastic actor-oriented models for social network analysts.
 \end{abstract}
 
 \noindent%
@@ -543,7 +543,7 @@ ggplot(data = dad, aes(from_id = from, to_id = to)) +
 \caption{The additional network effects included in our models fit to the friends data. On the left, a jumping transitive triplet (JTT). On the right, a doubly achieved distance between $i$ and $k$.}
 \end{figure}
 
-where $s_{i3} = \sum_{j \neq h} x_{ij}x_{ih}x_{hj} \mathbb{I}(z_i = z_h \neq z_j)$, and $s_{i4} =  |\{j : x_{ij} = 0, \sum\limits_h x_{ih}x_{hj} \geq 2\}|$. These statistics are known as the number of jumping transitive triplets and the number of doubly achieved distances two effect, respectively. The first statistic emphasizes triad relationships that are formed between actors from different covariate groups, while the other emphasizes indirect ties between actors. These two effects are visually represented and further described in in Figure~\ref{fig:structures}
+where $s_{i3} = \sum_{j \neq h} x_{ij}x_{ih}x_{hj} \mathbb{I}(z_i = z_h \neq z_j)$, and $s_{i4} =  |\{j : x_{ij} = 0, \sum\limits_h x_{ih}x_{hj} \geq 2\}|$. These statistics are known as the number of jumping transitive triplets and the number of doubly achieved distances two effect, respectively. The first statistic emphasizes triad relationships that are formed between actors from different covariate groups, while the other emphasizes indirect ties between actors. These two effects are visually represented and further described in Figure~\ref{fig:jtt} and Figure~\ref{fig:dad}, respectively.
 
 For comparison, we also fit models $M1$, $M2$, and $M3$ to the senate collaboration data. In addition, we fit two more models, $M4$ and $M5$ to the senate data that were found to be significant according to the Wald-type test:
 
@@ -592,6 +592,7 @@ To demonstrate, we use \texttt{geomnet} to visualize the connections in the $111
 
 % below chunk contains some repetitive stuff. Haven't figured out what it's purpose is yet. 
 <<summnetM1, message=FALSE, fig.cap='On the left, the first wave of observed data that is conditioned on in the model. On the right, the second wave of observed data. In the middle, a summary network from the first model fit to the data. This summary network represents 1,000 simulations of wave 2 using the values from the simple fitted model $M1$.',results='hide', fig.height=3>>=
+library(netvizinf)
 friendshipData <- array(c(fd2.w1, fd2.w2, fd2.w3), dim = c(16, 16, 3))
 drink1 <- s50a[20:35,1]
 drink2 <- s50a[20:35,2]
