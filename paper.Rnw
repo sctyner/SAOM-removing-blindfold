@@ -594,14 +594,12 @@ $\beta_3$ & -- & \Sexpr{SFE$M2[5]} & -- & -- & \Sexpr{SSE$M2[6]} & -- \\
 \caption{\label{tab:meanests} The means (standard deviations) of parameter values estimated from repeated fittings of $M1, M2, M3$ to the small friendship network and the senate collaboration network. Each model was fit 1,000 times to the friend data, while each model was fit 100 times to the senate data.}
 \end{table}
 
-For comparison, we also fit models $M1$, $M2$, and $M3$ to the senate collaboration data. Comparison of the parameter estimates of these models fit to the two different data sets is given in Table~\ref{tab:meanests} In addition, we fit two more models, $M4$ and $M5$ to the senate data that were found to be significant according to the Wald-type test:
+For comparison, we also fit models $M1$, $M2$, and $M3$ to the senate collaboration data. Comparison of the parameter estimates of these models fit to the two different data sets is given in Table~\ref{tab:meanests}. In addition, we fit two more models, $M4$ and $M5$ to the senate data that were found to be significant according to the Wald-type test:
 
 \begin{align*}
 f_i(x)^{M4} & = \beta_1s_{i1} + \beta_2s_{i2} + \beta_5s_{i5} \\
 f_i(x, z)^{M5} & = \beta_1s_{i1} + \beta_2s_{i2} + \beta_6s_{i6}.
 \end{align*}
-
-XXX TO DO - working on model estimates tonight XXX 
 
 In $M4$, $s_{i5} = \mathbb{I}(x_{i+} = x_{+i} = 0)$ is an indicator variable for isolated nodes, called the network-isolate effect. This parameter attempts to measure the effect of a node being completely isolated in the network. If the value of the parameter $\beta_5$ is high, nodes are encouraged to remain isolated. In $M5$,  $s_{i6} = \sum\limits_j x_{ij}x_{ji}\mathbb{I}(z_i = z_j)$ is a measure of reciprocity between senators in the same party, $z_i, z_j \in \{\text{Democrat, Independent, Republican}\}$, generally called the same covariate reciprocity effect. This parameter attempts to measure the propensity for forming reciprocal ties between nodes with the same covariate value. If the value of the parameter $\beta_6$ is high, nodes belonging to the same covariate group are encourage to reciprocate incoming ties. By exploring these models more visually, we hope to understand these effects and the model fitting process better. 
 
