@@ -284,7 +284,7 @@ Other modelling scenarios allow this rate to be more flexible,  e.g.\ a function
 } The parameter for the wait time for the whole network $n\alpha_m$ is the rate at which any tie change occurs. The estimation of this parameter is straightforward: a the method of moments is used to estimate the rate with the statistic $$C = \sum_i\sum_j |x_{ij}(t_{m+1}) = x_{ij}(t_m)|$$ which is the total number of changes from observation at time $t_m$ to the observation at time $t_{m+1}$. %In order to achieve the memorylessness property of a Markov process, 
 
 \hh{XXX we tried to estimate the rate based on the simulations - you could include a histogram of the number of changes for the 1000 simulations in the viz part XXX}
-\st{XXX I have the fitted models from the 1000 simulations (see Figure \ref{fig:distests}). Is that what you mean? XXX}
+\st{XXX see line 1257 for plot. where should I put it? }
  
 \subsubsection{The Objective Function} 
 
@@ -844,6 +844,22 @@ ggpairs(simu_spread, columns = 3:8, ggplot2::aes(colour=Model, alpha = .5)) + th
                     )
 @
 
+<<corplotsSenate>>=
+senM4est <- read.csv("data/congress/senateM4ests.csv")
+senM5est <- read.csv("data/congress/senateM5ests.csv")
+names(senM4est) <- c("alpha1", "alpha2", "alpha3", "beta1", "beta2", "beta5")
+names(senM5est) <- c("alpha1", "alpha2", "alpha3", "beta1", "beta2", "beta6")
+senM4est$Model <- "M4"
+senM5est$Model <- "M5"
+senM4est$Sim <- 1:nrow(senM4est)
+senM5est$Sim <- 1:nrow(senM5est)
+senM4est2 <- senM4est %>% gather(parameter, estimate, alpha1:beta5) 
+senM5est2 <- senM5est %>% gather(parameter, estimate, alpha1:beta6) 
+senM45est <- rbind(senM4est2, senM5est2)
+senM45est %>% spread(parameter, estimate)-> senM45est2
+ggpairs(senM45est2, columns = 3:9, ggplot2::aes(colour=Model, alpha = .5))
+@
+
 We also explore simulations from these different models given parameter values. Using the mean values of from the 1,000 fitted parameter values as the parameters in our models, we simulated 1,000 observations from each of our three models. In this process, we condition on the first friendship network observation, and the second and third observations are simulated from the SAOM models with the given parameter values. From these simulations, we first create a visualization that represents an average network. To do this, we follow the same procedure as in Section~\ref{sec:minds}, counting occurrences of each possible edge in the simulations, resulting in a summary network with weighted edges representing the number of times an edge appeared in the simulated wave 2 when simulating from the SAOM 1,000 times. As in Figure~\ref{fig:summnetM1}, edges only appear in the average network if they appear more than 5\% of the time in the simulations. In Figure~\ref{fig:averagenet}, we show the first wave, the ``average'' network from the three models we fit, and the second wave. \st{Comparing the three averages to waves 1 and 2, we see that they have very similar structure to wave 1. Model 2, which included the transitive triplet parameter, seems to have created a larger connected component overall than models 1 and 3. In particular, if we look at the group of nodes $\{10,11,14\}$, we see they are very strongly connected within the three average networks, and they are completely separate from the other nodes in the true wave 2. None of the three average networks show node 16 gaining ties as it does in wave two, nor do they show nodes 4 and 7 becoming isolated. In Model 2, however, the ties to node 7 appear much weaker than in Model 1 or Model 2, suggesting that of the three, Model 2 may be the best fit for our data.}  %XXXX ST commented out after I realized I had made the same mistake as figure 7. XX This could be an indication that, despite the highly significant nature of the parameter $\beta_3$ according to the $t$-tests in \texttt{RSiena}, the transitive triplet parameter should not be included because it does not result in a structure similar to the data. 
 
 <<averagenet, results='hide', out.width='99%',fig.cap='The three "average" networks in the middle, with the actual network observations oon either side. There is some difference between the three models, but overall, these three models cannot capture the structure in the true second wave of data.', fig.height=6>>=
@@ -1253,6 +1269,9 @@ p1 <- ggplot(data = numordersf, aes(x = from, y = to)) + geom_tile(color = 'blac
   ThemeNoNet + 
   theme(legend.position = 'none') + 
   coord_fixed() 
+
+# histogram of number of MS in 1000 reps
+# sfmsall %>% group_by(rep) %>% summarize(noMs = max(ms)) %>% ggplot() + geom_histogram(aes(x = noMs), binwidth = 5)
 
 sfmsall <- read_csv("data/smallfriendsmicrosteps.csv")
 
