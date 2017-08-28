@@ -559,9 +559,9 @@ senM3est$Model <- "M3"
 senM1est$Sim <- 1:nrow(senM1est)
 senM2est$Sim <- 1:nrow(senM2est)
 senM3est$Sim <- 1:nrow(senM3est)
-senM1est %>% gather(parameter, estimate, Rate:recip) %>% select(Sim, Model, parameter, estimate) -> senM1est2 
-senM2est %>% gather(parameter, estimate, Rate:jumpXTransTrip) %>% select(Sim, Model, parameter, estimate) -> senM2est2 
-senM3est %>% gather(parameter, estimate, Rate:nbrDist2twice) %>% select(Sim, Model, parameter, estimate) -> senM3est2 
+senM1est %>% gather(parameter, estimate, Rate:recip) %>% dplyr::select(Sim, Model, parameter, estimate) -> senM1est2 
+senM2est %>% gather(parameter, estimate, Rate:jumpXTransTrip) %>% dplyr::select(Sim, Model, parameter, estimate) -> senM2est2 
+senM3est %>% gather(parameter, estimate, Rate:nbrDist2twice) %>% dplyr::select(Sim, Model, parameter, estimate) -> senM3est2 
 senateEsts <- rbind(senM1est2, senM2est2, senM3est2)
 senateEsts$parameter <- as.factor(senateEsts$parameter)
 levels(senateEsts$parameter) <- c("beta1", "beta3", "beta4", "alpha1", "alpha2", "alpha3", "beta2")
@@ -569,12 +569,12 @@ SSE <-
   senateEsts %>% group_by(Model, parameter) %>% 
   summarize(meanEst = mean(estimate), sdEst = sd(estimate)) %>% 
   mutate(val = paste0(round(meanEst,3), " ", "(", round(sdEst,3), ")")) %>% 
-  select(Model, parameter, val) %>% 
+  dplyr::select(Model, parameter, val) %>% 
   spread(Model, val) %>% arrange(as.character(parameter))
 SFE <- simu2 %>% group_by(Model, parameter) %>% 
   summarize(meanEst = mean(estimate), sdEst = sd(estimate)) %>% 
    mutate(val = paste0(round(meanEst,3), " ", "(", round(sdEst,3), ")")) %>% 
-  select(Model, parameter, val) %>% 
+  dplyr::select(Model, parameter, val) %>% 
   spread(Model, val) %>% arrange(parameter)
 @
 
