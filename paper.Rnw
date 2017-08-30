@@ -328,20 +328,22 @@ This distribution, which is also known as the log-Weibull distribution, has prob
 g(u|\mu, \sigma) = \frac{1}{\sigma}\exp\left\{-\left(\frac{u-\mu}{\sigma} + \exp^{-\frac{u-\mu}{\sigma}}\right)\right\}.
 \end{equation}
 
-<<logweibull, fig.align='center', out.width = '.5\\linewidth', fig.cap='The probability distribution function for the type 1 extreme value distribution, also known as the log-weibull or Gumbel distribution with location parameter $ \\mu = 0$ and scale parameter $ \\sigma = 0$.'>>=
+<<logweibull, fig.align='center', out.width = '.99\\linewidth', fig.height = 2, fig.cap='The probability distribution function for the type 1 extreme value distribution, also known as the log-weibull or Gumbel distribution with location parameter $ \\mu = 0$ and scale parameter $ \\sigma = 0$.'>>=
 library(reliaR)
 x <- seq(-3,10,.01)
 y <- dgumbel(x = seq(-3,10,.01), sigma = 1, mu=0)
 qplot(x = x, y= y, geom = "line") + 
   annotate('text', x = 6, y = .25, 
         label = "g(u) = exp(-(u + exp(-u)))",size=5)  + 
-  labs(x = "u", y = "g(u) (density)")
+  labs(x = "u", y = "density of g(u)")
 @
 
 The probability density function for the type 1 extreme value distribution is shown in Figure~\ref{fig:logweibull}. Using the distribution given in Equation~\ref{eq:dist1} with mean $\mu = 0$ and scale $\sigma = 1$ as \citet{modelsSnijders} suggests %\hh{XXX I'm not following - which distribution do you mean by `this' distribution? The density above is the type 1 extreme value density. I got lost at the  ``objective function $f_i(\boldsymbol{\beta}, x)$ plus a random element, $U_i(x)$"} \st{XXX I hope it is clearer now above}
 is convenient because it \st{leads to a simple probability formula for} the probability that actor $i$ chooses to change its tie to actor $j$ \st{that can be written \textit{only}} in terms of the objective function. Let $p_{ij}(\boldsymbol{\beta}, x)$ be the probability that actor $i$ chooses to change its tie to actor $j$. Next, we write the network $x$ in its potential future state, $x(i \leadsto j)$, where the tie $x_{ij}$ has changed to $1-x_{ij}$. Then, the probility that the tie $x_{ij}$ changes is 
 
-$$p_{ij}(\boldsymbol{\beta}, x) = \dfrac{\exp\left\{f_i(\boldsymbol{\beta}, x(i\leadsto j))\right\}}{\sum_{h \neq i} \exp\left\{f_i(\boldsymbol{\beta}, x(i \leadsto h))\right\}}$$
+\begin{equation}\label{eq:pij}
+p_{ij}(\boldsymbol{\beta}, x) = \dfrac{\exp\left\{f_i(\boldsymbol{\beta}, x(i\leadsto j))\right\}}{\sum_{h \neq i} \exp\left\{f_i(\boldsymbol{\beta}, x(i \leadsto h))\right\}}
+\end{equation}
 
 When $i = j$ in $p_{ij}$, the numerator represents the exponential of the value of the objective function when evaluated at the current network state. When the value of the objective function is high at the current state, the probability of not making a change in a microstep is also high. In the CTMC, when actor $i$ may make a change, it chooses which tie $x_{i1, \dots, x_{in}}$ to change at random according to the probabilities $p_{ij}(\boldsymbol{\beta}, x)$. \st{The objective function and the resulting values of $p_{ij}$ are combined with the rate function, or in our case the rate parameter, to fully describe the CTMC that is used to model network change.}
 \hh{XXX This paragraph ends a bit abruptly - what is the future state probability used for?} \st{XX The future state probability is used within the continuous time markov chain to move through the different network states. This needs more fleshing out. Adding to the to-do list.}
@@ -404,8 +406,46 @@ load("data/ansnullpaper.rda")
 library(lattice)
 gof1 <- sienaGOF(ansnull, OutdegreeDistribution, varName ="friendship", join = FALSE)
 gof2 <- sienaGOF(ansnull, IndegreeDistribution, varName ="friendship", join = FALSE)
-p1 <- plot(gof1, period = 1)
-p2 <- plot(gof2, period = 1)
+
+sims1 <- data.frame(gof1$`Period 1`$Simulations)
+dat1 <- gof1$`Period 1`$Observations
+dat1 %>% data.frame() %>% gather(outdegree, val) %>% 
+  mutate(outdegree = parse_number(outdegree)-1) -> dat1
+p1 <- sims1 %>% 
+  mutate(sim = row_number()) %>% 
+  gather(outdegree, val, X1:X9) %>% 
+  mutate(outdegree = parse_number(outdegree) - 1) %>% 
+  filter(outdegree <= 6) %>%  
+  ggplot(aes(x = outdegree, y = val)) + 
+  geom_boxplot(aes(group = outdegree), size = .5, outlier.shape = "x", outlier.size = 5) + 
+  geom_violin(aes(group = outdegree), bw = 2, fill = NA) + 
+  geom_point(data = dat1, color = 'red') + 
+  geom_line(data= dat1, color = 'red') + 
+  geom_text(data = dat1, aes(label = val), hjust = -.5) + 
+  labs(x = "Outdegree (p = 0.154)", y = "Statistic", 
+       title = "Goodness-of-Fit: Outdegree distribution period 1") + 
+  ThemeNoNet
+
+sims2 <- data.frame(gof2$`Period 1`$Simulations)
+dat2 <- gof2$`Period 1`$Observations
+dat2 %>% data.frame() %>% gather(indegree, val) %>% 
+  mutate(indegree = parse_number(indegree)-1) -> dat2
+p2 <- sims2 %>% 
+  mutate(sim = row_number()) %>% 
+  gather(indegree, val, X1:X9) %>% 
+  mutate(indegree = parse_number(indegree) - 1) %>% 
+  filter(indegree <= 6) %>%  
+  ggplot(aes(x = indegree, y = val)) + 
+  geom_boxplot(aes(group = indegree), outlier.shape = "x", outlier.size = 5) + 
+  geom_violin(aes(group = indegree), bw = 2, fill = NA) + 
+  geom_point(data = dat2, color = 'red') + 
+  geom_line(data= dat2, color = 'red') + 
+  geom_text(data = dat2, aes(label = val), hjust = -.5) + 
+  labs(x = "Indegree (p = 0.063)", y = "Statistic", 
+       title = "Goodness-of-Fit: Indegree distribution period 1") + 
+  ThemeNoNet
+
+
 gridExtra::grid.arrange(p1, p2)
 # sum(gof1$`Period 1`$SimulatedTestStat >= gof1$`Period 1`$ObservedTestStat)/1000
 # [1] 0.154
@@ -434,7 +474,7 @@ ggplot(data= view_rs2, aes(x = y, y=-x)) +
   theme(aspect.ratio=1, axis.text = element_blank(), axis.ticks = element_blank(), panel.grid = element_blank()) 
 @
 
-<<alldataviz, fig.cap="The smaller friendship network data we will be modelling throughout the paper.", fig.width=8, fig.height=3>>=
+<<alldataviz, fig.cap="The smaller friendship network data we will be modelling throughout the paper.", out.width='.99\\linewidth', fig.height=3>>=
 actual1 <- merge(data.frame(as.edgelist(as.network(fd2.w1))), 
                  data.frame(id = 1:16, drink = drink2[,1]),
                  by.x = "X1", by.y = "id", all = T)
@@ -455,8 +495,8 @@ alldat$X2 <- as.factor(alldat$X2)
 #write_csv(alldat, "smallfriends4Geomnet.csv")
 alldataviz <- ggplot(data = alldat, 
        aes(from_id = X1, to_id = X2, color = as.ordered(drink), group = as.ordered(drink))) +
-  geom_net(fiteach = FALSE, directed=TRUE, layout.alg = 'fruchtermanreingold', size = 4, arrowsize = .25, arrowgap = .03, ecolour = 'grey40', labelon=T, labelcolour = 'black', fontsize = 4, vjust = .5) +
-  scale_color_brewer(palette = "YlOrRd", name = "Drinking\nBehavior") + 
+  geom_net(fiteach = FALSE, directed=TRUE, layout.alg = 'fruchtermanreingold', size = 5, arrowsize = .25, arrowgap = .03, ecolour = 'grey40', labelon=T, labelcolour = 'black', fontsize = 4, vjust = .5) +
+  scale_color_brewer(palette = "YlOrRd", name = "Drinking\nBehavior", labels = c("never", "1-2 times per year", "once per month", "once per week")) + 
   ThemeNet +
   facet_wrap(~Wave, labeller = "label_both") + 
   theme(legend.position = 'bottom', panel.background = element_rect(fill = NA, color = "grey30"))
@@ -568,12 +608,12 @@ levels(senateEsts$parameter) <- c("beta1", "beta3", "beta4", "alpha1", "alpha2",
 SSE <-
   senateEsts %>% group_by(Model, parameter) %>% 
   summarize(meanEst = mean(estimate), sdEst = sd(estimate)) %>% 
-  mutate(val = paste0(round(meanEst,3), " ", "(", round(sdEst,3), ")")) %>% 
+  mutate(val = paste0(sprintf("%.3f",meanEst), " ", "(", sprintf("%.3f", sdEst), ")")) %>% 
   select(Model, parameter, val) %>% 
   spread(Model, val) %>% arrange(as.character(parameter))
 SFE <- simu2 %>% group_by(Model, parameter) %>% 
   summarize(meanEst = mean(estimate), sdEst = sd(estimate)) %>% 
-   mutate(val = paste0(round(meanEst,3), " ", "(", round(sdEst,3), ")")) %>% 
+   mutate(val = paste0(sprintf("%.3f",meanEst), " ", "(", sprintf("%.3f", sdEst), ")")) %>% 
   select(Model, parameter, val) %>% 
   spread(Model, val) %>% arrange(parameter)
 @
@@ -583,6 +623,7 @@ SFE <- simu2 %>% group_by(Model, parameter) %>%
   \hline
   & \multicolumn{3}{|c|}{Friendship Data} & \multicolumn{3}{|c|}{Senate Data} \\
   \hline
+  M1 & M2 & M3 & M1 & M2 & M3 \\
   $\alpha_1$ & \Sexpr{SFE$M1[1]} & \Sexpr{SFE$M2[1]} & \Sexpr{SFE$M3[1]} & \Sexpr{SSE$M1[1]} & \Sexpr{SSE$M2[1]} & \Sexpr{SSE$M3[1]} \\
   $\alpha_2$ & \Sexpr{SFE$M1[2]} & \Sexpr{SFE$M2[2]} & \Sexpr{SFE$M3[2]} & \Sexpr{SSE$M1[2]} & \Sexpr{SSE$M2[2]} & \Sexpr{SSE$M3[2]}  \\
   $\alpha_3$ & -- & -- & -- & \Sexpr{SSE$M1[3]} & \Sexpr{SSE$M2[3]} & \Sexpr{SSE$M3[3]} \\
@@ -629,6 +670,7 @@ ggplot(data = clintonSenate) +
            aes(from_id = source, to_id = target, color = party, linewidth = gsw, shape = sex,size = n_au)) + 
   #theme_net() + 
   ThemeNet + 
+  scale_shape_manual(values = c(17,16)) + 
   scale_color_manual(values = c("royalblue", "forestgreen","firebrick")) + 
   theme(legend.position = 'bottom') + 
   facet_wrap(~Clinton, nrow = 1, labeller = 'label_both')
@@ -807,14 +849,15 @@ alt_mod_sv <- as.numeric(alt[,-c(1, 7,8)] %>% summarise_each(funs(mean)))
 alt_mod2_sv <- as.numeric(alt2nd[,-c(1,7,8)] %>% summarise_each(funs(mean)))
 @
 
-<<distests, fig.cap="Distribution of fitted parameter values for our three SAOMs. The inclusion of $\\beta_3$ or $\\beta_4$ clearly has an effect on the distribution of the rate parameters, $\\alpha_1$ and $\\alpha_2$.", fig.width=8>>=
+<<distests, fig.cap="Distribution of fitted parameter values for our three SAOMs. The inclusion of $\\beta_3$ or $\\beta_4$ clearly has an effect on the distribution of the rate parameters, $\\alpha_1$ and $\\alpha_2$.", fig.height=4>>=
 
 #simu2 <- read.csv("data/simulation-1000-M1-M2-M3.csv")
 
 ggplot(data = simu2) + 
   geom_density(aes(x = estimate, fill = Model), alpha = .5) + 
   facet_wrap(~parameter, scales = 'free') + 
-  ThemeNoNet
+  ThemeNoNet + 
+  theme(legend.position = 'bottom')
 @
 
 
@@ -845,7 +888,7 @@ ggpairs(simu_spread, columns = 3:8, ggplot2::aes(colour=Model, alpha = .5)) + th
                     )
 @
 
-<<corplotsSenate>>=
+<<corplotsSenate, eval = FALSE>>=
 senM4est <- read.csv("data/congress/senateM4ests.csv")
 senM5est <- read.csv("data/congress/senateM5ests.csv")
 names(senM4est) <- c("alpha1", "alpha2", "alpha3", "beta1", "beta2", "beta5")
@@ -1190,7 +1233,7 @@ This simulation process follows the steps of the continuous-time Markov chain. \
 
 The first vizualization we present here is an animation of microsteps simulated to emulate the transition steps of the CTMC from wave 1 to wave 2 of the small friendship network example shown in Figure ~\ref{fig:alldataviz}. Movies similar to this animation were used to visualize the changes of dynamic networks in \citet{dynnetviz}. When each ego node is selected in a microstep, it is emphasized in the animation, then the associated edge either appears or disappears. If there are no changes at a particular microstep, no changes are seen. Some frames of the animations are shown in Figure~\ref{fig:makinggif}, and the full movie can be viewed at INSERT LINK TO GIF. 
 
-<<makinggif, fig.cap='A selection of images in the microstep animation. The selected edges and nodes are emphasized by changing the size and the color, then when edges are removed, they fade out, shrinking in size, while the nodes change color and shrink to blend in with the other nodes.', fig.width=8, cache=TRUE, message = FALSE, warning = FALSE>>=
+<<makinggif, fig.cap='A selection of images in the microstep animation. The selected edges and nodes are emphasized by changing the size and the color, then when edges are removed, they fade out, shrinking in size, while the nodes change color and shrink to blend in with the other nodes.', cache=TRUE, message = FALSE, warning = FALSE, fig.height=3>>=
 # Need old version of dplyr to get this to work: 
 if (!require("dplyr050",character.only = TRUE)) {
       devtools::install_github("sctyner/dplyr050")
