@@ -514,13 +514,25 @@ where $n_j$ is the number of bills in a congressional session authored by senato
 
 <<senateplot, fig.cap='The collaboration network in the four senates during the Obama years, 2009-2016. Edges are shown only if the weighted propensity to cosponsor from one senator to another is greater than 0.25. We use the Fruchterman-Reingold algorithm to layout the node-link diagram.', fig.height=3>>=
 seobama <- read_csv("data/congress/senateobamapres_gsw_25.csv")
+to_label <- c("Joseph R. Biden Jr.", "John S. McCain", "Ted Cruz","Marco Rubio",
+  "Lindsey O. Graham","Rand Paul", "Bernard Sanders", "Jim Webb", "Mitch McConnell",
+  "Harry M. Reid", "Hillary Rodham Clinton")
+seobama$label <- as.factor(ifelse(seobama$source %in% to_label, seobama$source, ""))
+levels(seobama$label) <- c("", "Bernie Sanders", "Harry Reid", "Hillary Clinton", 
+                           "Jim Webb", "John McCain", "Joe Biden", "Lindsey Graham",
+                           "Marco Rubio", "Mitch McConnel", "Rand Paul", "Ted Cruz")
+set.seed(56049382)
 ggplot(data = seobama) + 
-  geom_net(directed = T, labelon=F, arrowsize = .25, singletons= T, fiteach = T, linewidth = .25, layout.alg = 'fruchtermanreingold',
-           aes(from_id = source, to_id = target, color = party),size = 1) + 
+  geom_net(directed = T, labelon=T, arrowsize = .25, singletons= T, fiteach = T, linewidth = .25, layout.alg = 'fruchtermanreingold', fontsize = 2, repel=T,
+           aes(from_id = source, to_id = target, color = party, label = label),
+           size = 1) + 
   ThemeNet + 
   scale_color_manual(values = c("royalblue", "forestgreen","firebrick")) + 
   theme(legend.position = 'bottom') + 
-  facet_wrap(~senate, nrow = 1)
+  facet_wrap(~senate, nrow = 2, labeller = "label_both") + 
+  xlim(c(0,1.05)) + 
+  ylim(c(0,1.05))
+
 @
 
 Because we require binary edges for our models, we focus only on very strong collaborations. For our senate collaboration networks, $x$, edges are defined as 
