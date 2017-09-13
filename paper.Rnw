@@ -516,11 +516,12 @@ where $n_j$ is the number of bills in a congressional session authored by senato
 seobama <- read_csv("data/congress/senateobamapres_gsw_25.csv")
 to_label <- c("Joseph R. Biden Jr.", "John S. McCain", "Ted Cruz","Marco Rubio",
   "Lindsey O. Graham","Rand Paul", "Bernard Sanders", "Jim Webb", "Mitch McConnell",
-  "Harry M. Reid", "Hillary Rodham Clinton")
+  "Harry M. Reid", "Hillary Rodham Clinton", "Amy Jean Klobuchar")
 seobama$label <- as.factor(ifelse(seobama$source %in% to_label, seobama$source, ""))
-levels(seobama$label) <- c("", "Bernie Sanders", "Harry Reid", "Hillary Clinton", 
-                           "Jim Webb", "John McCain", "Joe Biden", "Lindsey Graham",
-                           "Marco Rubio", "Mitch McConnel", "Rand Paul", "Ted Cruz")
+levels(seobama$label) <- c("", "Amy Klobuchar", "Bernie Sanders", "Harry Reid",
+                           "Hillary Clinton", "Jim Webb", "John McCain", "Joe Biden",
+                           "Lindsey Graham", "Marco Rubio", "Mitch McConnel", 
+                           "Rand Paul", "Ted Cruz")
 set.seed(56049382)
 ggplot(data = seobama) + 
   geom_net(directed = T, labelon=T, arrowsize = .25, singletons= T, fiteach = T, linewidth = .25, layout.alg = 'fruchtermanreingold', fontsize = 2, repel=T,
