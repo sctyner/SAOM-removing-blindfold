@@ -1361,7 +1361,7 @@ pcaordersf <- numordersf
 numordersf$from <- factor(numordersf$from, levels = paste0("V", 1:16))
 numordersf$to <- factor(numordersf$to, levels = rev(paste0("V", 1:16)))
 
-p1 <- ggplot(data = numordersf, aes(x = from, y = to)) + geom_tile(color = 'black', aes(fill = as.factor(value))) + 
+p1 <- ggplot(data = numordersf, aes(y = from, x = to)) + geom_tile(color = 'black', aes(fill = as.factor(value))) + 
   scale_fill_manual(values = c('white', 'black')) +
   scale_x_discrete(position = "top", labels = as.character(1:16)) +
   scale_y_discrete(labels = rev(as.character(1:16)))  + 
@@ -1410,7 +1410,7 @@ To reorder the vertices for the matrix visualization, we first constructed a cum
 $$ \mathbf{A}^{cum}_{ij} = \sum_{r = 0}^R X_{ij}(r). $$
 We then performed a principal component analysis on $\mathbf{A}^{cum}$, and used the values of the first principal component to order the vertices on the $x$ and $y$ axes for the adjacency matrix animation. For one such series of microsteps simulated by \texttt{RSiena}, we present the adjacency matrix ordered by the (arbitrary) vertex id alongside the seriated adjacency microsteps using the first principal component loading on the cumulative adjacency matrix, $\mathbf{A}^{cum}$, in Figure~\ref{fig:adjmatorder}. 
 
-<<adjmatani, fig.cap='A selection of frames from the adjacency matrix visualization animation for one series of microsteps. At the beginning of the animation, shown in the top row, there are two clearly connected components: one in the top left corner, and one in the bottom right corner. By the end, the component in the top left has spread out, while the bottom right component has shrunk, but remains closely connected.', fig.show='animate', warning = FALSE, message = FALSE, interval=.2, results='hide', fig.height=4>>=
+<<adjmatani, fig.cap='A selection of frames from the adjacency matrix visualization animation for one series of microsteps. At the beginning of the animation, shown in the top row, there are two clearly connected components: one in the top left corner, and one in the bottom right corner. By the end, the component in the top left has spread out, while the bottom right component has shrunk, but remains closely connected.', warning = FALSE, message = FALSE, results='hide', fig.height=4>>=
 adjmatall <- matrix(0, nrow = 16, ncol = 16)
 rownames(adjmatall) <- paste0("V", 1:16)
 colnames(adjmatall) <- paste0("V", 1:16)
