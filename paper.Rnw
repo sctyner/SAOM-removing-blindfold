@@ -97,7 +97,7 @@ Social networks have been studied for decades, beginning with a few foundational
 <<setup, echo = FALSE, message = FALSE, warning = FALSE>>=
 options(replace.assign=TRUE,width=70, digits=3)
 require(knitr)
-opts_chunk$set(fig.path='figure/', cache.path='cache/', fig.align='center', fig.pos='h', out.width='.99\\linewidth', par=TRUE, cache=FALSE, concordance=TRUE, autodep=TRUE, message=F, warning=F, echo = FALSE)#, root.dir = "~/Desktop/Dissertation/SAOM-removing-blindfold/")
+opts_chunk$set(fig.path='figure/', cache.path='cache/', fig.align='center', fig.pos='h', out.width='.99\\textwidth', par=TRUE, cache=FALSE, concordance=TRUE, autodep=TRUE, message=F, warning=F, echo = FALSE, dev="cairo_pdf", fig.width = 6, fig.height = 6)#, root.dir = "~/Desktop/Dissertation/SAOM-removing-blindfold/")
 @
 
 <<pkgs>>=
@@ -111,37 +111,58 @@ library(netvizinf)
 library(RColorBrewer)
 library(gridExtra)
 library(cowplot)
+library(extrafont)
+loadfonts(quiet = T)
 
 ThemeNoNet <- theme_bw() %+replace% 
-            theme(plot.title = element_text(size = rel(1.5),
-                                            face = 'plain', angle = 0), 
-                  axis.title.x = element_text(size = rel(1.5),
-                                            face = 'plain', angle = 0),
-                  axis.title.y = element_text(size = rel(1.5),
-                                            face = 'plain', angle = 90),
-                  axis.text.x.top = element_text(size = rel(1.5),
-                                            face = 'plain', angle = 0), 
-                  axis.text.x.bottom = element_text(size = rel(1.5),
-                                            face = 'plain', angle = 0), 
-                  axis.text.y.left = element_text(size = rel(1.5),
-                                            face = 'plain', angle = 0),
-                  axis.text.y.right = element_text(size = rel(1.5),
-                                            face = 'plain', angle = 0),
-                  strip.text.x = element_text(size = rel(2),
-                                            face = 'plain', angle = 0, 
+            theme(plot.title = element_text(size = 12,
+                                            face = 'plain', 
+                                            angle = 0, 
+                                            family="Times New Roman"), 
+                  axis.title.x = element_text(size = 12,
+                                            face = 'plain', 
+                                            angle = 0,
+                                            family="Times New Roman"),
+                  axis.title.y = element_text(size = 12,
+                                            face = 'plain', 
+                                            angle = 90,
+                                            family="Times New Roman"),
+                  axis.text.x.top = element_text(size = 12,
+                                            face = 'plain', 
+                                            angle = 0,
+                                            family="Times New Roman"), 
+                  axis.text.x.bottom = element_text(size = 12,
+                                            face = 'plain', 
+                                            angle = 0,
+                                            family="Times New Roman"), 
+                  axis.text.y.left = element_text(size = 12,
+                                            face = 'plain', 
+                                            angle = 0,
+                                            family="Times New Roman"),
+                  axis.text.y.right = element_text(size = 12,
+                                            face = 'plain', 
+                                            angle = 0,
+                                            family="Times New Roman"),
+                  strip.text.x = element_text(size = 12,
+                                            face = 'plain', 
+                                            angle = 0, 
+                                            family="Times New Roman",
                                             margin = margin(t = 3, r = 0, b = 3, l = 0, unit = "pt")),
-                  strip.text.y =element_text(size = rel(2),
-                                            face = 'plain', angle = 90,margin = margin(t = 3, r = 3, b = 3, l = 3, unit = "pt")),
+                  strip.text.y =element_text(size = 12,
+                                            face = 'plain', 
+                                            angle = 90,
+                                            family="Times New Roman",
+                                            margin = margin(t = 3, r = 3, b = 3, l = 3, unit = "pt")),
                   strip.background = element_rect(colour = "black", fill = "white")
                     )
 ThemeNet <- theme_net() %+replace% 
-            theme(plot.title = element_text(size = rel(2),
-                                            face = 'plain', angle = 0), 
-                  strip.text.x = element_text(size = rel(2),
-                                            face = 'plain', angle = 0, 
+            theme(plot.title = element_text(size = 12,
+                                            face = 'plain', angle = 0, family = "Times New Roman"), 
+                  strip.text.x = element_text(size = 12,
+                                            face = 'plain', angle = 0, family = "Times New Roman", 
                                             margin = margin(t = 3, r = 0, b = 3, l = 0, unit = "pt")),
-                  strip.text.y =element_text(size = rel(2),
-                                            face = 'plain', angle = 0,margin = margin(t = 3, r = 0, b = 3, l = 0, unit = "pt")),
+                  strip.text.y =element_text(size = 12,
+                                            face = 'plain', angle = 0, family = "Times New Roman",margin = margin(t = 3, r = 0, b = 3, l = 0, unit = "pt")),
                   strip.background = element_rect(colour = "black", fill = "white"))
 @
 
@@ -165,17 +186,11 @@ Models for dynamic social networks have a great deal of modelling potential beca
 %\par In order to estimate the parameters of  SAOMs the software SIENA, and its \texttt{R} implementation \texttt{RSiena}, was developed \cite{RSiena}. This software marks a huge contribution to the field of social network analysis., and when we began working with it we were eager to understand how it works. HH: we are still interested in this.
 %\hh{The next sentence is very vague - make it more specific: what aspect of SAOMs is not well understood? I think what you want is something like ``SAOMs are not very tractable analytically with traditional methods, e.g. likelihood functions turn into very complex objects because of the sheer number of parameters involved. Therefore, computationally more tractable solutions are used to fit estimators, in particular, SAOMs are fit using ... }
 Unlike other network models, SAOMs are not very well understood. \st{They are relatively new, especially compared to the classic exponential random graph models, and they are not very tractable analytically. Likelihood functions quickly very complex objects to analyze due to the dependency structure inherent in the data. Therefore, computationally more tractable solutions are used to fit estimators, and in particular, % Traditional modeling steps, like determining the likelihood function, are very complex. Because of this, 
-SAOMs are often fit to data using a series of Markov chain Monte Carlo (MCMC) phases for finding method of moments estimators. In order to estimate the parameters of SAOMs, we use the software SIENA, and its \texttt{R} implementation \texttt{RSiena}, which was developed by \citet{RSiena}. This software marks a huge contribution to the field of social network analysis, but the many moving pieces involved in parameter estimation are largely ``behind the scenes" and hidden from the software user.} In this paper, in order to better understand the model-fitting process, we attempt to bring SAOM fits and the fitting process out of their black boxes, by combining the principals of network visualization with those of model visualization as discussed in \citet{modelvis}. %Here, we explore RSiena and SAOMs with innovative network visualizations, both static and dynamic.
-By bringing some light to the underlying methods and structures that are ``behind the scenes" of when fitting SAOMs to network data, we aim to help researchers working with the models better understand the implications and analyses of these models.
+SAOMs are often fit to data using a series of Markov Chain Monte Carlo (MCMC) phases for finding method of moments estimators. In order to estimate the parameters of SAOMs, we use the software SIENA, and its \texttt{R} implementation \texttt{RSiena}, which was developed by \citet{RSiena}. This software marks a huge contribution to the field of social network analysis, but the many moving pieces involved in parameter estimation are largely ``behind the scenes" and hidden from the software user.} In this paper, in order to better understand the model-fitting process, we attempt to bring SAOM fits and the fitting process out of their black boxes, by combining the principals of network visualization with those of model visualization as discussed in \citet{modelvis}. %Here, we explore RSiena and SAOMs with innovative network visualizations, both static and dynamic.
+By bringing some light to the underlying methods and structures that are behind the scenes when fitting SAOMs to network data, we aim to help researchers working with the models better understand the implications and analyses of these models.
 }
 
-\par The guiding principles of model visualization introduced in \citet{modelvis} are: 
-\begin{enumerate}
-\item Display the model in the data space.
-\item Collections of models are more informative than singletons. 
-\item Explore the fitting \textit{process} rather than just looking at the final result.
-\end{enumerate}
-Stochastic actor-oriented models are a prime example of a set of models that can benefit greatly from application of model visualization. For instance, the models themselves include a continuous-time Markov chain (CTMC) that is completely hidden from the analyst in the model fitting process. Bringing the CTMC out of the black box and into the light through model visualization can provide researchers with insights into the underlying features of the model. Furthermore, SAOMs can include a great deal of parameters to be added to the model structure, each of which is attached to a network statistic. These statistics are often somewhat, if not highly, correlated, which causes high correlation between the associated parameters in a SAOM. By visualizing collections of SAOMs, we gain a better understanding of these correlations and find ways to deal with them and rectify their effects in the model. In addition, the estimation of the parameters in a SAOM relies on a Robbins-Monro algorithm, and the convergence checks for these estimates rely on simulation from the fitted model. Again, each of these steps are largely kept in the background of the estimation process. With the help of static and dynamic visualizations we bring the hidden model fitting processes into the foreground, eventually leading to a better understanding and higher accessibility of stochastic actor-oriented models for social network analysts. 
+\par We get into the SAOM black box by using model visualization (see \citet{modelvis}) to display the model in the data space, view collections of models instead of single models, and visually explore the process of fitting the SAOMs as opposed to looking at only the final output. Stochastic actor-oriented models are a prime example of a set of models that can benefit greatly from the application of model visualization. For instance, the models themselves include a continuous-time Markov chain (CTMC) that is completely hidden from the analyst in the model fitting process. Bringing the CTMC out of the black box and into the light through model visualization can provide researchers with insights into the underlying features of the model. Furthermore, SAOMs can include a great deal of parameters to be added to the model structure, each of which is attached to a network statistic. These statistics are often somewhat, if not highly, correlated, which causes high correlation between the associated parameters in a SAOM. By visualizing collections of SAOMs, we gain a better understanding of these correlations and find ways to deal with them and rectify their effects in the model. In addition, the estimation of the parameters in a SAOM relies on a Robbins-Monro algorithm, and the convergence checks for these estimates rely on simulation from the fitted model. Again, each of these steps are largely kept in the background of the estimation process. With the help of static and dynamic visualizations we bring the hidden model fitting processes into the foreground, eventually leading to a better understanding and higher accessibility of stochastic actor-oriented models for social network analysts. 
 
 In Section~\ref{sec:netintro}, we introduce basic concepts of networks and network visualizations. In Section~\ref{sec:saoms}, we present the family of stochastic actor-oriented models for social network analysis. In Section~\ref{sec:ModelVis}, we combine concepts from Sections~\ref{sec:netintro} and \ref{sec:saoms} in an application of the model-vis paradigm, and conclude with a discussion in Section~\ref{sec:discussion}.
 
@@ -202,12 +217,14 @@ toynet <- list(nodes = nodes, edges = rbind(g, c(5,4)))
 
 The first method, the node-link diagram, represents nodes with points in 2D Euclidean space and then represents edges by connecting the points with lines when there is an edge between the two nodes. These lines can also have arrows on them indicating the direction of the edge for directed networks. But because there is typically no natural placement of the points unless they have important spatial locations, a random placement of the points is used, then adjusted via a layout algorithm, of which there are many \citep{drawingalgs}. 
 
-<<toyplots, fig.show='hold', fig.cap="On the left, a node-link diagram of our directed toy network, with nodes placed using the Kamada-Kawai algorithm. On the right, the adjacency matrix visualization for that same network.", out.width='.49\\linewidth'>>=
+<<toyplots, fig.show='hold', fig.cap="On the left, a node-link diagram of our directed toy network, with nodes placed using the Kamada-Kawai algorithm. On the right, the adjacency matrix visualization for that same network.", out.width='.49\\textwidth'>>=
 toynetdat <- fortify(as.edgedf(toynet$edges), toynet$nodes)
 ggplot(data = toynetdat) + 
   geom_net(aes(from_id=from_id, to_id=to_id), labelon = T, size = 11, labelcolour = 'white', ecolour = 'black', vjust = .5, hjust = .5, fontsize = 9, arrowgap = .05, directed = T) +
-  ThemeNet + 
+  ThemeNet +
+  theme(plot.title = element_text(size = 20)) + 
   labs(title = "Node-Link Diagram")
+#ggsave("figure/toynetnld.pdf",plot = nld, width = 4, height = 4)
 
 ggplot(data = toynet$edges) +
   #geom_tile(aes(x = from, y = -to), color = 'grey20', fill = 'black') +
@@ -217,8 +234,13 @@ ggplot(data = toynet$edges) +
   scale_x_continuous(breaks = 1:5, labels = 1:5, limits = c(0.5,5.5), position = "top") +
   scale_y_continuous(breaks = (-5):(-1), labels = 5:1, limits = c(-5.5,-.5)) +
   ThemeNoNet + 
-  theme(panel.grid = element_blank(), aspect.ratio = 1) +
-  labs(title = "Adjacency Matrix Visualization", x = "to (alter)", y = "from (ego)")
+  theme(panel.grid = element_blank(), aspect.ratio = 1, 
+        plot.title = element_text(size = 20), 
+        axis.title.x.top = element_text(size = 18),
+        axis.title.y.left = element_text(size = 18), 
+        axis.text.x.top  = element_text(size = 18),
+        axis.text.y.left  = element_text(size = 18)) +
+  labs(title = "Adjacency Matrix Visualization", x = "\nto (alter)", y = "from (ego)\n")
 @
 %\hh{XXX Explain each of these visualizations and either comment on the differences in the visualizations (colors) or don't show them. }
 
@@ -266,7 +288,7 @@ In this paper, the term \textit{dynamic network} refers to a network, consisting
 
 \subsubsection{The Rate Function}
 
-For the network $x$ and each actor $i$ in the network, the number of times that an actor $i$ gets to change its ties, $x_{ij}$, to other nodes $j \neq i$ in the network is dictated by a \emph{rate function} $\rho(x, \mathbf{z}, \boldsymbol{\alpha})$, where $\boldsymbol{\alpha}$ are the parameters in the function $\rho$, and $x$ is the current network state, with covariates of interest $\mathbf{z}$. For this paper, we assume a simple rate \st{``function"}, $\rho(x, \mathbf{z}, \boldsymbol{\alpha}) = \alpha_m$ that is constant across all actors between observations at time $t_m$ to $t_{m+1}$, \st{thus our rate function is just a rate parameter in the overall model}. In general, SAOMs can incorporate covariate values and network statistics into the model, so that each node will have a different rate of change.  %\hh{XXX that means that the function is essentially just a rate parameter, right?} \st{XXX yes XXX}
+For the network $x$ and each actor $i$ in the network, the number of times that an actor $i$ gets to change its ties, $x_{ij}$, to other nodes $j \neq i$ in the network is dictated by a \emph{rate function} $\rho(x, \mathbf{z}, \boldsymbol{\alpha})$, where $\boldsymbol{\alpha}$ are the parameters in the function $\rho$, and $x$ is the current network state, with covariates of interest $\mathbf{z}$. For this paper, we assume a simple rate function, $\rho(x, \mathbf{z}, \boldsymbol{\alpha}) = \alpha_m$ that is constant across all actors between observations at time $t_m$ to $t_{m+1}$, \st{thus our rate function is just a rate parameter in the overall model}. In general, SAOMs can incorporate covariate values and network statistics into the model, so that each node will have a different rate of change.  %\hh{XXX that means that the function is essentially just a rate parameter, right?} \st{XXX yes XXX}
 Other modelling scenarios allow this rate to be more flexible,  e.g.\ a function that depends on the time period of observation, some actor-level covariates or some actor-level network statistics. 
 %\hh{How is the rate parameter different from a rate parameter?} \st{I think you meant how is a rate fn different from a rate parameter? I updated the language XXX->}%In our model with the simple rate function, 
 \st{In our simple model with a simple rate parameter instead of a rate function,} the rate parameter dictates how quickly an actor $i$ gets an opportunity to change one of its ties to the other nodes in the network, $x_{ij}$, for $j \in \{1, \dots, n\}$ in the time period from $t_{m}$ to $t_{m+1}$. If $j = i$, no change in the network is made. The model also assumes that the actors $i$ are conditionally independent given their ties, $x_{i1}, \dots, x_{in}$ at the current network state. \st{Let $\tau(i|x,m) $ be the wait time until actor $i$ makes its next change from its current state in the network $x$. Note that $m$ indicates the number of the wave that is conditioned on in the SAOM. For any time point, $T$, where $t_{m} \leq T < t_{m+1}$, the waiting time to the next change opportunity by actor $i$ is exponentially distributed with expected value $\alpha_m^{-1}$. The conditional independence assumption is expressed in Equation~\ref{eq:c1}.
@@ -283,9 +305,9 @@ Other modelling scenarios allow this rate to be more flexible,  e.g.\ a function
 
 } The parameter for the wait time for the whole network $n\alpha_m$ is the rate at which any tie change occurs. The estimation of this parameter is straightforward: a the method of moments is used to estimate the rate with the statistic $$C = \sum_i\sum_j |x_{ij}(t_{m+1}) = x_{ij}(t_m)|$$ which is the total number of changes from observation at time $t_m$ to the observation at time $t_{m+1}$. %In order to achieve the memorylessness property of a Markov process, 
 
-\hh{XXX we tried to estimate the rate based on the simulations - you could include a histogram of the number of changes for the 1000 simulations in the viz part XXX}
-\st{XXX see line 1257 for plot. where should I put it? }
-\hh{XXX Put a reference to the plot here.}
+% \hh{XXX we tried to estimate the rate based on the simulations - you could include a histogram of the number of changes for the 1000 simulations in the viz part XXX}
+% \st{XXX see line 1257 for plot. where should I put it? }
+% \hh{XXX Put a reference to the plot here.}
  
 \subsubsection{The Objective Function} 
 
@@ -328,13 +350,14 @@ This distribution, which is also known as the log-Weibull distribution, has prob
 g(u|\mu, \sigma) = \frac{1}{\sigma}\exp\left\{-\left(\frac{u-\mu}{\sigma} + \exp^{-\frac{u-\mu}{\sigma}}\right)\right\}.
 \end{equation}
 
-<<logweibull, fig.align='center', out.width = '.99\\linewidth', fig.height = 2, fig.cap='The probability distribution function for the type 1 extreme value distribution, also known as the log-weibull or Gumbel distribution with location parameter $ \\mu = 0$ and scale parameter $ \\sigma = 0$.'>>=
+<<logweibull, fig.align='center', out.width = '.5\\textwidth', fig.height = 4, fig.cap='The probability distribution function for the type 1 extreme value distribution, also known as the log-weibull or Gumbel distribution with location parameter $ \\mu = 0$ and scale parameter $ \\sigma = 0$.'>>=
 library(reliaR)
 x <- seq(-3,10,.01)
 y <- dgumbel(x = seq(-3,10,.01), sigma = 1, mu=0)
 qplot(x = x, y= y, geom = "line") + 
   annotate('text', x = 6, y = .25, 
-        label = "g(u) = exp(-(u + exp(-u)))",size=5)  + 
+        label = "g(u) = exp(-(u + exp(-u)))",size=5, family = "Times New Roman")  + 
+  theme(text = element_text(size = 20, family = "Times New Roman")) + 
   labs(x = "u", y = "density of g(u)")
 @
 
@@ -345,7 +368,9 @@ is convenient because it \st{leads to a simple probability formula for} the prob
 p_{ij}(\boldsymbol{\beta}, x) = \dfrac{\exp\left\{f_i(\boldsymbol{\beta}, x(i\leadsto j))\right\}}{\sum_{h \neq i} \exp\left\{f_i(\boldsymbol{\beta}, x(i \leadsto h))\right\}}
 \end{equation}
 
-When $i = j$ in $p_{ij}$, the numerator represents the exponential of the value of the objective function when evaluated at the current network state. When the value of the objective function is high at the current state, the probability of not making a change in a microstep is also high. In the CTMC, when actor $i$ may make a change, it chooses which tie $x_{i1, \dots, x_{in}}$ to change at random according to the probabilities $p_{ij}(\boldsymbol{\beta}, x)$. \st{The objective function and the resulting values of $p_{ij}$ are combined with the rate function, or in our case the rate parameter, to fully describe the CTMC that is used to model network change.}
+When $i = j$ in $p_{ij}$, the numerator represents the exponential of the value of the objective function when evaluated at the current network state. When the value of the objective function is high at the current state, the probability of not making a change in a microstep is also high. In the CTMC, when actor $i$ may make a change, it chooses which tie $x_{i1, \dots, x_{in}}$ to change at random according to the probabilities $p_{ij}(\boldsymbol{\beta}, x)$. \st{The objective function and the resulting values of $p_{ij}$ are combined with the rate function to fully describe the CTMC that is used to model network change in a SAOM.}
+
+
 \hh{XXX This paragraph ends a bit abruptly - what is the future state probability used for?} \st{XX The future state probability is used within the continuous time markov chain to move through the different network states. This needs more fleshing out. Adding to the to-do list.}
 
 
@@ -361,7 +386,7 @@ The two pieces of a SAOM, the rate function/parameter and the objective function
    \end{cases}
 \]
 
-Thus, the rate of change between any two states, $x^b$ and $x^c$, that differ by only one tie $x_{ij}$, is the product of the rate at which actor $i$ gets to change a tie and the probability that the tie that will change is the tie to node $j$. Estimating the parameters in these models is difficult, but thanks to the SIENA software \citep(Rsiena), we have an accessible way to fit SAOMs to network observations. 
+Thus, the rate of change between any two states, $x^b$ and $x^c$, that differ by only one tie $x_{ij}$, is the product of the rate at which actor $i$ gets to change a tie and the probability that the tie that will change is the tie to node $j$. This matrix $\mathbf{Q}$ is the foundation for estimation of a SAOM. Estimating the parameters in these models is difficult, but thanks to the SIENA software \citep{RSiena}, we have an accessible way to fit SAOMs to network observations. 
 
 XXX HH can you help? I need a way better transition than that XXX
 }
@@ -390,7 +415,7 @@ where $\theta$ is the vector of rate and objective function parameters, and $s_{
 
 There are three phases in the the SIENA algorithm, as described in \citet{RSienamanual, SienaAlgs}. The first phase performs initial estimation of the score functions for use in the Robbins-Monro procedure for method-of-moments estimation. The second phase carries out the Robbins-Monro algorithm and obtains estimates of the parameter values through iterative updates and simulation from the CTMC at current parameter values. The third phase uses the parameter vector estimated in phase two to estimate the score functions and covariance matrix of the parameter estimate, and also carries out convergence checks. In each of the the first two phases, the estimation procedure also uses ``microsteps" that simulate from the model as it exists in its current state in order to update either the score functions or the parameter estimates. These simulated microsteps are observed instances of the continuous-time Markov chain that is the backbone of the stochastic actor-oriented model. In Section~\ref{sec:ModelVis}, we further explore these phases in the SIENA method-of-moments algorithm through visualization, bringing them out of the ``black-box" and into the light. 
 
-\subsection{Model Goodness-of-Fit}
+\subsection{Model Goodness-of-Fit}\label{sec:modgof}
 
 The \texttt{RSiena} software that fits the models to data also includes a goodnes-of-fit function for examining model fit, \texttt{sienaGOF()}. This function ``assess[es] the fit of the model with respect to auxiliary statistics of networks" \citep[p.~53]{RSienamanual}. Examples of auxiliary statistics include the out- or indegree distribution on the nodes, with the option for users to input their own statistics to examine. The goodness-of-fit is evaluated as follows:
 \begin{enumerate}
@@ -401,64 +426,66 @@ The \texttt{RSiena} software that fits the models to data also includes a goodne
 \item A $p$-value is found by computing the proportion of simulated distances found in step 4 that are as large or larger than the Mahalanobis distance from the data. A SAOM is thus considered a good fit if $p$ is large.
 \end{enumerate}
  
-<<sienagof, fig.cap="Goodness of fit measures for two network statistics computed on the first simulated wave of a SAOM: indegree and outdegree cumulative distributions. On the x-axis is the degree value, and on the y-axis is the number of times that degree value occurs in the network. \\st{The p-value shown on the x-axis is the proportion of observations simulated from the model that have observed statistic values as large or larger than the values observed in the data.}", cache = TRUE, message = FALSE, warning = FALSE, fig.height=5>>=
-load("data/ansnullpaper.rda")
-library(lattice)
-gof1 <- sienaGOF(ansnull, OutdegreeDistribution, varName ="friendship", join = FALSE)
-gof2 <- sienaGOF(ansnull, IndegreeDistribution, varName ="friendship", join = FALSE)
+% <<sienagof, fig.cap="Goodness of fit measures for two network statistics computed on the first simulated wave of a SAOM: indegree and outdegree cumulative distributions. On the x-axis is the degree value, and on the y-axis is the number of times that degree value occurs in the network. \\st{The p-value shown on the x-axis is the proportion of observations simulated from the model that have observed statistic values as large or larger than the values observed in the data.}", cache = TRUE, message = FALSE, warning = FALSE, fig.height=5>>=
+% load("data/ansnullpaper.rda")
+% library(lattice)
+% gof1 <- sienaGOF(ansnull, OutdegreeDistribution, varName ="friendship", join = FALSE)
+% gof2 <- sienaGOF(ansnull, IndegreeDistribution, varName ="friendship", join = FALSE)
+% 
+% sims1 <- data.frame(gof1$`Period 1`$Simulations)
+% dat1 <- gof1$`Period 1`$Observations
+% dat1 %>% data.frame() %>% gather(outdegree, val) %>% 
+%   mutate(outdegree = parse_number(outdegree)-1) -> dat1
+% p1 <- sims1 %>% 
+%   mutate(sim = row_number()) %>% 
+%   gather(outdegree, val, X1:X9) %>% 
+%   mutate(outdegree = parse_number(outdegree) - 1) %>% 
+%   filter(outdegree <= 6) %>%  
+%   ggplot(aes(x = outdegree, y = val)) + 
+%   geom_boxplot(aes(group = outdegree), size = .5, outlier.shape = "x", outlier.size = 5) + 
+%   geom_violin(aes(group = outdegree), bw = 2, fill = NA) + 
+%   geom_point(data = dat1, color = 'red') + 
+%   geom_line(data= dat1, color = 'red') + 
+%   geom_text(data = dat1, aes(label = val), hjust = -.5) + 
+%   labs(x = "Outdegree (p = 0.154)", y = "Statistic", 
+%        title = "Goodness-of-Fit: Outdegree distribution period 1") + 
+%   ThemeNoNet
+% 
+% sims2 <- data.frame(gof2$`Period 1`$Simulations)
+% dat2 <- gof2$`Period 1`$Observations
+% dat2 %>% data.frame() %>% gather(indegree, val) %>% 
+%   mutate(indegree = parse_number(indegree)-1) -> dat2
+% p2 <- sims2 %>% 
+%   mutate(sim = row_number()) %>% 
+%   gather(indegree, val, X1:X9) %>% 
+%   mutate(indegree = parse_number(indegree) - 1) %>% 
+%   filter(indegree <= 6) %>%  
+%   ggplot(aes(x = indegree, y = val)) + 
+%   geom_boxplot(aes(group = indegree), outlier.shape = "x", outlier.size = 5) + 
+%   geom_violin(aes(group = indegree), bw = 2, fill = NA) + 
+%   geom_point(data = dat2, color = 'red') + 
+%   geom_line(data= dat2, color = 'red') + 
+%   geom_text(data = dat2, aes(label = val), hjust = -.5) + 
+%   labs(x = "Indegree (p = 0.063)", y = "Statistic", 
+%        title = "Goodness-of-Fit: Indegree distribution period 1") + 
+%   ThemeNoNet
+% 
+% 
+% gridExtra::grid.arrange(p1, p2)
+% # sum(gof1$`Period 1`$SimulatedTestStat >= gof1$`Period 1`$ObservedTestStat)/1000
+% # [1] 0.154
+% # > sum(gof2$`Period 1`$SimulatedTestStat >= gof2$`Period 1`$ObservedTestStat)/1000
+% # [1] 0.063
+% 
+% @
 
-sims1 <- data.frame(gof1$`Period 1`$Simulations)
-dat1 <- gof1$`Period 1`$Observations
-dat1 %>% data.frame() %>% gather(outdegree, val) %>% 
-  mutate(outdegree = parse_number(outdegree)-1) -> dat1
-p1 <- sims1 %>% 
-  mutate(sim = row_number()) %>% 
-  gather(outdegree, val, X1:X9) %>% 
-  mutate(outdegree = parse_number(outdegree) - 1) %>% 
-  filter(outdegree <= 6) %>%  
-  ggplot(aes(x = outdegree, y = val)) + 
-  geom_boxplot(aes(group = outdegree), size = .5, outlier.shape = "x", outlier.size = 5) + 
-  geom_violin(aes(group = outdegree), bw = 2, fill = NA) + 
-  geom_point(data = dat1, color = 'red') + 
-  geom_line(data= dat1, color = 'red') + 
-  geom_text(data = dat1, aes(label = val), hjust = -.5) + 
-  labs(x = "Outdegree (p = 0.154)", y = "Statistic", 
-       title = "Goodness-of-Fit: Outdegree distribution period 1") + 
-  ThemeNoNet
-
-sims2 <- data.frame(gof2$`Period 1`$Simulations)
-dat2 <- gof2$`Period 1`$Observations
-dat2 %>% data.frame() %>% gather(indegree, val) %>% 
-  mutate(indegree = parse_number(indegree)-1) -> dat2
-p2 <- sims2 %>% 
-  mutate(sim = row_number()) %>% 
-  gather(indegree, val, X1:X9) %>% 
-  mutate(indegree = parse_number(indegree) - 1) %>% 
-  filter(indegree <= 6) %>%  
-  ggplot(aes(x = indegree, y = val)) + 
-  geom_boxplot(aes(group = indegree), outlier.shape = "x", outlier.size = 5) + 
-  geom_violin(aes(group = indegree), bw = 2, fill = NA) + 
-  geom_point(data = dat2, color = 'red') + 
-  geom_line(data= dat2, color = 'red') + 
-  geom_text(data = dat2, aes(label = val), hjust = -.5) + 
-  labs(x = "Indegree (p = 0.063)", y = "Statistic", 
-       title = "Goodness-of-Fit: Indegree distribution period 1") + 
-  ThemeNoNet
-
-
-gridExtra::grid.arrange(p1, p2)
-# sum(gof1$`Period 1`$SimulatedTestStat >= gof1$`Period 1`$ObservedTestStat)/1000
-# [1] 0.154
-# > sum(gof2$`Period 1`$SimulatedTestStat >= gof2$`Period 1`$ObservedTestStat)/1000
-# [1] 0.063
-
-@
-
-The \texttt{plot.sienaGOF()} function allows us to visualize this fit. In Figure~\ref{fig:sienagof}, we provide an example of what the goodness-of-fit plot output looks like for indegree and outdegree statistics for a small model. Box plots and violin plots are drawn on top of each other in the figure in order to show the distribution of the simulated network observations compared to the true data shown in red points connected by red lines. If the red points lie "well within" the simulated values, the model is a good fit to the data. The model examined in Figure~\ref{fig:sienagof} appears to do a better job of capturing the outdegree distribution than the indegree distribution of the data. 
+The \texttt{plot.sienaGOF()} function allows us to visualize this fit. %In Figure~\ref{fig:sienagof}, we provide an example of what the goodness-of-fit plot output looks like for indegree and outdegree statistics for a small model. 
+This function draws a box plots and a violin plot at each value of the statistic of interest observed in the simulations. In order to compare the distribution of the simulated network to the true data, red points connected by red lines representing the observed values are superimposed on the boxplots. If the red points lie "well within" the simulated values, the model is a good fit to the data. The plot is not intuitive for understanding network data. %The model examined in Figure~\ref{fig:sienagof} appears to do a better job of capturing the outdegree distribution than the indegree distribution of the data. 
+In Section~\ref{sec:minds}, we propose a new way of visualizing goodness-of-fit that uses the traditional node-link diagram to visualize the entire network instead of numerical summaries of the the network. 
 
 \subsection{Example Data}
 
-<<adjmatviz, fig.align='center', fig.cap="A visualization of the adjacency matrices of the three waves of network observations in the ``Teenage Friends and Lifestyle Study'' data. The subset we will be using is outlined in red.", fig.width=8, results='hide',fig.show='asis', fig.width=8, fig.height=3>>=
+<<adjmatviz, fig.align='center', fig.cap="A visualization of the adjacency matrices of the three waves of network observations in the ``Teenage Friends and Lifestyle Study'' data. The subset we will be using is outlined in red.", results='hide',fig.show='asis', fig.width=8, fig.height=3>>=
 source("code/00e_small_friends.R")
 view_rs2$wave <- factor(view_rs2$wave)
 levels(view_rs2$wave) <- c("Wave 1", "Wave 2", "Wave 3")
@@ -469,12 +496,12 @@ ggplot(data= view_rs2, aes(x = y, y=-x)) +
   geom_rect(data= NULL, inherit.aes = FALSE, color = 'red',
             aes(xmin = 19.5, xmax = 35.5, ymax = -19.5, ymin = -35.5, fill =NA)) + 
   facet_wrap(~wave) + theme_bw() +
-  labs(x = "j", y = "i") + 
+  labs(x = "node j (alter)", y = "node i (ego)") + 
   ThemeNoNet + 
   theme(aspect.ratio=1, axis.text = element_blank(), axis.ticks = element_blank(), panel.grid = element_blank()) 
 @
 
-<<alldataviz, fig.cap="The smaller friendship network data we will be modelling throughout the paper.", out.width='.99\\linewidth', fig.height=3>>=
+<<alldataviz, fig.cap="The smaller friendship network data we will be modelling throughout the paper. In the first wave, we can see there are two large, separate friend group. By the second wave, three students with heavier drinking behavior have separated from their group, while the others become members of the other group. By the third wave, the large group has almost completely broken up. We want to capture these changes with our SAOMs.", out.width='.99\\textwidth', fig.height=3>>=
 actual1 <- merge(data.frame(as.edgelist(as.network(fd2.w1))), 
                  data.frame(id = 1:16, drink = drink2[,1]),
                  by.x = "X1", by.y = "id", all = T)
@@ -499,7 +526,10 @@ alldataviz <- ggplot(data = alldat,
   scale_color_brewer(palette = "YlOrRd", name = "Drinking\nBehavior", labels = c("never", "1-2 times per year", "once per month", "once per week")) + 
   ThemeNet +
   facet_wrap(~Wave, labeller = "label_both") + 
-  theme(legend.position = 'bottom', panel.background = element_rect(fill = NA, color = "grey30"))
+  theme(legend.position = 'bottom', 
+        panel.background = element_rect(fill = NA, color = "grey30"), 
+        legend.text = element_text(size = 12, family = "Times New Roman"), 
+        legend.title = element_text(size = 14, family = "Times New Roman"))
 alldataviz
 @
 
@@ -512,7 +542,7 @@ WPC_{ij} = \dfrac{\sum\limits_{k=1}^{n_j} \frac{Y_{ij(k)}}{c_{j(k)}}}{\sum\limit
 
 where $n_j$ is the number of bills in a congressional session authored by senator $j$, $c_{j(k)}$ is the number of cosponsors on senator $j$'s $k^{th}$ bill, where $k \in \{1,\dots, n_j\}$, and $Y_{ij(k)}$ is a binary variable that is 1 if senator $i$ cosponsored senator $j$'s $k^{th}$ bill, and is 0 otherwise. This measure ranges in value from 0 to 1, where $WPC_{ij} = 1$ if senator $i$ is a cosponsor on every one of senator $j$'s bills and $WPC_{ij} = 0$ if senator $i$ is never a cosponsor any of senator $j$'s bills. 
 
-<<senateplot, fig.cap='The collaboration network in the four senates during the Obama years, 2009-2016. Edges are shown only if the weighted propensity to cosponsor from one senator to another is greater than 0.25. We use the Fruchterman-Reingold algorithm to layout the node-link diagram.', fig.height=3>>=
+<<senateplot, fig.cap='The collaboration network in the four senates during the Obama years, 2009-2016. Edges are shown only if the weighted propensity to cosponsor from one senator to another is greater than 0.25. We use the Fruchterman-Reingold algorithm to layout the node-link diagram.', fig.width=8, fig.height=8, out.width='\\textwidth'>>=
 seobama <- read_csv("data/congress/senateobamapres_gsw_25.csv")
 to_label <- c("Joseph R. Biden Jr.", "John S. McCain", "Ted Cruz","Marco Rubio",
   "Lindsey O. Graham","Rand Paul", "Bernard Sanders", "Jim Webb", "Mitch McConnell",
@@ -524,16 +554,15 @@ levels(seobama$label) <- c("", "Amy Klobuchar", "Bernie Sanders", "Harry Reid",
                            "Rand Paul", "Ted Cruz")
 set.seed(56049382)
 ggplot(data = seobama) + 
-  geom_net(directed = T, labelon=T, arrowsize = .25, singletons= T, fiteach = T, linewidth = .25, layout.alg = 'fruchtermanreingold', fontsize = 2, repel=T,
+  geom_net(directed = T, labelon=T, arrowsize = .25, singletons= T, fiteach = T, linewidth = .25, layout.alg = 'fruchtermanreingold', fontsize = 3, repel=T, 
            aes(from_id = source, to_id = target, color = party, label = label),
            size = 1) + 
   ThemeNet + 
   scale_color_manual(values = c("royalblue", "forestgreen","firebrick")) + 
-  theme(legend.position = 'bottom') + 
+  theme(legend.position = 'bottom', strip.text = element_text(size = 20)) + 
   facet_wrap(~senate, nrow = 2, labeller = "label_both") + 
   xlim(c(0,1.05)) + 
   ylim(c(0,1.05))
-
 @
 
 Because we require binary edges for our models, we focus only on very strong collaborations. For our senate collaboration networks, $x$, edges are defined as 
@@ -562,7 +591,7 @@ f_i(x)^{M3} & = \beta_1s_{i1} + \beta_2s_{i2} + \beta_4s_{i4},
 
 \begin{figure}\label{fig:structures}
 \begin{subfigure}[t]{.45\textwidth}
-<<jtt, echo=FALSE, fig.width=2, fig.height=2, message = FALSE, warning = FALSE, fig.align='center',out.width='.49\\linewidth'>>=
+<<jtt, echo=FALSE, fig.width=2, fig.height=2, message = FALSE, warning = FALSE, fig.align='center',out.width='.49\\textwidth'>>=
 jTTe <- data.frame(from = c('i', 'i', 'h'), to = c('h', 'j', 'j'))
 jTTn <- data.frame(id = letters[8:10], group = c(1,1,2))
 
@@ -572,8 +601,8 @@ set.seed(12345)
 ggplot(data = jTT, aes(from_id = from, to_id = to)) + 
   geom_net(aes(shape = as.factor(group)), directed = T, labelon = T, 
            labelcolour='grey80',vjust = 0.5, hjust =0.5, arrowgap = .15, 
-           colour = 'black', size=10, fontsize = 4,
-           ecolour = c("red", "grey40", "grey40", "grey40")) + 
+           colour = 'black', size=10, fontsize = 5,
+           ecolour = c("grey40", "grey40","red", "grey40")) + 
   expand_limits(x=c(-0.1,1.1), y=c(-0.1,1.1)) +
   ThemeNet +
   theme(legend.position = "none")
@@ -581,7 +610,7 @@ ggplot(data = jTT, aes(from_id = from, to_id = to)) +
 \caption{\label{fig:jtt}Realization of a jumping transitive triplet, where $i$ is the focal actor, $j$ is the target actor, and $h$ is the intermediary. The group of the actors is represented by the shape of the node.}
 \end{subfigure}\hfill
 \begin{subfigure}[t]{.45\textwidth}
-<<dab, echo=FALSE, fig.width=2, fig.height=2, message = FALSE, warning = FALSE, fig.align='center', out.width='.49\\linewidth'>>=
+<<dab, echo=FALSE, fig.width=2, fig.height=2, message = FALSE, warning = FALSE, fig.align='center', out.width='.49\\textwidth'>>=
 dade <- data.frame(from = c('i', 'i', 'h', 'j'), to = c('h', 'j', 'k', 'k'))
 dadn <- data.frame(id = letters[8:11], group = c(1,1,1,1))
 
@@ -589,7 +618,7 @@ dad <- merge(dade, dadn, by.x = 'from', by.y = "id", all = T)
 
 set.seed(12345) 
 ggplot(data = dad, aes(from_id = from, to_id = to)) + 
-  geom_net(aes(shape = as.factor(group)), directed = T, labelon = T, labelcolour='grey80',vjust = 0.5, hjust =0.5, arrowgap = .15, colour = 'black', size=10, fontsize = 4) + 
+  geom_net(aes(shape = as.factor(group)), directed = T, labelon = T, labelcolour='grey80',vjust = 0.5, hjust =0.5, arrowgap = .15, colour = 'black', size=10, fontsize = 5) + 
   expand_limits(x=c(-0.1,1.1), y=c(-0.1,1.1)) +
   ThemeNet +
   theme(legend.position = "none")
@@ -633,6 +662,7 @@ SFE <- simu2 %>% group_by(Model, parameter) %>%
 @
 
 \begin{table}
+\scalebox{0.9}{
 \begin{tabular}{l|ccc|ccc }
   \hline
   & \multicolumn{3}{|c|}{Friendship Data} & \multicolumn{3}{|c|}{Senate Data} \\
@@ -647,6 +677,7 @@ $\beta_3$ & -- & \Sexpr{SFE$M2[5]} & -- & -- & \Sexpr{SSE$M2[6]} & -- \\
   $\beta_4$ & -- & --  & \Sexpr{SFE$M3[6]} & -- & -- & \Sexpr{SSE$M3[7]} \\
   \hline
 \end{tabular}
+}
 \caption{\label{tab:meanests} The means (standard deviations) of parameter values estimated from repeated fittings of $M1, M2, M3$ to the small friendship network and the senate collaboration network. Each model was fit 1,000 times to the friend data, while each model was fit 100 times to the senate data.}
 \end{table}
 
@@ -682,6 +713,7 @@ clintonSenate <- rbind(se111clint, se111noclint)
 ggplot(data = clintonSenate) + 
   geom_net(directed = T, labelon=F, arrowsize = .3, singletons= T, fiteach = T, arrowgap = .01, layout.alg = 'fruchtermanreingold',
            aes(from_id = source, to_id = target, color = party, linewidth = gsw, shape = sex,size = n_au)) + 
+  scale_size_continuous(name="# bills\nauthored") +
   #theme_net() + 
   ThemeNet + 
   scale_shape_manual(values = c(17,16)) + 
@@ -817,6 +849,9 @@ Another way to view the model in the data space is through simulation from the m
 
 
 <<gof2, fig.cap="An example of viewing the distribution of a statistic of interest from a SAOM. Here, the Mahalanobis distance of the cumulative outdegree values computed on a simulated network to the mean value simulated is shown. The distance computed from the data is shown as a vertical line.", fig.height=3>>=
+load("data/ansnullpaper.rda")
+library(lattice)
+gof1 <- sienaGOF(ansnull, OutdegreeDistribution, varName ="friendship", join = FALSE)
 qplot(x = log(gof1$`Period 1`$SimulatedTestStat), binwidth = .2) + 
   geom_vline(xintercept = log(gof1$`Period 1`$ObservedTestStat)) + 
   ThemeNoNet + 
@@ -824,7 +859,9 @@ qplot(x = log(gof1$`Period 1`$SimulatedTestStat), binwidth = .2) +
 
 @
 
-\st{Because longitudinal network data consist of three different ``spaces" of data, viewing the model in the data space can depend on which aspect of the model and the data you are interested in viewing. The SIENA software includes a method for modelling covariate change in the network by incorporating the network structure, assuming that the ties between nodes can affect how nodes behave over time. In this instance, a time series plot of predicted covariate values for the nodes as the network evolves is viewing the model in the time and node spaces. If, as in Figure~\ref{fig:sienagof}, summary statistics computed on the network are of interest, distributions of these statistics computed on networks simulated from the model show the model in the edge data space. For an example, see Figure~\ref{fig:gof2}, where the distribution of the log of the Mahalanobis distance is shown for the outdegree distribution auxiliary statistics, and the log Mahalanobis distance for the observed data is shown as a vertical line. 
+\st{Because longitudinal network data consist of three different ``spaces" of data, viewing the model in the data space can depend on which aspect of the model and the data you are interested in viewing. The SIENA software includes a method for modelling covariate change in the network by incorporating the network structure, assuming that the ties between nodes can affect how nodes behave over time. In this instance, a time series plot of predicted covariate values for the nodes as the network evolves is viewing the model in the time and node spaces. If, as discussed in Section~\ref{sec:modgof},
+%Figure~\ref{fig:sienagof}, 
+summary statistics computed on the network are of interest, distributions of these statistics computed on networks simulated from the model show the model in the edge data space. For an example, see Figure~\ref{fig:gof2}, where the distribution of the log of the Mahalanobis distance is shown for the outdegree distribution auxiliary statistics, and the log Mahalanobis distance for the observed data is shown as a vertical line. 
 
 \begin{figure}
 \centering
@@ -879,25 +916,25 @@ ggplot(data = simu2) +
 
 #simu2 <- read.csv("data/simulation-1000-M1-M2-M3.csv")
 simu_spread <- simu2 %>% spread(parameter, estimate)
-ggpairs(simu_spread, columns = 3:8, ggplot2::aes(colour=Model, alpha = .5)) + theme(plot.title = element_text(size = rel(1.5),
-                                            face = 'plain', angle = 0), 
-                  axis.title.x = element_text(size = rel(1.5),
-                                            face = 'plain', angle = 0, inherit.blank = T),
-                  axis.title.y = element_text(size = rel(1.5),
+ggpairs(simu_spread, columns = 3:8, ggplot2::aes(colour=Model, alpha = .5)) + theme(plot.title = element_text(size = 12,
+                                            face = 'plain', angle = 0, family = "Times New Roman"), 
+                  axis.title.x = element_text(size = 12,
+                                            face = 'plain', angle = 0, family = "Times New Roman", inherit.blank = T),
+                  axis.title.y = element_text(size = 12,
                                             face = 'plain', angle = 90, inherit.blank = T),
-                  axis.text.x.top = element_text(size = rel(1.5),
+                  axis.text.x.top = element_text(size = 12,
                                             face = 'plain', angle = 90, inherit.blank = TRUE), 
-                  axis.text.x.bottom = element_text(size = rel(1.5),
+                  axis.text.x.bottom = element_text(size = 12,
                                             face = 'plain', angle = 90, inherit.blank = TRUE), 
-                  axis.text.y.left = element_text(size = rel(1.5),
-                                            face = 'plain', angle = 0, inherit.blank = T),
-                  axis.text.y.right = element_text(size = rel(1.5),
-                                            face = 'plain', angle = 0, inherit.blank = T),
-                  strip.text.x = element_text(size = rel(2),
-                                            face = 'plain', angle = 0, 
+                  axis.text.y.left = element_text(size = 12,
+                                            face = 'plain', angle = 0, family = "Times New Roman", inherit.blank = T),
+                  axis.text.y.right = element_text(size = 12,
+                                            face = 'plain', angle = 0, family = "Times New Roman", inherit.blank = T),
+                  strip.text.x = element_text(size = 14,
+                                            face = 'plain', angle = 0, family = "Times New Roman", 
                                             margin = margin(t = 3, r = 0, b = 3, l = 0, unit = "pt"), inherit.blank = T),
-                  strip.text.y =element_text(size = rel(2),
-                                            face = 'plain', angle = 90,margin = margin(t = 3, r = 3, b = 3, l = 3, unit = "pt"),inherit.blank = T),
+                  strip.text.y =element_text(size = 14,
+                                            face = 'plain', family = "Times New Roman", angle = 90,margin = margin(t = 3, r = 3, b = 3, l = 3, unit = "pt"),inherit.blank = T),
                   strip.background = element_rect(colour = "black", fill = "white")
                     )
 @
@@ -1252,7 +1289,7 @@ The first vizualization we present here is an animation of microsteps simulated 
 if (!require("dplyr050",character.only = TRUE)) {
       devtools::install_github("sctyner/dplyr050")
 }
-
+library(dplyr050)
 friend.data.w1 <- as.matrix(read.table("data/s50_data/s50-network1.dat"))
 friend.data.w2 <- as.matrix(read.table("data/s50_data/s50-network2.dat"))
 friend.data.w3 <- as.matrix(read.table("data/s50_data/s50-network3.dat"))
@@ -1269,7 +1306,7 @@ friendshipData <- array(c(fd2.w1, fd2.w2,fd2.w3), dim = c(16, 16, 3))
 #myeffnull <- getEffects(mydata)
 #myalgorithm <- sienaAlgorithmCreate(projname = 's16_3')
 set.seed(823746)
-
+load("data/ansnullpaper.rda")
 ansnullchains <- get_chain_info(ansnull)
 ansnullchains %>%
   filter(period == 1) %>%  #only look at chains from wave 1 to wave 2
@@ -1407,7 +1444,7 @@ plots
 @
 
 Using the principal component analysis on $\mathbf{A}^{cum}$ to order the rows and columns of the adjacency matrix visualization clearly shows the two distinct connected components in the first wave of the network, which are difficult to find in the arbitrarily ordered visualization. We use this layout to fix the layout in the animation of one of the microstep process simulations. This animation, which is shown in Figure~\ref{fig:adjmatani} is very simple: a square appears or disappears in the animation as that edge appears or disappears in the microstep process. Through this animation, we can see edges appearing, and then later on disappearing. These in-between steps are not shown when we look at the network at our discrete observation points. By viewing this animation, we gain a better understanding of the dynamics of this model. 
-<<histogramalters, fig.width = 8, fig.height=11, fig.cap="Each panel shows the theoretical (as lines) and empirical (as points) probabilities of the chosen ego node changing its tie to each of the other nodes. The color of the line indicates whether the tie from the ego to the alter node is being added, removed, or if there is no change to the network in this step.">>=
+<<histogramalters, fig.width = 8, fig.height=10, fig.cap="Each panel shows the theoretical (as lines) and empirical (as points) probabilities of the chosen ego node changing its tie to each of the other nodes. The color of the line indicates whether the tie from the ego to the alter node is being added, removed, or if there is no change to the network in this step.">>=
 ansnullchains %>% group_by(period, rep) %>% 
   mutate(ms = row_number()) %>% 
   filter(ms == 1, period == 1) %>% 
@@ -1441,10 +1478,10 @@ changes3$ego <- factor(changes3$ego, levels = paste0("V", 1:16), labels = 1:16)
 changes3$alter <- factor(changes3$alter, levels = paste0("V", 1:16), labels = 1:16) 
 
 ggplot(data = changes3) + 
-  geom_segment(
-    aes(x = alter , xend = alter, y = 0, yend = alterProb, color=type), size = 2) + 
-  geom_point(aes(x = alter, y = empprob), shape = 4, size = 2, alpha = .5) + 
-  labs(x = "alter node", y = "probability of alter node") + 
+  geom_segment(aes(x = alter, xend = alter, y = 0, yend = empprob, color = type), size = 2, alpha = .75) + 
+  geom_point(
+    aes(x = alter , y = alterProb), shape = 4, size = 2, alpha = .75) + 
+  labs(x = "alter node\n", y = "\nprobability of alter node") + 
   coord_flip() + 
   facet_wrap(~ego, labeller = "label_both") + 
   ThemeNoNet
