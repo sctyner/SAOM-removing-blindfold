@@ -889,7 +889,7 @@ We chose these four collections because they each explore something different ab
 
 \subsubsection{Exploring the space of all possible models}
 
-<<sigtesting, fig.show = 'hold', out.width='\\textwidth', fig.height=3, fig.cap="Significant effects for the two data sets, at the level of $\alpha = 0.10$ as calculated by the Wald-type test available in the \texttt{RSiena} software.">>=
+<<sigtesting, fig.show = 'hold', out.width='\\textwidth', fig.height=3, fig.cap="Significant effects for the two data sets, at the level of 0.10 as calculated by the Wald-type test available in the SIENA software.">>=
 smfr_effs <- read_csv("data/effects_significance_smallFriends.csv")
 smfr_effs$inter1[is.na(smfr_effs$inter1)] <- "none"
 library(ggrepel)
