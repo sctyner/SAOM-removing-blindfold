@@ -26,7 +26,9 @@
 
 %---------------------------------------------------
 %                 Placing Figures
-
+\renewcommand{\topfraction}{0.99}	% max fraction of floats at top
+\renewcommand{\bottomfraction}{0.8}	% max fraction of floats at bottom
+\renewcommand{\textfraction}{0.05}	% allow minimal text w. figs
 
 %---------------------------------------------------
 % Define new environment
@@ -185,10 +187,10 @@ Models for dynamic social networks have a great deal of modelling potential beca
 \st{
 %\par In order to estimate the parameters of  SAOMs the software SIENA, and its \texttt{R} implementation \texttt{RSiena}, was developed \cite{RSiena}. This software marks a huge contribution to the field of social network analysis., and when we began working with it we were eager to understand how it works. HH: we are still interested in this.
 %\hh{The next sentence is very vague - make it more specific: what aspect of SAOMs is not well understood? I think what you want is something like ``SAOMs are not very tractable analytically with traditional methods, e.g. likelihood functions turn into very complex objects because of the sheer number of parameters involved. Therefore, computationally more tractable solutions are used to fit estimators, in particular, SAOMs are fit using ... }
-Unlike other network models, SAOMs are not very well understood. \st{They are relatively new, especially compared to the classic exponential random graph models, and they are not very tractable analytically. Likelihood functions quickly very complex objects to analyze due to the dependency structure inherent in the data. Therefore, computationally more tractable solutions are used to fit estimators, and in particular, % Traditional modeling steps, like determining the likelihood function, are very complex. Because of this, 
+Unlike other network models, SAOMs are not very well understood. They are relatively new, especially compared to the classic exponential random graph models, and they are not very tractable analytically. Likelihood functions quickly very complex objects to analyze due to the dependency structure inherent in the data. Therefore, computationally more tractable solutions are used to fit estimators, and in particular, % Traditional modeling steps, like determining the likelihood function, are very complex. Because of this, 
 SAOMs are often fit to data using a series of Markov Chain Monte Carlo (MCMC) phases for finding method of moments estimators. In order to estimate the parameters of SAOMs, we use the software SIENA, and its \texttt{R} implementation \texttt{RSiena}, which was developed by \citet{RSiena}. This software marks a huge contribution to the field of social network analysis, but the many moving pieces involved in parameter estimation are largely ``behind the scenes" and hidden from the software user.} In this paper, in order to better understand the model-fitting process, we attempt to bring SAOM fits and the fitting process out of their black boxes, by combining the principals of network visualization with those of model visualization as discussed in \citet{modelvis}. %Here, we explore RSiena and SAOMs with innovative network visualizations, both static and dynamic.
 By bringing some light to the underlying methods and structures that are behind the scenes when fitting SAOMs to network data, we aim to help researchers working with the models better understand the implications and analyses of these models.
-}
+
 
 \par We get into the SAOM black box by using model visualization (see \citet{modelvis}) to display the model in the data space, view collections of models instead of single models, and visually explore the process of fitting the SAOMs as opposed to looking at only the final output. Stochastic actor-oriented models are a prime example of a set of models that can benefit greatly from the application of model visualization. For instance, the models themselves include a continuous-time Markov chain (CTMC) that is completely hidden from the analyst in the model fitting process. Bringing the CTMC out of the black box and into the light through model visualization can provide researchers with insights into the underlying features of the model. Furthermore, SAOMs can include a great deal of parameters to be added to the model structure, each of which is attached to a network statistic. These statistics are often somewhat, if not highly, correlated, which causes high correlation between the associated parameters in a SAOM. By visualizing collections of SAOMs, we gain a better understanding of these correlations and find ways to deal with them and rectify their effects in the model. In addition, the estimation of the parameters in a SAOM relies on a Robbins-Monro algorithm, and the convergence checks for these estimates rely on simulation from the fitted model. Again, each of these steps are largely kept in the background of the estimation process. With the help of static and dynamic visualizations we bring the hidden model fitting processes into the foreground, eventually leading to a better understanding and higher accessibility of stochastic actor-oriented models for social network analysts. 
 
@@ -422,8 +424,8 @@ The \texttt{RSiena} software that fits the models to data also includes a goodne
 \item The auxiliary statistics are computed on the observed data and on $N$ simulated observations from the model. Typically, $N=1000$. 
 \item The mean vector and covariance matrix of the statistics on the simulations from the model are computed.
 \item The Mahalanobis distance from the observed statistics to the distribution of the simulated statistics is computed using the mean and covariance found in step 2. 
-\item The Mahalanobis distrance from each of the $N$ simulations to the same distribution is computed, and the Mahalanobis distance of the observed data is compared to this distribution of distances.
-\item A $p$-value is found by computing the proportion of simulated distances found in step 4 that are as large or larger than the Mahalanobis distance from the data. A SAOM is thus considered a good fit if $p$ is large.
+\item The Mahalanobis distance from each of the $N$ simulations to the same distribution is computed, and the Mahalanobis distance of the observed data is compared to this distribution of distances.
+\item An empirical $p$-value is found by computing the proportion of simulated distances found in step 4 that are as large or larger than the Mahalanobis distance from the data. A SAOM is thus considered a good fit if $p$ is large.
 \end{enumerate}
  
 % <<sienagof, fig.cap="Goodness of fit measures for two network statistics computed on the first simulated wave of a SAOM: indegree and outdegree cumulative distributions. On the x-axis is the degree value, and on the y-axis is the number of times that degree value occurs in the network. \\st{The p-value shown on the x-axis is the proportion of observations simulated from the model that have observed statistic values as large or larger than the values observed in the data.}", cache = TRUE, message = FALSE, warning = FALSE, fig.height=5>>=
@@ -480,7 +482,7 @@ The \texttt{RSiena} software that fits the models to data also includes a goodne
 % @
 
 The \texttt{plot.sienaGOF()} function allows us to visualize this fit. %In Figure~\ref{fig:sienagof}, we provide an example of what the goodness-of-fit plot output looks like for indegree and outdegree statistics for a small model. 
-This function draws a box plots and a violin plot at each value of the statistic of interest observed in the simulations. In order to compare the distribution of the simulated network to the true data, red points connected by red lines representing the observed values are superimposed on the boxplots. If the red points lie "well within" the simulated values, the model is a good fit to the data. The plot is not intuitive for understanding network data. %The model examined in Figure~\ref{fig:sienagof} appears to do a better job of capturing the outdegree distribution than the indegree distribution of the data. 
+This function draws a box plot and a violin plot at each value of the statistic of interest observed in the simulations: \st{on the $x$-axis, the out(in)degrees observed in the data ($0, 1, 2, 3, \dots$), and on the $y$-axis, the cumulative number of times that out(in)degree value appears in the simulations and the data.} In order to compare the distribution of the counts of nodes with the specified degree as calculated on the simulated networks to the counts observed in the true data, red points connected by red lines representing the observed values are superimposed on the boxplots. If the red points lie "well within" the simulated values, the model is a good fit to the data. \st{This plot is not shown because it is not intuitive for understanding network data. Boxplots separated by the many outdegree values observed do not communicate \textit{how} the nodes are connected, just that some have more connections than others. In order to understand the fit of the model, we should try to understand how well the model captures the\textit{overall} structure of the network, not just one or two summary measurements of that structure.} %The model examined in Figure~\ref{fig:sienagof} appears to do a better job of capturing the outdegree distribution than the indegree distribution of the data. 
 In Section~\ref{sec:minds}, we propose a new way of visualizing goodness-of-fit that uses the traditional node-link diagram to visualize the entire network instead of numerical summaries of the the network. 
 
 \subsection{Example Data}
@@ -529,7 +531,7 @@ alldataviz <- ggplot(data = alldat,
   theme(legend.position = 'bottom', 
         panel.background = element_rect(fill = NA, color = "grey30"), 
         legend.text = element_text(size = 12, family = "Times New Roman"), 
-        legend.title = element_text(size = 14, family = "Times New Roman"))
+        legend.title = element_text(size = 12, family = "Times New Roman"))
 alldataviz
 @
 
@@ -579,7 +581,10 @@ The networks we constructed for the four senates during President Obama's admini
 
 \section{Model Visualizations} \label{sec:ModelVis}
 
-Every good data analysis includes both numerical and visual summaries of the data, so why restrict model description and diagnostics to numerical summaries? The concept of model visualization was developed to complement traditional model diagnostic tools. Typically, numerical summaries such as $R^2$ are used to assess model fit, and the occasional visualization, like a residual plot, are used to determine how well the model fits the data. \citeauthor{modelvis} outline three separate ideas, each of which are can be referred to simply as the "model": the model family, the model form, and the fitted model. The latter is primarily what one thinks of first when considering a model in a data analysis, where specified a model is fit to data, and parameter estimates and other numerical summaries, such as $R^2$ are reported. In the context of SAOMs, the fitted model contains the form of the rate and objective functions, the estimated rate parameters, and the estimated objective function parameters. The model form describes the the model \textit{before} the fitting process, defining which parameters are in the model within the context of the larger model family. In SAOMs, the model form includes description of the rate and objective functions and the variables therein that describe how the network evolves over time. Finally, the model family is the broadest description of the model. This is the type of model that you wish to fit to the data, and is chosen based on the problem, data, and knowledge at hand. For example, we chose to use a SAOM to model network data over an exponential random graph model (ERGM) because we believe that actor-level variables effect network structure and formation, and we wanted to model the network changes over time. These three uses of the term ``model" can each be visualized according to the three principals of model visualization: display the model in the data space, look at a collection of models, and explore the process of fitting the model, not just the end result. We turn our focus to the fitted model and the model form. Specifically, we want to know how the model form affects the fitted model. Using our example data sets and our visualization toolbox, we hope to answer this question for SAOMs.
+Every good data analysis includes both numerical and visual summaries of the data, so why restrict model description and diagnostics to numerical summaries? The concept of model visualization was developed to complement traditional model diagnostic tools. Typically, numerical summaries such as $R^2$ are used to assess model fit, and the occasional visualization, like a residual plot, are used to determine how well the model fits the data. \citeauthor{modelvis} outline three separate ideas, each of which are can be referred to simply as the "model": the model family, the model form, and the fitted model. The latter is primarily what one thinks of first when considering a model in a data analysis, where specified a model is fit to data, and parameter estimates and other numerical summaries, such as $R^2$ are reported. In the context of SAOMs, the fitted model contains the form of the rate and objective functions, the estimated rate parameters, and the estimated objective function parameters. The model form describes the the model \textit{before} the fitting process, defining which parameters are in the model within the context of the larger model family. In SAOMs, the model form includes description of the rate and objective functions and the variables therein that describe how the network evolves over time. Finally, the model family is the broadest description of the model. This is the type of model that you wish to fit to the data, and is chosen based on the problem, data, and knowledge at hand. For example, we chose to use a SAOM to model network data over an exponential random graph model (ERGM) because we believe that actor-level variables effect network structure and formation, and we wanted to model the network changes over time. 
+
+%These three uses of the term ``model" 
+\st{The model family, the model form, and the fitted model can each be visualized according to the three principals of model visualization: we can }view the model in the data space, visualize collections of models, and explore the process of fitting the model, not just the end result. \st{Since we have already decided on our model family, SAOMs, }we now shift our focus to the fitted model and the model form. Specifically, we want to learn more about how the model form we choose affects the fitted model by using our example data sets and our visualization toolbox. We begin by introducing the five models that we fit to our example data. \st{Next we use the five models to guide our visual explorations of SAOMs. We first use novel tools and ideas to view a SAOM in the data space of a dynamic network. We then explore collections of the same models fit many times to the example data to see how the simulation processes in \texttt{RSiena} affect the model fits. Finally, we look behind the scenes and into the individual steps of the continuous time Markov chain to learn more about how this "hidden data" mechanism works and how it results in a fitted model. } 
 
 \subsection{The Models}
 
@@ -628,7 +633,7 @@ ggplot(data = dad, aes(from_id = from, to_id = to)) +
 \caption{The additional network effects included in our models fit to the friends data. On the left, a jumping transitive triplet (JTT). On the right, a doubly achieved distance between $i$ and $k$.}
 \end{figure}
 
-where $s_{i3} = \sum_{j \neq h} x_{ij}x_{ih}x_{hj} \mathbb{I}(z_i = z_h \neq z_j)$, and $s_{i4} =  |\{j : x_{ij} = 0, \sum\limits_h x_{ih}x_{hj} \geq 2\}|$. These statistics are known as the number of jumping transitive triplets and the number of doubly achieved distances two effect, respectively. The first statistic emphasizes triad relationships that are formed between actors from different covariate groups, while the other emphasizes indirect ties between actors. These two effects are visually represented and further described in Figure~\ref{fig:jtt} and Figure~\ref{fig:dad}, respectively.
+where $s_{i3} = \sum_{j \neq h} x_{ij}x_{ih}x_{hj} \mathbb{I}(z_i = z_h \neq z_j)$, and $s_{i4} =  |\{j : x_{ij} = 0, \sum\limits_h x_{ih}x_{hj} \geq 2\}|$. These statistics are known as the number of jumping transitive triplets and the number of doubly achieved distances two effect, respectively. The first statistic emphasizes triad relationships that are formed between actors from different covariate groups, while the other emphasizes indirect ties between actors. The covariate groups are determined by the student's drinking behavior, the values of which are numeric and mean-centered. The four values in our data are $\{\text{never, 1-2 times per year, once per month, once per week}\}$, which after being converted to numeric and mean-centered become $\{-0.8125,-1.8125,0.1875,1.1875\}$. The two additional effects are visually represented and further described in Figure~\ref{fig:jtt} and Figure~\ref{fig:dad}, respectively.
 
 <<tableofmeans>>=
 simu2 <- read.csv("data/simulation-1000-M1-M2-M3.csv")
@@ -661,57 +666,47 @@ SFE <- simu2 %>% group_by(Model, parameter) %>%
   spread(Model, val) %>% arrange(parameter)
 @
 
-\begin{table}
-\scalebox{0.9}{
-\begin{tabular}{l|ccc|ccc }
-  \hline
-  & \multicolumn{3}{|c|}{Friendship Data} & \multicolumn{3}{|c|}{Senate Data} \\
-  \hline
-  M1 & M2 & M3 & M1 & M2 & M3 \\
-  $\alpha_1$ & \Sexpr{SFE$M1[1]} & \Sexpr{SFE$M2[1]} & \Sexpr{SFE$M3[1]} & \Sexpr{SSE$M1[1]} & \Sexpr{SSE$M2[1]} & \Sexpr{SSE$M3[1]} \\
-  $\alpha_2$ & \Sexpr{SFE$M1[2]} & \Sexpr{SFE$M2[2]} & \Sexpr{SFE$M3[2]} & \Sexpr{SSE$M1[2]} & \Sexpr{SSE$M2[2]} & \Sexpr{SSE$M3[2]}  \\
-  $\alpha_3$ & -- & -- & -- & \Sexpr{SSE$M1[3]} & \Sexpr{SSE$M2[3]} & \Sexpr{SSE$M3[3]} \\
-  $\beta_1$ & \Sexpr{SFE$M1[3]} & \Sexpr{SFE$M2[3]} & \Sexpr{SFE$M3[3]} & \Sexpr{SSE$M1[4]} & \Sexpr{SSE$M2[4]} & \Sexpr{SSE$M3[4]} \\
-  $\beta_2$ & \Sexpr{SFE$M1[4]} & \Sexpr{SFE$M2[4]} & \Sexpr{SFE$M3[4]} & \Sexpr{SSE$M1[5]} & \Sexpr{SSE$M2[5]} & \Sexpr{SSE$M3[5]}\\
-$\beta_3$ & -- & \Sexpr{SFE$M2[5]} & -- & -- & \Sexpr{SSE$M2[6]} & -- \\
-  $\beta_4$ & -- & --  & \Sexpr{SFE$M3[6]} & -- & -- & \Sexpr{SSE$M3[7]} \\
-  \hline
-\end{tabular}
-}
-\caption{\label{tab:meanests} The means (standard deviations) of parameter values estimated from repeated fittings of $M1, M2, M3$ to the small friendship network and the senate collaboration network. Each model was fit 1,000 times to the friend data, while each model was fit 100 times to the senate data.}
-\end{table}
 
-For comparison, we also fit models M1, M2, and M3 to the senate collaboration data. Comparison of the parameter estimates of these models fit to the two different data sets is given in Table~\ref{tab:meanests}. In addition, we fit two more models, M4 and M5 to the senate data that were found to be significant according to the Wald-type test:
+In Section~\ref{sec:samemoddiffdat}, we also fit models M1, M2, and M3 to the senate collaboration data for comparison. %Comparison of the parameter estimates of these models fit to the two different data sets is given in Table~\ref{tab:meanests}. 
+In addition, we fit two more models, M4 and M5 to the senate data that were found to be significant according to the Wald-type test:
 
 \begin{align*}
 f_i(x)^{M4} & = \beta_1s_{i1} + \beta_2s_{i2} + \beta_5s_{i5} \\
 f_i(x, z)^{M5} & = \beta_1s_{i1} + \beta_2s_{i2} + \beta_6s_{i6}.
 \end{align*}
 
-In M4, $s_{i5} = \mathbb{I}(x_{i+} = x_{+i} = 0)$ is an indicator variable for isolated nodes, called the network-isolate effect. This parameter attempts to measure the effect of a node being completely isolated in the network. If the value of the parameter $\beta_5$ is high, nodes are encouraged to remain isolated. In M5,  $s_{i6} = \sum\limits_j x_{ij}x_{ji}\mathbb{I}(z_i = z_j)$ is a measure of reciprocity between senators in the same party, $z_i, z_j \in \{\text{Democrat, Independent, Republican}\}$, generally called the same covariate reciprocity effect. This parameter attempts to measure the propensity for forming reciprocal ties between nodes with the same covariate value. If the value of the parameter $\beta_6$ is high, nodes belonging to the same covariate group are encourage to reciprocate incoming ties. By exploring these models more visually, we hope to understand these effects and the model fitting process better. 
+In M4, $s_{i5} = \mathbb{I}(x_{i+} = x_{+i} = 0)$ is an indicator variable for isolated nodes, called the network-isolate effect. This parameter attempts to measure the effect of a node being completely isolated in the network. If the value of the parameter $\beta_5$ is high, nodes are encouraged to remain isolated. In M5,  $s_{i6} = \sum\limits_j x_{ij}x_{ji}\mathbb{I}(z_i = z_j)$ is a measure of reciprocity between senators in the same party, $z_i, z_j \in \{\text{Democrat, Independent, Republican}\}$, generally called the same covariate reciprocity effect. The values of the covariate are converted to numeric, $\{1,2,3\}$, respectively, and mean-centered within \texttt{RSiena}. The mean-centered values of $z \in \{\text{Democrat, Independent, Republican}\}$ are $\{-0.96, 0.04, 1.04\}$. The parameter $\beta_6$ attempts to measure the propensity for forming reciprocal ties between nodes with the same covariate value. If the value of the parameter $\beta_6$ is high, nodes belonging to the same covariate group are encourage to reciprocate incoming ties. \st{Due to the intractability of SAOMs, it is difficult to know for certain how to interpret a fitted value of a parameter. We can make educated guesses based on the definition of the effect and the sign of the fitted value, but a direct interpretation is not always possible. But,} by exploring these models more visually, we aim to understand these effects, their interpretations, and the model fitting process better. 
 
 \subsection{View the model in the data space}\label{sec:minds}
 
-The first way we hope to better understand stochastic actor-oriented models is by viewing the model(s) in the data space. In \citeauthor{modelvis}, they define the \textit{data space} as ``the region over which we can reliably make inferences, usually a hypercube containing the data" \citep[p.~206]{modelvis}. But what does this definition mean for network data? For dynamic social networks, there are a few different data ``spaces": 
+The first way we hope to better understand stochastic actor-oriented models is by viewing the model(s) in the data space. In \citeauthor{modelvis}, they \st{happen to} define the \textit{data space} as ``the region over which we can reliably make inferences, usually a hypercube containing the data" \citep[p.~206]{modelvis}. But what does this definition mean for network data? For dynamic social networks, there are a few different data ``spaces": 
 \begin{enumerate}
 \item the actors and their corresponding covariates,
 \item the edges and their correpsonding variables that describe the relationships between the nodes, and 
-\item the time over which the network evolves
+\item the time, both the continuous unobserved time and the discrete observed time points, over which the network evolves
 \end{enumerate}
 These three data pieces can be visualized together in various ways. The traditional node-link visualization uses one of many algorithms to layout the actors as points in 2D space, then draws segments connecting the points in 2D if there is an edge between two nodes, and draws nothing otherwise. The time aspect can be visualized by drawing each network observation in time and placing the observed timepoints side-by-side. 
 
-One tool that can bring these three data spaces together in this way is the \texttt{R} package \texttt{geomnet} \citep{geomnet}. Different aesthesic aspects of each piece of the node-link diagram can be tied to the underlying node or edge data. The color, size, and shape of the points can be used to represent variables in the node data, while the color, linewidth, and linetype of the lines between points can be used to represent the edge variables. In a social network, node data might be age, gender, and occupation of the person in the network, and edge data might be length of connection between two people, how the people first met (school, work, church, etc.), and how often they interact, and we can view the network at different timepoints side-by-side to see its evolution. Pulling all of this information together with \texttt{geomnet} allows the entire data space to be viewed at once. 
+\st{Because longitudinal network data consist of three different ``spaces" of data, viewing the model in the data space can depend on which aspect of the \textit{model} and the \textit{data} we are interested in viewing. %The SIENA software includes a method for modelling covariate change in the network 
+Incorporating data covariates into the network structure allows us to assess whether the ties between nodes are affected by how nodes behave over time. In this instance, we would want to view predictions over time. A SAOM can also model behavior change over time, taking both the node and edge information into account. In this case, a plot of predicted covariate values over time would put the model into the time and node data space. Most likely, however, is that we would want to view all of the data spaces simultaneously.}
 
-<<funsenatevis, fig.height=3, fig.cap='The 111th Senate separated into ``BC" and ``AC": before Clinton left the Senate to become Secretary of State (on the right), and after she left (on the left).' >>=
+One tool that can bring the \st{node, edge, and time} data spaces together in this way is the \texttt{R} package \texttt{geomnet} \citep{geomnet}. Different visual features in the node-link diagram can be tied to the underlying node or edge data. The color, size, and shape of the points can be used to represent variables in the node data, while the color, linewidth, and linetype of the lines between points can be used to represent the edge variables. In a social network, node data might be age, gender, and occupation of the person in the network, and edge data might be length of connection between two people, how the people first met (school, work, church, etc.), and how often they interact, and we can view the network at different timepoints side-by-side to see its evolution. Pulling all of this information together with \texttt{geomnet} allows the entire data space to be viewed at once. 
+
+<<funsenatevis, fig.height=3, fig.cap='The 111th Senate at two discrete time points: while Clinton was in the senate in the first few weeks of 2009 (on the left) and after she left the senate to become Secretary of State (on the right). We put some potential model covariates, sex and party of the senator and the number of bills they authored in the data space through the shape, color, and size of the nodes, respectively. We also map the strength of the tie, the $WPC$, to the width of the edge between two nodes. Thicker lines implies higher propensity to collaborate. In addition, senators with no ties higher than $WPC = 0.25$ are not shown.'>>=
 se111clint <- filter(seobama, senate == 111)
 se111noclint <- filter(seobama, senate == 111)
 se111noclint$target[which(se111noclint$target == "Hillary Rodham Clinton")] <- NA
 se111clint$Clinton <- 'Yes'
 se111noclint$Clinton <- 'No'
 clintonSenate <- rbind(se111clint, se111noclint)
+clintonSenate$Clinton <- as.factor(clintonSenate$Clinton)
+clintonSenate$Clinton <- ordered(clintonSenate$Clinton, levels = c("Yes", "No"))
 
-ggplot(data = clintonSenate) + 
-  geom_net(directed = T, labelon=F, arrowsize = .3, singletons= T, fiteach = T, arrowgap = .01, layout.alg = 'fruchtermanreingold',
+clintonSenate %>% filter(source %in% target)
+
+clintonSenate %>% filter(!(source %in% c("Roland Burris", "Bernard Sanders", "Frank R. Lautenberg", "Judd A. Gregg", "Mary L. Landrieu") & is.na(target))) %>%
+ggplot() + 
+  geom_net(directed = T, labelon=F, arrowsize = .3, singletons= F, fiteach = T, arrowgap = .01, layout.alg = 'fruchtermanreingold',
            aes(from_id = source, to_id = target, color = party, linewidth = gsw, shape = sex,size = n_au)) + 
   scale_size_continuous(name="# bills\nauthored") +
   #theme_net() + 
@@ -722,12 +717,12 @@ ggplot(data = clintonSenate) +
   facet_wrap(~Clinton, nrow = 1, labeller = 'label_both')
 @
 
-To demonstrate, we use \texttt{geomnet} to visualize the connections in the $111^{th}$ at two different points: when Hillary Clinton was in the senate, and after she left to become Secretary of State. Clinton was only in the $111^{th}$ senate for 17 days, from January 3, 2009, to January 20, 2009, when she was in the middle of her second term in the senate. In that time, she authored two bills and was a cosponsor on 17 other bills. With Clinton included in the node-link diagram, the senate looks much more collaborative than it does without her in the diagram. We can compare the number of bills authored throughout the senate by mapping the size of the node to the numer of bills authored by that senator. We also map shape to gender, and keep color mapped to party of the senator. In addition, we can see the strength of the tie by mapping the linewidth of the edge to the $WPC$ value between the two senators. In this single visualization, we have viewed node information (number of bills authored by a senator and the gender of that senator), edge infortmation (the direction and strength of ties between two senators), and time (before and after Clinton left the senate). 
+To demonstrate, we use \texttt{geomnet} to visualize the connections in the $111^{th}$ United States Senate at two different points: when Hillary Clinton was in the senate, and after she left to become Secretary of State. Clinton was only in the $111^{th}$ senate for 17 days, from January 3, 2009, to January 20, 2009, when she was in the middle of her second term as senator from New York. In that time, she authored two bills and was a cosponsor on 17 other bills. With Clinton included in the node-link diagram, the senate looks much more highly collaborative than it does without her in the diagram. We can compare the number of bills authored throughout the senate by mapping the size of the node to the numer of bills authored by that senator. We also map shape to sex, and keep color mapped to party of the senator. In addition, we can see the strength of the tie by mapping the linewidth of the edge to the $WPC$ value between the two senators. In this single visualization, we have viewed node information (number of bills authored by a senator and the sex and party of that senator), edge information (the direction and strength of ties between two senators), and time (before and after Clinton left the senate). 
 % ST: I don't like this paragraph
 % The visual aspects of the node-link diagram connecting the node, edge, and time data spaces are themselves part of the data space, because they can be viewed in different ways. Another way to connect the node and the edge data, as discussed in Section~\ref{sec:netvizintro}, is through the network's adjaceny matrix. The time dimension can also be incorporated with side-by-side adjacency matrix visualizations. 
 
 % below chunk contains some repetitive stuff. Haven't figured out what it's purpose is yet. 
-<<summnetM1, message=FALSE, fig.cap='On the left, the first wave of observed data that is conditioned on in the model. On the right, the second wave of observed data. In the middle, a summary network from the first model fit to the data. This summary network represents 1,000 simulations of wave 2 using the values from the simple fitted model M1.',results='hide', fig.height=3>>=
+<<summnetM1, message=FALSE, fig.cap='On the left, the first wave of observed data that is conditioned on in the model. On the right, the second wave of observed data. In the middle, a summary network from the first model fit to the data. This summary network represents 1,000 simulations of wave 2 using the values from the simple fitted model M1.',results='hide', fig.height=2.5>>=
 library(netvizinf)
 friendshipData <- array(c(fd2.w1, fd2.w2, fd2.w3), dim = c(16, 16, 3))
 drink1 <- s50a[20:35,1]
@@ -811,7 +806,7 @@ combinedavgs %>% group_by(cat) %>%
   mutate(linewidth = weight / max(weight,na.rm = T)) -> combinedavgs
 
 combinedavgs %>% filter(cat == "Model1") %>% mutate(logweight = log(weight)) -> t1 
-colors <- tweenr::tween_color(data = c("#969696", "#67000d"), n = 26, ease = 'linear')
+colors <- tweenr::tween_color(data = c("#969696", "#d73027"), n = 26, ease = 'linear')
 t1 %>% arrange(logweight) -> t1
 t1$color <- NA
 t1$color[1:26] <- colors[[1]]
@@ -844,25 +839,24 @@ p3 <- ggplot(data = filter(combinedavgs, cat == "2nd Wave")) +
 grid.arrange(p2, p1, p3, nrow = 1)
 @
 
-Another way to view the model in the data space is through simulation from the model. No single network alone simulated from a SAOM is going to look like the data or represent the model, just as no single value simulated from the standard normal distribution will look like a bell-shaped curve. It would therefore better to visualize many simulations together. From a statistician's point of view, a stumbling block with statistical network models generally is the lack of an ``average network" measure. Statisticians frequently rely on averages and expected values in data analyses, but statistical network models, especially those as complex as SAOMs, lack a single, intuitive expected value measure. We could talk about expected values of parameters, but the parameters can be hard to interpret. Furthermore, there is no way to talk about the expected value of an observation from a statistical network model. How then, can we arrive at an ``average" network? We propose to answer this question through visualization. For network data, one way we propose to come up with an "average" network is through a summary network drawn using the traditional node-link diagram. In Figure~\ref{fig:summnetM1}, we show an \textit{average network} created with 1,000 simulations of the second wave of the network from Model 1. \st{To make this average network, we first simulated 1,000 wave 2 and wave 3 observations of our small friendship example data from model M1, for which parameters had previously been estimated. We then combine the 1,000 instances of wave 2, and count up the number of times each edge appears in a simulation. Then, we combine these 1,000 networks into a single network with edgeweight equal to the proportion of time that edge appears in our 1,000 simulations. This is the network we draw using the node-link diagram.} An edge is only drawn in the average network if it appears in more than 5\% of the simulations (in at least 51 of the 1000 simulations), with edges that appear more frequently emphasized by thicker linewidths and a darker color. On either side of the average network in Figure~\ref{fig:summnetM1}, we show the actual data, wave 1 on the left, and wave 2 on the right. \st{We can see that the structure of the average network is much more similar to the first wave than to the second wave. However, the simulations are supposed to represent the second wave of data, which is shown on the right in Figure~\ref{fig:summnetM1}. This is an indication that the simple model, M1, is doing a very poor job of capturing the change mechanism from the first to the second wave of observation.} % XXX ST - I was looking at the wrong one. I had wave == 2 instead of wave == 1 in the code. This means I was looking at the wrong simulations, so they really do look more like the first data obs than the second obs. XXX Comparing the three visualizations side-by-side shows us that the summary network of simulations of wave 2 looks more like the true wave 2 than wave 1, which is a good indication that the model is capturing the true data structure. It's not ideal, however, because there appear to be too many reciprocated ties in the summary network, far more than there are in the data. This could indicate that we should remove the reciprocity parameter from the model. 
+Another way to view the model in the data space is through simulation from the model. No single network alone simulated from a SAOM is going to look like the data or represent the model, just as no single value simulated from the standard normal distribution will look like a bell-shaped curve. \st{Statisticians would prefer to look at a sample, or at least a summary statistic or two, }so it would therefore better to visualize many simulations together. From a statistician's point of view, a stumbling block with statistical network models generally is the lack of an ``average network" or ``expected network" value. Statisticians frequently rely on averages and expected values in data analyses, but statistical network models, especially those as complex as SAOMs, lack a single, intuitive expected value measure. We could talk about expected values of parameters, but the parameters can be hard to interpret. \st{Expected values of parameters are important, but if they cannot directly tell us anything about our dependent variable (networks in this case), they lose some value to us.} Furthermore, there is no way to talk about the expected value of an observation \st{simulated} from a statistical network model. How then, can we arrive at an ``average" network? We answer this question through visualization. For network data, one way we view an "average" network is through a summary network drawn using the traditional node-link diagram. In Figure~\ref{fig:summnetM1}, we show an \textit{average network} created with 1,000 simulations of the second wave of the network from Model 1. \st{To make this average network, we first simulated 1,000 wave 2 and wave 3 observations of our small friendship example data from model M1, for which parameters had previously been estimated. We then combine the 1,000 instances of wave 2, and count up the number of times each edge appears in a simulation. Then, we combine these 1,000 networks into a single network with edgeweight equal to the proportion of time that edge appears in our 1,000 simulations. This weighted edgelist is the network we draw using the node-link diagram.} An edge is only drawn in the average network if it appears in more than 5\% of the simulations (in at least 51 of the 1000 simulations), with edges that appear more frequently emphasized by thicker linewidths and a darker color, representing the proportion of times appeared in the model simulations. On either side of the average network in Figure~\ref{fig:summnetM1}, we show the actual data, wave 1 on the left, and wave 2 on the right. \st{We can see that the structure of the average network is much more similar to the first wave than to the second wave. However, the simulations are supposed to represent the second wave of data, which is shown on the right in Figure~\ref{fig:summnetM1}. This is an indication that the simple model, M1, is doing a very poor job of capturing the change mechanism from the first to the second wave of observation. The average network can thus be used to help determine model goodness-of-fit. Because the the average network looks more like the first wave than the second wave, we can use the visualization in Figure \ref{fig:summnetM1} as evidence of poor model fit.}  % XXX ST - I was looking at the wrong one. I had wave == 2 instead of wave == 1 in the code. This means I was looking at the wrong simulations, so they really do look more like the first data obs than the second obs. XXX Comparing the three visualizations side-by-side shows us that the summary network of simulations of wave 2 looks more like the true wave 2 than wave 1, which is a good indication that the model is capturing the true data structure. It's not ideal, however, because there appear to be too many reciprocated ties in the summary network, far more than there are in the data. This could indicate that we should remove the reciprocity parameter from the model. 
 
-
-
-<<gof2, fig.cap="An example of viewing the distribution of a statistic of interest from a SAOM. Here, the Mahalanobis distance of the cumulative outdegree values computed on a simulated network to the mean value simulated is shown. The distance computed from the data is shown as a vertical line.", fig.height=3, out.width='.6\\textwidth'>>=
+<<gof2, fig.cap="An example of viewing the distribution of a statistic of interest from a SAOM. Here, the Mahalanobis distance of the cumulative outdegree values computed on a simulated network to the mean value simulated is shown. The distance computed from the data is shown as a vertical line.", fig.height=3, out.width='.6\\textwidth', eval = FALSE>>=
 load("data/ansnullpaper.rda")
 library(lattice)
 gof1 <- sienaGOF(ansnull, OutdegreeDistribution, varName ="friendship", join = FALSE)
-qplot(x = log(gof1$`Period 1`$SimulatedTestStat), binwidth = .2) + 
-  geom_vline(xintercept = log(gof1$`Period 1`$ObservedTestStat)) + 
+histdat <- data.frame(x = log(gof1$`Period 1`$SimulatedTestStat))
+ggplot(histdat) + geom_histogram(aes(x = x), binwidth = .1, fill = 'white', color = "black") + 
+  #geom_density(aes(x = x, y = ..density..*250)) + 
+  geom_vline(xintercept = log(gof1$`Period 1`$ObservedTestStat), color = 'red') + 
   ThemeNoNet + 
   labs(x = "log(Statistic Value)", title = "Distribution of log Mahalanobis Distance")
 
 @
 
-\st{Because longitudinal network data consist of three different ``spaces" of data, viewing the model in the data space can depend on which aspect of the model and the data we are interested in viewing. %The SIENA software includes a method for modelling covariate change in the network 
-Incorporating data covariates into the network structure allows us to assess whether ties between nodes are affected by how nodes behave over time. In this instance, a time series plot of predicted covariate values for the nodes as the network evolves is viewing the model in the time and node spaces. If, as discussed in Section~\ref{sec:modgof},
+%\st{If, as discussed in Section~\ref{sec:modgof},
 %Figure~\ref{fig:sienagof}, 
-summary statistics computed on the network are of interest, distributions of these statistics computed on networks simulated from the model show the model in the edge data space. For an example, see Figure~\ref{fig:gof2}, where the distribution of the log of the Mahalanobis distance is shown for the outdegree distribution auxiliary statistics, and the log Mahalanobis distance for the observed data is shown as a vertical line. 
+%summary statistics such as outdegree and indegree distribution computed on the network are of interest, we can look at the computed distances between the data and the model simulations. distributions of these statistics computed on networks simulated from the model show the model in the edge data space. For an example, see Figure~\ref{fig:gof2}, where the distribution of the log of the Mahalanobis distance is shown for the outdegree distribution auxiliary statistics, and the log Mahalanobis distance for the observed data is shown as a vertical line. }
 
 \begin{figure}
 \centering
@@ -870,7 +864,7 @@ summary statistics computed on the network are of interest, distributions of the
 \caption{\label{fig:lineup} A small lineup of node-link diagrams showing the second wave of our small friendship network among five networks simulated from model M1.}
 \end{figure}
 
-Another potential goodness-of-fit visualization is a lineup like those proposed in \citet{buja:2009}. A \texttt{lineup} ``asks the witness to identify the plot of the real data from among a set of decoys, the null plots, under the veil of ignorance" \citep[p. 4369]{buja:2009}. It can be thought of like a police lineup, where the ``suspect" is in a lineup among several innocent lookalike fillers, and a witness picking the suspect out of the lineup is considered evidence against the suspect. In data and model visualization, the ``suspect" is a plot of the true data, while the ``filler" is composed of several plots of mock data, simulated from a hypothesized model. If the true data stands out among the simulated data, that is taken as evidence of poor model fit, whereas if the true data is difficult to identify among the simulated data, that is taked as evidence of good model fit. \st{An application of the lineup protocal can be found in \citet{hofmann2012graphical}, where the authors examine, for instance, the differences between polar and cartesian coordinates for plotting categorical data, and density plots and box plots for determining distributional differences. They pose questions to experiment participants such as, ``Which plot is most different from the others?" for the first example and, ``In which plot is the blue group furthest to the right?" for the distributional differences. The data visualizations examined in \citet{hofmann2012graphical} are less complex than a node-link network diagram. What questions should we ask for network data visualizations? Asking participants to identify the most different plot may be difficult, as we show} in Figure~\ref{fig:lineup}. In the network lineup, the second wave of the small friendship network is shown among five simulated networks from model M1 using parameter values estimated from the data. What makes these plots ``different"? It seems possible to argue for any one of the six plots in Firgure~\ref{fig:lineup} as most different. So, we guide participants to look at the overall structure of the graphs to determine which has the most and least complex structure. The least complex plot, number six, has no triplets, while the most complex plot, number three, has three triplets, and in fact, plot three is the data. We have found in an experiment where all the node-link diagrams shown are simulated, one from an ``alternative" model and the rest from a ``null" model, the triangular shape of the triplets stands out to people the most. We can use the lineup protocol to help better understand SAOMs because it allows us to view the model in the data space by placing observations the model side-by-side with the data and examining the differences.} 
+Another potential goodness-of-fit visualization \st{that places the model in the node and edge data space} is a lineup like those proposed in \citet{buja:2009}. A \textit{lineup} ``asks the witness to identify the plot of the real data from among a set of decoys, the null plots, under the veil of ignorance" \citep[p. 4369]{buja:2009}. It can be thought of like a police lineup, where the ``suspect" is in a lineup among several innocent lookalike fillers, and a witness picking the suspect out of the lineup is considered evidence against the suspect. In data and model visualization, the ``suspect" is a plot of the true data, while the ``filler" is composed of several plots of mock data, simulated from a hypothesized model. If the true data stands out among the simulated data, that is taken as evidence of poor model fit, whereas if the true data is difficult to identify among the simulated data, that is taked as evidence of good model fit. \st{An application of the lineup protocal can be found in \citet{hofmann2012graphical}, where the authors examine, for instance, the differences between polar and cartesian coordinates for plotting categorical data, and density plots and box plots for determining distributional differences. They pose questions to experiment participants such as, ``Which plot is most different from the others?" for the first example and, ``In which plot is the blue group furthest to the right?" for the distributional differences. The data visualizations examined in \citet{hofmann2012graphical} are less complex than a node-link network diagram. What questions should we ask for network data visualizations? Asking participants to identify the most different plot may be difficult.  In the network lineup shown in Figure~\ref{fig:lineup}, the second wave of the small friendship network is shown among five simulated networks from model M1 using parameter values estimated from the data. What makes these plots ``different"? It seems possible to argue for any one of the six plots in Figure~\ref{fig:lineup} as most different. So, we guide participants to look at the overall structure of the graphs to determine which has the most and least complex structure. The least complex plot, number six, has no triplets, while the most complex plot, number three, has three triplets, and in fact, plot three is the data. We have found in an experiment where all the node-link diagrams shown are based on simulated data, one observation from an ``alternative" model and the rest from a ``null" model, the triangular shape of the triplets stands out the most to participants. We can use the lineup protocol to help better understand SAOMs because it allows us to view the model in the data space by placing observations the model side-by-side with the data and examining the differences. This can also help us determine the significant structural effects, if any, of the parameters in the model on observations simulated from the model. The triangular shape mentioned above becomes more prevalent when a transitive triplet parameter in included in a model, but it does not always cause triplets to form in the simulated data. This requires more investigation with larger data sets and more complex models, but is promising for the development of additional goodness-of-fit measures for network models.}
 
 % \st{
 % \begin{itemize}
@@ -883,82 +877,54 @@ Another potential goodness-of-fit visualization is a lineup like those proposed 
 
 \subsection{Visualizing collections of models}
 
-The second principle of model visualization is that ``collections are more informative than singletons" \citep[p.~210]{modelvis}. The authors describe several different methods for producing such collections, but we focus on only a few here. We look at collections produced ``from exploring the space of all possible models," ``by varying model settings", ``by fitting the same model to different datasets", and ``by treating each iteration as a model" \citep[p.~210-11]{modelvis}. Because fitting a SAOM requires MCMC methods, we also fit the same model many times, resulting in distributions of fitted parameters for one data set.
+\st{There are many possible ways to collect models together. We could look at the same models fit to different data, different models fit to the same data, or because of the nature of SAOMs, we could fit the same models to the same data many times to see how the simulations change. For the SAOMs, we decided that there were four collections that were most important: 
+\begin{enumerate}
+\item the collections resulting from exploring the space of all possible models;
+\item the collections we get when varying model settings; 
+\item the results from fitting the same model form to different data;
+\item the results from fitting the same model to the same data many times.
+\end{enumerate}
 
-To our small friendship network, we fit three models, M1, M2, and M3, using \texttt{RSiena} 1,000 times each. We then looked at the distribution of the fitted values, which are shown in Figure~\ref{fig:distests}. We can see from these distributions that the inclusion of the jumping transitive triplet parameter, $\beta_3$ is obviously affecting the distributions of the other four parameters included in all models, $\alpha_1$, $\alpha_2$, $\beta_1$, and $\beta_2$. \st{When $\beta_3$ is included, its estimate is postitive, meaning that friendships between two girls with different drinking behaviors tend to form when there is an intermediary who is already friends with the two girls. The inclusion of this parameter leads to increases in the rate parameters' estimates, suggesting that encouraging the transitive triplet behavior means that the girls would also change friends more frequently. The outegree parameter, $\beta_1$ decreases when $\beta_3$ is included, while the reciprocity parameter, $\beta_2$ increases. This implies the girls in the data prefer to form closer friend groups, as indicated by reciprocated ties and jumping transitive triplet formation, as opposed to being popular and having many friends. Having many friends who do not reciprocate is discouraged by M2.} In comparison with models M1 and M3, model M2 typically has higher estimates of the rate parameter, meaning that the inclusion of the covariate statistic in the model leads to higher estimates of the number of times, on average, a node gets to change its ties. It is not clear, however, that the addition of a parameter to the objective function \textit{should} effect the estimation of the rate parameters, so we continue to explore the collection of parameter estimates.
+We chose these four collections because they each explore something different about SAOMs. The first takes the many dozens of parameters available to include in a SAOM into account, which easily translates into the second by showing how those many parameters affect the fitted models. Then, we look at how the same model looks when fit to different sets of dynamic network data. Finally, we look at the results from fitting the same model to the same data because the MCMCs and CTMCs that make up a SAOM lead to different parameter estimates every time, so it important to see how the results can vary.}
 
-To further investigate this potentially problematic relationship between the parameter values, we look at correlations between each of the parameter estimates in each model. In Figure~\ref{fig:corplots}, we examine correlations between each of pair of parameters within each model and overall.\nocite{ggally} The strongest correlation within each model is between $\beta_1$ and $\beta_2$, with absolute value of correlation between those two parameter values greater than 0.90 in all three models. The $\beta_1$ parameter is also highly correlated with the $\beta_3$ parameter within model M2, but it is not as highly correlated with the $\beta_4$ parameter in model M3. 
+\subsubsection{Exploring the space of all possible models}
 
-<<getdata>>=
-nulls <- read.csv("data/distribution_null_model.csv")
-alt <- read.csv("data/distribution_jumpTT_model.csv")
-alt2nd <- read.csv("data/distribution_dblpairs_model.csv")
-means <- simu2 %>% group_by(Model, parameter) %>% summarize(
-  means = mean(estimate)
-)
-null_mod_sv <- as.numeric(nulls[,-c(1,6,7)] %>% summarise_each(funs(mean)))
-alt_mod_sv <- as.numeric(alt[,-c(1, 7,8)] %>% summarise_each(funs(mean)))
-alt_mod2_sv <- as.numeric(alt2nd[,-c(1,7,8)] %>% summarise_each(funs(mean)))
+<<sigtesting, fig.show = 'hold', out.width='\\textwidth', fig.height=3, fig.cap="Significant effects for the two data sets, at the level of $\alpha = 0.10$ as calculated by the Wald-type test available in the \texttt{RSiena} software.">>=
+smfr_effs <- read_csv("data/effects_significance_smallFriends.csv")
+smfr_effs$inter1[is.na(smfr_effs$inter1)] <- "none"
+library(ggrepel)
+set.seed(12345678)
+smfr_effs %>% filter(type == "eval" & Waldpval <=0.10) %>% 
+ggplot(aes(x = estimate, y = Waldpval, color = inter1)) + 
+  #geom_errorbarh(aes(xmin = estimate - se, xmax = estimate + se), color = 'black') +  
+  geom_vline(xintercept = 0) + 
+  geom_point(size = 3) + 
+  geom_text_repel(aes(label = shortName)) + 
+  scale_color_brewer(palette = "Paired", name = "Interaction\nVariable") + 
+  ggtitle("Significant effects at level 0.10 for friendship data") + 
+  coord_flip() + 
+  ThemeNoNet
+sen_effs <- read_csv("data/congress/senateModelSigEffects.csv")
+#sen_effs$Waldpval <- parse_number(sen_effs$Waldpval)
+sen_effs$inter1[is.na(sen_effs$inter1)] <- "none"
+ggplot(data = sen_effs %>% filter(Waldpval <=0.10), aes(x = estimate, y = Waldpval, color = inter1)) + 
+  # geom_errorbarh(aes(xmin = estimate - se, xmax = estimate + se), color = 'black') +  
+  geom_vline(xintercept = 0) + 
+  geom_point(size = 3) + 
+  geom_text_repel(aes(label = shortName)) + 
+  scale_color_brewer(palette = "Paired", name = "Interaction\nVariable") + 
+  ggtitle("Significant effects at level 0.10 for senate data") + 
+  coord_flip() + 
+  ThemeNoNet
 @
 
-<<distests, fig.cap="Distribution of fitted parameter values for our three SAOMs. The inclusion of $\\beta_3$ or $\\beta_4$ clearly has an effect on the distribution of the rate parameters, $\\alpha_1$ and $\\alpha_2$.", fig.height=4>>=
+\st{The \texttt{RSiena} manual contains over eighty possible effects to include in the model. In order to select parameters to include in the models for our example data, we searched through the possible effects available to model given the data structure to find \textit{significant} effects. We tested for significance using the Wald-type tests built into \texttt{RSiena} for one-at-a-time effects testing. We start with the outdegree and reciprocity measures as the foundation of the models we fit, then add one evaluation effect, fit the model, test the additional effect for significance, and repeat for all possible parameters to add to the model. We performed this procedure for both the small friendship and the senate collaboration data. The results for significant effects are shown in Figure~\ref{fig:sigtesting}. We see in both the friendship data and the senate data results that most of the significant effects have absolute value less than ten. In addition, the $p$-values for the effects from the friendship data are more spread out than the $p$-values for the senate data, which are concentrated at about 0.02 or less. This may suggest that larger data sets tend to result in smaller $p$-values, just like a larger sample size results in smaller $p$-values in a $t$-test.} 
 
-#simu2 <- read.csv("data/simulation-1000-M1-M2-M3.csv")
+\subsubsection{Varying model settings}
 
-ggplot(data = simu2) + 
-  geom_density(aes(x = estimate, fill = Model), alpha = .5) + 
-  facet_wrap(~parameter, scales = 'free') + 
-  ThemeNoNet + 
-  theme(legend.position = 'bottom')
-@
+We have varied model settings already by choosing models M1, M2, M3 to fit to our small firendship network data set. In Section~\ref{sec:samemodsamedat}, we fit these models to the data 1,000 times, and in this section, we explore simulations from these three models given the mean values of from the 1,000 fitted parameter values as the parameters in our models. From each of these three models using the means of parameter estimates as our fixed parameter values, we simulated 1,000 observations from each of the three models. In this process, we condition on the first friendship network observation, and the second and third observations are simulated from the SAOM models with the given parameter values. From these simulations, we first create a visualization that represents an average network. 
 
-
-<<corplots, fig.cap="A matrix of plots demonstrating the strong correlations between parameter estimate in our SAOMs. The strongest correlation within each model is between $\\beta_1$ and $\\beta_2$.", fig.width=8>>=
-
-#simu2 <- read.csv("data/simulation-1000-M1-M2-M3.csv")
-simu_spread <- simu2 %>% spread(parameter, estimate)
-ggpairs(simu_spread, columns = 3:8, ggplot2::aes(colour=Model, alpha = .5)) + theme(plot.title = element_text(size = 12,
-                                            face = 'plain', angle = 0, family = "Times New Roman"), 
-                  axis.title.x = element_text(size = 12,
-                                            face = 'plain', angle = 0, family = "Times New Roman", inherit.blank = T),
-                  axis.title.y = element_text(size = 12,
-                                            face = 'plain', angle = 90, inherit.blank = T),
-                  axis.text.x.top = element_text(size = 12,
-                                            face = 'plain', angle = 90, inherit.blank = TRUE), 
-                  axis.text.x.bottom = element_text(size = 12,
-                                            face = 'plain', angle = 90, inherit.blank = TRUE), 
-                  axis.text.y.left = element_text(size = 12,
-                                            face = 'plain', angle = 0, family = "Times New Roman", inherit.blank = T),
-                  axis.text.y.right = element_text(size = 12,
-                                            face = 'plain', angle = 0, family = "Times New Roman", inherit.blank = T),
-                  strip.text.x = element_text(size = 14,
-                                            face = 'plain', angle = 0, family = "Times New Roman", 
-                                            margin = margin(t = 3, r = 0, b = 3, l = 0, unit = "pt"), inherit.blank = T),
-                  strip.text.y =element_text(size = 14,
-                                            face = 'plain', family = "Times New Roman", angle = 90,margin = margin(t = 3, r = 3, b = 3, l = 3, unit = "pt"),inherit.blank = T),
-                  strip.background = element_rect(colour = "black", fill = "white")
-                    )
-@
-
-<<corplotsSenate, eval = FALSE>>=
-senM4est <- read.csv("data/congress/senateM4ests.csv")
-senM5est <- read.csv("data/congress/senateM5ests.csv")
-names(senM4est) <- c("alpha1", "alpha2", "alpha3", "beta1", "beta2", "beta5")
-names(senM5est) <- c("alpha1", "alpha2", "alpha3", "beta1", "beta2", "beta6")
-senM4est$Model <- "M4"
-senM5est$Model <- "M5"
-senM4est$Sim <- 1:nrow(senM4est)
-senM5est$Sim <- 1:nrow(senM5est)
-senM4est2 <- senM4est %>% gather(parameter, estimate, alpha1:beta5) 
-senM5est2 <- senM5est %>% gather(parameter, estimate, alpha1:beta6) 
-senM45est <- rbind(senM4est2, senM5est2)
-senM45est %>% spread(parameter, estimate)-> senM45est2
-ggpairs(senM45est2, columns = 3:9, ggplot2::aes(colour=Model, alpha = .5))
-@
-
-We also explore simulations from these different models given parameter values. Using the mean values of from the 1,000 fitted parameter values as the parameters in our models, we simulated 1,000 observations from each of our three models. In this process, we condition on the first friendship network observation, and the second and third observations are simulated from the SAOM models with the given parameter values. From these simulations, we first create a visualization that represents an average network. To do this, we follow the same procedure as in Section~\ref{sec:minds}, counting occurrences of each possible edge in the simulations, resulting in a summary network with weighted edges representing the number of times an edge appeared in the simulated wave 2 when simulating from the SAOM 1,000 times. As in Figure~\ref{fig:summnetM1}, edges only appear in the average network if they appear more than 5\% of the time in the simulations. In Figure~\ref{fig:averagenet}, we show the first wave, the ``average'' network from the three models we fit, and the second wave. \st{Comparing the three averages to waves 1 and 2, we see that they have very similar structure to wave 1. Model 2, which included the transitive triplet parameter, seems to have created a larger connected component overall than models 1 and 3. In particular, if we look at the group of nodes $\{10,11,14\}$, we see they are very strongly connected within the three average networks, and they are completely separate from the other nodes in the true wave 2. None of the three average networks show node 16 gaining ties as it does in wave two, nor do they show nodes 4 and 7 becoming isolated. In Model 2, however, the ties to node 7 appear much weaker than in Model 1 or Model 2, suggesting that of the three, Model 2 may be the best fit for our data.}  %XXXX ST commented out after I realized I had made the same mistake as figure 7. XX This could be an indication that, despite the highly significant nature of the parameter $\beta_3$ according to the $t$-tests in \texttt{RSiena}, the transitive triplet parameter should not be included because it does not result in a structure similar to the data. 
-
-<<averagenet, results='hide', out.width='99%',fig.cap='The node-link diagrams from the three "average" networks that we calculated are in the top row, and the true wave 1 and wave 2 data are shown in the bottom row above. There is some difference between the three models, but overall, these three models cannot capture the structure in the true second wave of data.', fig.height=6>>=
+<<averagenet, results='hide', out.width='\\textwidth',fig.cap='The node-link diagrams from the three "average" networks that we calculated are in the top row, and the true wave 1 and wave 2 data are shown in the bottom row above. There is some difference between the three models, but overall, these three models cannot capture the structure in the true second wave of data.', fig.height=5>>=
 #friend.data.w1 <- as.matrix(read.table("s50_data/s50-network1.dat"))
 #friend.data.w2 <- as.matrix(read.table("s50_data/s50-network2.dat"))
 #friend.data.w3 <- as.matrix(read.table("s50_data/s50-network3.dat"))
@@ -1269,14 +1235,112 @@ ggplot(data = combinedavgs) +
 #            layout.par = list(var = 'user', dist = 'none', exp = 3,vm = distmat))
 @
 
+To do create the average network visualization shown in Figure~\ref{fig:averagenet}, we follow the same procedure as in Section~\ref{sec:minds}, counting occurrences of each possible edge in the simulations, resulting in a summary network with weighted edges representing the number of times an edge appeared in the simulated wave 2 when simulating from the SAOM 1,000 times. As in Figure~\ref{fig:summnetM1}, edges only appear in the average network if they appear more than 5\% of the time in the simulations. In Figure~\ref{fig:averagenet}, we show the first wave, the ``average'' network from the three models we fit, and the second wave. \st{Comparing the three averages to waves 1 and 2, we see that they have very similar structure to wave 1. Model 2, which included the transitive triplet parameter, seems to have created a larger connected component overall than models 1 and 3. In particular, if we look at the group of nodes $\{10,11,14\}$, we see they are very strongly connected within the three average networks, and they are completely separate from the other nodes in the true wave 2. None of the three average networks show node 16 gaining ties as it does in wave two, nor do they show nodes 4 and 7 becoming isolated. In Model 2, however, the ties to node 7 appear much weaker than in Model 1 or Model 2, suggesting that of the three, Model 2 may be the best fit for our data.}  %XXXX ST commented out after I realized I had made the same mistake as figure 7. XX This could be an indication that, despite the highly significant nature of the parameter $\beta_3$ according to the $t$-tests in \texttt{RSiena}, the transitive triplet parameter should not be included because it does not result in a structure similar to the data. 
 
-\st{What are some things that could go in here?:
-\begin{itemize}
-\item "average" networks -- you've already done this! Write it up, make several examples. How does the procedure for averaging generalize? What is it good for? 
-\item distributions of fitted parameters. again, you've already done this!!! just write it up and put it in here. 
-\item view correlations between model parameters under different model sets. eg 2 betas, 3 betas, 4 betas, etc.
-\end{itemize}
- }
+% \st{What are some things that could go in here?:
+% \begin{itemize}
+% \item "average" networks -- you've already done this! Write it up, make several examples. How does the procedure for averaging generalize? What is it good for? 
+% \item distributions of fitted parameters. again, you've already done this!!! just write it up and put it in here. 
+% \item view correlations between model parameters under different model sets. eg 2 betas, 3 betas, 4 betas, etc.
+% \end{itemize}
+%  }
+
+
+\subsubsection{Fitting the same model to different data}\label{sec:samemoddiffdat}
+% table of fitted M1 M2 M3
+\begin{table}
+\scalebox{0.9}{
+\begin{tabular}{l|ccc|ccc }
+  \hline
+  & \multicolumn{3}{|c|}{Friendship Data} & \multicolumn{3}{|c|}{Senate Data} \\
+  \hline
+  & M1 & M2 & M3 & M1 & M2 & M3 \\
+  $\alpha_1$ & \Sexpr{SFE$M1[1]} & \Sexpr{SFE$M2[1]} & \Sexpr{SFE$M3[1]} & \Sexpr{SSE$M1[1]} & \Sexpr{SSE$M2[1]} & \Sexpr{SSE$M3[1]} \\
+  $\alpha_2$ & \Sexpr{SFE$M1[2]} & \Sexpr{SFE$M2[2]} & \Sexpr{SFE$M3[2]} & \Sexpr{SSE$M1[2]} & \Sexpr{SSE$M2[2]} & \Sexpr{SSE$M3[2]}  \\
+  $\alpha_3$ & -- & -- & -- & \Sexpr{SSE$M1[3]} & \Sexpr{SSE$M2[3]} & \Sexpr{SSE$M3[3]} \\
+  $\beta_1$ & \Sexpr{SFE$M1[3]} & \Sexpr{SFE$M2[3]} & \Sexpr{SFE$M3[3]} & \Sexpr{SSE$M1[4]} & \Sexpr{SSE$M2[4]} & \Sexpr{SSE$M3[4]} \\
+  $\beta_2$ & \Sexpr{SFE$M1[4]} & \Sexpr{SFE$M2[4]} & \Sexpr{SFE$M3[4]} & \Sexpr{SSE$M1[5]} & \Sexpr{SSE$M2[5]} & \Sexpr{SSE$M3[5]}\\
+$\beta_3$ & -- & \Sexpr{SFE$M2[5]} & -- & -- & \Sexpr{SSE$M2[6]} & -- \\
+  $\beta_4$ & -- & --  & \Sexpr{SFE$M3[6]} & -- & -- & \Sexpr{SSE$M3[7]} \\
+  \hline
+\end{tabular}
+}
+\caption{\label{tab:meanests} The means (standard deviations) of parameter values estimated from repeated fittings of $M1, M2, M3$ to the small friendship network and the senate collaboration network. Each model was fit 1,000 times to the friend data, while each model was fit 100 times to the senate data.}
+\end{table}
+\subsubsection{Fitting the same model to the same data}\label{sec:samemodsamedat}
+
+%We look at collections produced ``from exploring the space of all possible models," ``by varying model settings", ``by fitting the same model to different datasets", and ``by treating each iteration as a model" \citep[p.~210-11]{modelvis}. Because fitting a SAOM requires MCMC methods, we also fit the same model many times, resulting in distributions of fitted parameters for one data set.
+
+To our small friendship network, we fit three models, M1, M2, and M3, using \texttt{RSiena} 1,000 times each. We then looked at the distribution of the fitted values, which are shown in Figure~\ref{fig:distests}. We can see from these distributions that the inclusion of the jumping transitive triplet parameter, $\beta_3$ is obviously affecting the distributions of the other four parameters included in all models, $\alpha_1$, $\alpha_2$, $\beta_1$, and $\beta_2$. \st{When $\beta_3$ is included, its estimate is postitive, meaning that friendships between two girls with different drinking behaviors tend to form when there is an intermediary who is already friends with the two girls. The inclusion of this parameter leads to increases in the rate parameters' estimates, suggesting that encouraging the transitive triplet behavior means that the girls would also change friends more frequently. The outegree parameter, $\beta_1$ decreases when $\beta_3$ is included, while the reciprocity parameter, $\beta_2$ increases. This implies the girls in the data prefer to form closer friend groups, as indicated by reciprocated ties and jumping transitive triplet formation, as opposed to being popular and having many friends. Having many friends who do not reciprocate is discouraged by M2.} In comparison with models M1 and M3, model M2 typically has higher estimates of the rate parameter, meaning that the inclusion of the covariate statistic in the model leads to higher estimates of the number of times, on average, a node gets to change its ties. It is not clear, however, that the addition of a parameter to the objective function \textit{should} effect the estimation of the rate parameters, so we continue to explore the collection of parameter estimates.
+
+To further investigate this potentially problematic relationship between the parameter values, we look at correlations between each of the parameter estimates in each model. In Figure~\ref{fig:corplots}, we examine correlations between each of pair of parameters within each model and overall.\nocite{ggally} The strongest correlation within each model is between $\beta_1$ and $\beta_2$, with absolute value of correlation between those two parameter values greater than 0.90 in all three models. The $\beta_1$ parameter is also highly correlated with the $\beta_3$ parameter within model M2, but it is not as highly correlated with the $\beta_4$ parameter in model M3. 
+
+<<getdata>>=
+nulls <- read.csv("data/distribution_null_model.csv")
+alt <- read.csv("data/distribution_jumpTT_model.csv")
+alt2nd <- read.csv("data/distribution_dblpairs_model.csv")
+means <- simu2 %>% group_by(Model, parameter) %>% summarize(
+  means = mean(estimate)
+)
+null_mod_sv <- as.numeric(nulls[,-c(1,6,7)] %>% summarise_each(funs(mean)))
+alt_mod_sv <- as.numeric(alt[,-c(1, 7,8)] %>% summarise_each(funs(mean)))
+alt_mod2_sv <- as.numeric(alt2nd[,-c(1,7,8)] %>% summarise_each(funs(mean)))
+@
+
+<<distests, fig.cap="Distribution of fitted parameter values for our three SAOMs. The inclusion of $\\beta_3$ or $\\beta_4$ clearly has an effect on the distribution of the rate parameters, $\\alpha_1$ and $\\alpha_2$.", fig.height=4>>=
+
+#simu2 <- read.csv("data/simulation-1000-M1-M2-M3.csv")
+
+ggplot(data = simu2) + 
+  geom_density(aes(x = estimate, fill = Model), alpha = .5) + 
+  facet_wrap(~parameter, scales = 'free') + 
+  ThemeNoNet + 
+  theme(legend.position = 'bottom')
+@
+
+
+<<corplots, fig.cap="A matrix of plots demonstrating the strong correlations between parameter estimate in our SAOMs. The strongest correlation within each model is between $\\beta_1$ and $\\beta_2$.", fig.width=8>>=
+
+#simu2 <- read.csv("data/simulation-1000-M1-M2-M3.csv")
+simu_spread <- simu2 %>% spread(parameter, estimate)
+ggpairs(simu_spread, columns = 3:8, ggplot2::aes(colour=Model, alpha = .5)) + theme(plot.title = element_text(size = 12,
+                                            face = 'plain', angle = 0, family = "Times New Roman"), 
+                  axis.title.x = element_text(size = 12,
+                                            face = 'plain', angle = 0, family = "Times New Roman", inherit.blank = T),
+                  axis.title.y = element_text(size = 12,
+                                            face = 'plain', angle = 90, inherit.blank = T),
+                  axis.text.x.top = element_text(size = 12,
+                                            face = 'plain', angle = 90, inherit.blank = TRUE), 
+                  axis.text.x.bottom = element_text(size = 12,
+                                            face = 'plain', angle = 90, inherit.blank = TRUE), 
+                  axis.text.y.left = element_text(size = 12,
+                                            face = 'plain', angle = 0, family = "Times New Roman", inherit.blank = T),
+                  axis.text.y.right = element_text(size = 12,
+                                            face = 'plain', angle = 0, family = "Times New Roman", inherit.blank = T),
+                  strip.text.x = element_text(size = 14,
+                                            face = 'plain', angle = 0, family = "Times New Roman", 
+                                            margin = margin(t = 3, r = 0, b = 3, l = 0, unit = "pt"), inherit.blank = T),
+                  strip.text.y =element_text(size = 14,
+                                            face = 'plain', family = "Times New Roman", angle = 90,margin = margin(t = 3, r = 3, b = 3, l = 3, unit = "pt"),inherit.blank = T),
+                  strip.background = element_rect(colour = "black", fill = "white")
+                    )
+@
+
+<<corplotsSenate, eval = FALSE>>=
+senM4est <- read.csv("data/congress/senateM4ests.csv")
+senM5est <- read.csv("data/congress/senateM5ests.csv")
+names(senM4est) <- c("alpha1", "alpha2", "alpha3", "beta1", "beta2", "beta5")
+names(senM5est) <- c("alpha1", "alpha2", "alpha3", "beta1", "beta2", "beta6")
+senM4est$Model <- "M4"
+senM5est$Model <- "M5"
+senM4est$Sim <- 1:nrow(senM4est)
+senM5est$Sim <- 1:nrow(senM5est)
+senM4est2 <- senM4est %>% gather(parameter, estimate, alpha1:beta5) 
+senM5est2 <- senM5est %>% gather(parameter, estimate, alpha1:beta6) 
+senM45est <- rbind(senM4est2, senM5est2)
+senM45est %>% spread(parameter, estimate)-> senM45est2
+ggpairs(senM45est2, columns = 3:9, ggplot2::aes(colour=Model, alpha = .5))
+@
 
 \subsection{Explore algorithms, not just end result}
 
@@ -1288,7 +1352,7 @@ This simulation process follows the steps of the continuous-time Markov chain. \
 
 The first vizualization we present here is an animation of microsteps simulated to emulate the transition steps of the CTMC from wave 1 to wave 2 of the small friendship network example shown in Figure ~\ref{fig:alldataviz}. Movies similar to this animation were used to visualize the changes of dynamic networks in \citet{dynnetviz}. When each ego node is selected in a microstep, it is emphasized in the animation, then the associated edge either appears or disappears. If there are no changes at a particular microstep, no changes are seen. Some frames of the animations are shown in Figure~\ref{fig:makinggif}, and the full movie can be viewed at INSERT LINK TO GIF. 
 
-<<makinggif, fig.cap='A selection of images in the microstep animation. The selected edges and nodes are emphasized by changing the size and the color, then when edges are removed, they fade out, shrinking in size, while the nodes change color and shrink to blend in with the other nodes.', cache=TRUE, message = FALSE, warning = FALSE, fig.height=3>>=
+<<makinggif, fig.cap='A selection of images in the microstep animation. The selected edges and nodes are emphasized by changing the size and the color, then when edges are removed, they fade out, shrinking in size, while the nodes change color and shrink to blend in with the other nodes.', cache=TRUE, message = FALSE, warning = FALSE, fig.height=2.5>>=
 # Need old version of dplyr to get this to work: 
 if (!require("dplyr050",character.only = TRUE)) {
       devtools::install_github("sctyner/dplyr050")
@@ -1410,7 +1474,7 @@ To reorder the vertices for the matrix visualization, we first constructed a cum
 $$ \mathbf{A}^{cum}_{ij} = \sum_{r = 0}^R X_{ij}(r). $$
 We then performed a principal component analysis on $\mathbf{A}^{cum}$, and used the values of the first principal component to order the vertices on the $x$ and $y$ axes for the adjacency matrix animation. For one such series of microsteps simulated by \texttt{RSiena}, we present the adjacency matrix ordered by the (arbitrary) vertex id alongside the seriated adjacency microsteps using the first principal component loading on the cumulative adjacency matrix, $\mathbf{A}^{cum}$, in Figure~\ref{fig:adjmatorder}. 
 
-<<adjmatani, fig.cap='A selection of frames from the adjacency matrix visualization animation for one series of microsteps. At the beginning of the animation, shown in the top row, there are two clearly connected components: one in the top left corner, and one in the bottom right corner. By the end, the component in the top left has spread out, while the bottom right component has shrunk, but remains closely connected.', warning = FALSE, message = FALSE, results='hide', fig.height=4>>=
+<<adjmatani, fig.cap='A selection of frames from the adjacency matrix visualization animation for one series of microsteps. (Ego and alter node labels are removed to declutter the graph.) At the beginning of the animation, shown in the top row, there are two clearly connected components: one in the top left corner, and one in the bottom right corner. By the end, the component in the top left has spread out, while the bottom right component has shrunk, but remains closely connected.', warning = FALSE, message = FALSE, results='hide', fig.height=2.5>>=
 adjmatall <- matrix(0, nrow = 16, ncol = 16)
 rownames(adjmatall) <- paste0("V", 1:16)
 colnames(adjmatall) <- paste0("V", 1:16)
@@ -1443,8 +1507,10 @@ adjmatall3$frame <- adjmatall3$ms
   scale_fill_manual(values = c("white", "black")) + 
   scale_x_discrete(position = "bottom", labels = str_replace(order1, "V", "")) + 
   scale_y_discrete(labels = rev(str_replace(order1, "V", ""))) + 
+    labs(x = "alter node (j)", y = "ego node (i)") + 
   ThemeNoNet + 
-  theme(legend.position = 'none') +
+  theme(legend.position = 'none', axis.text.x.bottom = element_blank(), 
+        axis.text.y.left = element_blank()) +
   coord_fixed() + 
   facet_wrap(~frame, labeller = 'label_both', nrow = 2)  
 #}
@@ -1577,9 +1643,10 @@ edges <- msall1_df %>%
 msall1_df2 <- left_join(msall1_df, edges, by = c("from" = "from", "to" = "to"))
 
 p1 <- ggplot(data = msall1_df2) + 
-  geom_tile(aes(x = ms, y = -eid, fill = ms)) + 
+  geom_tile(aes(x = ms, y = -eid)) + 
+  annotate("text", x = c(-1, 84, 40), y = c(-30, -30, -60), label = c("Wave 1", "Wave 2", "Microsteps"), angle = c(90, 90, 0)) + 
   geom_vline(xintercept = c(0.5,81.5)) + 
-  scale_fill_continuous(low = "red", high = "blue") + 
+  #scale_fill_continuous(low = "red", high = "blue") + 
   ThemeNoNet + 
   theme(legend.position = 'none', axis.ticks.y = element_blank(),
         axis.text.y = element_blank(), axis.title = element_blank()) +
@@ -1607,34 +1674,35 @@ edges2 <- msall2_df %>%
 msall2_df2 <- left_join(msall2_df, edges2, by = c("from" = "from", "to" = "to"))
 
 p2 <- ggplot(data = msall2_df2) + 
-  geom_tile(aes(x = ms, y = -eid, fill = ms)) + 
+  geom_tile(aes(x = ms, y = -eid)) + 
+  annotate("text", x = c(-1, 51, 25), y = c(-25, -25, -40), label = c("Wave 1", "Wave 2", "Microsteps"), angle = c(90, 90, 0))+ 
   geom_vline(xintercept = c(0.5,49.5)) + 
-  scale_fill_continuous(low = "red", high = "blue") +
+  #scale_fill_continuous(low = "red", high = "blue") +
   ThemeNoNet + 
   theme(legend.position = 'none', axis.ticks.y = element_blank(),
         axis.text.y = element_blank(), axis.title = element_blank()) #+
   #labs(x = "Microstep", y = "Edges (most frequent at top)")
 
 # rep 3 
-msall3 <- netvizinf::listMicrosteps(dat = wave1friends,
-                      microsteps = filter(ansnullchainsw1w2, rep == 3))
-msall3_df <- plyr::rbind.fill(lapply(X = seq_along(msall3), FUN = function(i, x) {
-        x[[i]]$ms <- i - 1
-        return(x[[i]])
-    }, msall3))
-msall3_df <- msall3_df %>% dplyr::select(from, to, ms)
-msall3_df <- msall3_df %>% add_row(from = paste0("V",wave2$from),
-                      to = paste0("V",wave2$to), 
-                      ms = max(msall3_df$ms)+1)
-
-edges3 <- msall3_df %>% 
-  group_by(from, to) %>%
-  summarize(edgeappears = n()) %>% 
-  arrange(desc(edgeappears)) %>% ungroup() %>%
-  mutate(eid = row_number())
-
-msall3_df2 <- left_join(msall3_df, edges3, by = c("from" = "from", "to" = "to"))
-
+# msall3 <- netvizinf::listMicrosteps(dat = wave1friends,
+#                       microsteps = filter(ansnullchainsw1w2, rep == 3))
+# msall3_df <- plyr::rbind.fill(lapply(X = seq_along(msall3), FUN = function(i, x) {
+#         x[[i]]$ms <- i - 1
+#         return(x[[i]])
+#     }, msall3))
+# msall3_df <- msall3_df %>% dplyr::select(from, to, ms)
+# msall3_df <- msall3_df %>% add_row(from = paste0("V",wave2$from),
+#                       to = paste0("V",wave2$to), 
+#                       ms = max(msall3_df$ms)+1)
+# 
+# edges3 <- msall3_df %>% 
+#   group_by(from, to) %>%
+#   summarize(edgeappears = n()) %>% 
+#   arrange(desc(edgeappears)) %>% ungroup() %>%
+#   mutate(eid = row_number())
+# 
+# msall3_df2 <- left_join(msall3_df, edges3, by = c("from" = "from", "to" = "to"))
+# 
 # p3 <- ggplot(data = msall3_df2) + 
 #   geom_tile(aes(x = ms, y = -eid, fill = ms)) + 
 #   geom_vline(xintercept = c(0.5,106.5)) + 
