@@ -294,7 +294,7 @@ In this paper, the term \textit{dynamic network} refers to a network, consisting
 For the network $x$ and each actor $i$ in the network, the number of times that an actor $i$ gets to change its ties, $x_{ij}$, to other nodes $j \neq i$ in the network is dictated by a \emph{rate function} $\rho(x, \mathbf{z}, \boldsymbol{\alpha})$, where $\boldsymbol{\alpha}$ are the parameters in the function $\rho$, and $x$ is the current network state, with covariates of interest $\mathbf{z}$. For this paper, we assume a simple rate function, $\rho(x, \mathbf{z}, \boldsymbol{\alpha}) = \alpha_m$ that is constant across all actors between observations at time $t_m$ to $t_{m+1}$, \st{thus our rate function is just a rate parameter in the overall model}. In general, SAOMs can incorporate covariate values and network statistics into the model, so that each node will have a different rate of change.  %\hh{XXX that means that the function is essentially just a rate parameter, right?} \st{XXX yes XXX}
 Other modelling scenarios allow this rate to be more flexible,  e.g.\ a function that depends on the time period of observation, some actor-level covariates or some actor-level network statistics. 
 %\hh{How is the rate parameter different from a rate parameter?} \st{I think you meant how is a rate fn different from a rate parameter? I updated the language XXX->}%In our model with the simple rate function, 
-\st{In our simple model with a simple rate parameter instead of a rate function,} the rate parameter dictates how quickly an actor $i$ gets an opportunity to change one of its ties to the other nodes in the network, $x_{ij}$, for $j \in \{1, \dots, n\}$ in the time period from $t_{m}$ to $t_{m+1}$. If $j = i$, no change in the network is made. The model also assumes that the actors $i$ are conditionally independent given their ties, $x_{i1}, \dots, x_{in}$ at the current network state. \st{Let $\tau(i|x,m) $ be the wait time until actor $i$ makes its next change from its current state in the network $x$. Note that $m$ indicates the number of the wave that is conditioned on in the SAOM. For any time point, $T$, where $t_{m} \leq T < t_{m+1}$, the waiting time to the next change opportunity by actor $i$ is exponentially distributed with expected value $\alpha_m^{-1}$. The conditional independence assumption is expressed in Equation~\ref{eq:c1}.
+\st{In our simple model with a simple rate parameter instead of a rate function,} the rate parameter dictates how quickly an actor $i$ gets an opportunity to change one of its ties to the other nodes in the network, $x_{ij}$, for $j \in \{1, \dots, n\}$ in the time period from $t_{m}$ to $t_{m+1}$. If $j = i$, no change in the network is made. The model also assumes that the actors $i$ are conditionally independent given their ties, $x_{i1}, \dots, x_{in}$ at the current network state. \st{Let $\tau(i|x,m) $ be the wait time until actor $i$ makes its next change from its current state in the network $x$. Note that $m$ indicates the number of the wave that is conditioned on in the SAOM. For any time point, $T$, where $t_{m} \leq T < t_{m+1}$, the waiting time to the next change opportunity by actor $i$ is exponentially distributed with expected value $\alpha_m^{-1}$. The conditional independence of nodes in the network given their current ties is expressed in Equation~\ref{eq:c1}.
 
 \begin{equation} \label{eq:c1}
  \tau(i|x,m) | x_{i1}(m), \dots, x_{in}(m) \stackrel{\text{iid}}{\sim} Exp(\alpha_m)
@@ -346,14 +346,15 @@ same covariate & $s_{i6}(x) = \sum_j x_{ij} \mathbb{I}(z_i = z_j)$ & \includegra
 \end{table}
 
 When node $i$ is given the chance to change a tie, %\hh{`we assume that they wish' sounds strange - don't assume wishes, state assumptions}
-it attempts to maximize the value of its objective function $f_i(\boldsymbol{\beta}, x)$ plus a random element, $U_i(x)$, to account for unknown attraction between nodes. In \citet{modelsSnijders}, it is recommended that the $U_i(x)$ be random draws from a type 1 extreme value distribution. The additional random element is included to account for any random, unexplainable change in the network ties. % XX What is the thought behind that? } ``the type 1 extreme value distribution (or Gumbel distribution) with mean 0 and scale parameter 1" \citep[p. 368]{snijders01}. 
-This distribution, which is also known as the log-Weibull distribution, has probability distribution function, using $\mu$ for the mean parameter and $\sigma$ for the scale parameter, of
+it attempts to maximize the value of its objective function $f_i(\boldsymbol{\beta}, x)$ as well as a random element, $U_i(x)$, to account for unknown attraction between nodes. The additional random element is included to account for any random, unexplainable change in the network ties. \citet{modelsSnijders} recommends that the $U_i(x)$ be random draws from a type 1 extreme value distribution.  % XX What is the thought behind that? } ``the type 1 extreme value distribution (or Gumbel distribution) with mean 0 and scale parameter 1" \citep[p. 368]{snijders01}. 
+This distribution, which is also known as the log-Weibull distribution, has probability distribution function of:
 
 \begin{equation} \label{eq:dist1}
 g(u|\mu, \sigma) = \frac{1}{\sigma}\exp\left\{-\left(\frac{u-\mu}{\sigma} + \exp^{-\frac{u-\mu}{\sigma}}\right)\right\}.
 \end{equation}
+using $\mu$ for the mean parameter and $\sigma$ for the scale parameter.
 
-<<logweibull, fig.align='center', out.width = '.5\\textwidth', fig.height = 4, fig.cap='The probability distribution function for the type 1 extreme value distribution, also known as the log-weibull or Gumbel distribution with location parameter $ \\mu = 0$ and scale parameter $ \\sigma = 0$.'>>=
+<<logweibull, fig.align='center', out.width = '.5\\textwidth', fig.height = 4, fig.cap='The probability distribution function for the type 1 extreme value distribution, also known as the log-Weibull or Gumbel distribution with location parameter $ \\mu = 0$ and scale parameter $ \\sigma = 0$.'>>=
 library(reliaR)
 x <- seq(-3,10,.01)
 y <- dgumbel(x = seq(-3,10,.01), sigma = 1, mu=0)
@@ -364,7 +365,7 @@ qplot(x = x, y= y, geom = "line") +
   labs(x = "u", y = "density of g(u)")
 @
 
-The probability density function for the type 1 extreme value distribution is shown in Figure~\ref{fig:logweibull}. Using the distribution given in Equation~\ref{eq:dist1} with mean $\mu = 0$ and scale $\sigma = 1$ as \citet{modelsSnijders} suggests %\hh{XXX I'm not following - which distribution do you mean by `this' distribution? The density above is the type 1 extreme value density. I got lost at the  ``objective function $f_i(\boldsymbol{\beta}, x)$ plus a random element, $U_i(x)$"} \st{XXX I hope it is clearer now above}
+The probability density function for the type 1 extreme value distribution is shown in Figure~\ref{fig:logweibull}. For mean $\mu = 0$ and scale $\sigma = 1$ as \citet{modelsSnijders} suggests %\hh{XXX I'm not following - which distribution do you mean by `this' distribution? The density above is the type 1 extreme value density. I got lost at the  ``objective function $f_i(\boldsymbol{\beta}, x)$ plus a random element, $U_i(x)$"} \st{XXX I hope it is clearer now above}
 is convenient because it \st{leads to a simple probability formula for} the probability that actor $i$ chooses to change its tie to actor $j$ \st{that can be written \textit{only}} in terms of the objective function. Let $p_{ij}(\boldsymbol{\beta}, x)$ be the probability that actor $i$ chooses to change its tie to actor $j$. Next, we write the network $x$ in its potential future state, $x(i \leadsto j)$, where the tie $x_{ij}$ has changed to $1-x_{ij}$. Then, the probility that the tie $x_{ij}$ changes is 
 
 \begin{equation}\label{eq:pij}
@@ -388,9 +389,9 @@ The two pieces of a SAOM, the rate function/parameter and the objective function
    \end{cases}
 \]
 
-Thus, the rate of change between any two states, $x^b$ and $x^c$, that differ by only one tie $x_{ij}$, is the product of the rate at which actor $i$ gets to change a tie and the probability that the tie that will change is the tie to node $j$. This matrix $\mathbf{Q}$ is the foundation for estimation of a SAOM. Estimating the parameters in these models is difficult, but thanks to the SIENA software \citep{RSiena}, we have an accessible way to fit SAOMs to network observations. 
+Thus, the rate of change between any two states, $x^b$ and $x^c$, that differ by only one tie $x_{ij}$, is the product of the rate at which actor $i$ gets to change a tie and the probability that the tie that will change is the tie to node $j$. This matrix $\mathbf{Q}$ is the foundation for estimation of a SAOM. %Estimating the parameters in these models is difficult, but thanks to the SIENA software \citep{RSiena}, we have an accessible way to fit SAOMs to network observations. 
 
-XXX HH can you help? I need a way better transition than that XXX
+%XXX HH can you help? I need a way better transition than that XXX
 }
 
 %### A SAOM as a CTMC {#saomctmc}
@@ -581,7 +582,7 @@ The networks we constructed for the four senates during President Obama's admini
 
 \section{Model Visualizations} \label{sec:ModelVis}
 
-Every good data analysis includes both numerical and visual summaries of the data, so why restrict model description and diagnostics to numerical summaries? The concept of model visualization was developed to complement traditional model diagnostic tools. Typically, numerical summaries such as $R^2$ are used to assess model fit, and the occasional visualization, like a residual plot, are used to determine how well the model fits the data. \citeauthor{modelvis} outline three separate ideas, each of which are can be referred to simply as the "model": the model family, the model form, and the fitted model. The latter is primarily what one thinks of first when considering a model in a data analysis, where specified a model is fit to data, and parameter estimates and other numerical summaries, such as $R^2$ are reported. In the context of SAOMs, the fitted model contains the form of the rate and objective functions, the estimated rate parameters, and the estimated objective function parameters. The model form describes the the model \textit{before} the fitting process, defining which parameters are in the model within the context of the larger model family. In SAOMs, the model form includes description of the rate and objective functions and the variables therein that describe how the network evolves over time. Finally, the model family is the broadest description of the model. This is the type of model that you wish to fit to the data, and is chosen based on the problem, data, and knowledge at hand. For example, we chose to use a SAOM to model network data over an exponential random graph model (ERGM) because we believe that actor-level variables effect network structure and formation, and we wanted to model the network changes over time. 
+Every good data analysis includes both numerical and visual summaries of the data, so why restrict model description and diagnostics to numerical summaries? The concept of model visualization was developed to complement traditional model diagnostic tools. Typically, numerical summaries such as $R^2$ are used to assess model fit, and the occasional visualization, like a residual plot, are used to determine how well the model fits the data. \citeauthor{modelvis} outline three separate ideas, each of which are can be referred to simply as the "model": the model family, the model form, and the fitted model. The latter is primarily what one thinks of first when considering a model in a data analysis, where a specified model is fit to data, and parameter estimates and other numerical summaries, such as $R^2$ are reported. In the context of SAOMs, the fitted model contains the form of the rate and objective functions, the estimated rate parameters, and the estimated objective function parameters. The model form describes the the model \textit{before} the fitting process, defining which parameters are in the model within the context of the larger model family. In SAOMs, the model form includes description of the rate and objective functions and the variables therein that describe how the network evolves over time. Finally, the model family is the broadest description of the model. This is the type of model that you wish to fit to the data, and is chosen based on the problem, data, and knowledge at hand. For example, we chose to use a SAOM to model network data over an exponential random graph model (ERGM) because we believe that actor-level variables effect network structure and formation, and we wanted to model the network changes over time. 
 
 %These three uses of the term ``model" 
 \st{The model family, the model form, and the fitted model can each be visualized according to the three principals of model visualization: we can }view the model in the data space, visualize collections of models, and explore the process of fitting the model, not just the end result. \st{Since we have already decided on our model family, SAOMs, }we now shift our focus to the fitted model and the model form. Specifically, we want to learn more about how the model form we choose affects the fitted model by using our example data sets and our visualization toolbox. We begin by introducing the five models that we fit to our example data. \st{Next we use the five models to guide our visual explorations of SAOMs. We first use novel tools and ideas to view a SAOM in the data space of a dynamic network. We then explore collections of the same models fit many times to the example data to see how the simulation processes in \texttt{RSiena} affect the model fits. Finally, we look behind the scenes and into the individual steps of the continuous time Markov chain to learn more about how this "hidden data" mechanism works and how it results in a fitted model. } 
@@ -1344,7 +1345,7 @@ ggpairs(simu_spread, columns = 3:8, ggplot2::aes(colour=Model, alpha = .5)) + th
 @
 
 
-To further investigate the odd relationship between the parameter values, we look at correlations between each of the parameter estimates in each model. In Figure~\ref{fig:corplots}, we examine correlations between each of pair of parameters within each model and overall.\nocite{ggally} The strongest correlation within each model is between $\beta_1$ and $\beta_2$, with absolute value of correlation between those two parameter values greater than 0.90 in all three models. The $\beta_1$ parameter is also highly correlated with the $\beta_3$ parameter within model M2, but it is not as highly correlated with the $\beta_4$ parameter in model M3. \st{XX NEED TRANSITION XX }
+To further investigate the odd relationship between the parameter values, we look at correlations between each of the parameter estimates in each model. In Figure~\ref{fig:corplots}, we examine correlations between each of pair of parameters within each model and overall.\nocite{ggally} The strongest correlation within each model is between $\beta_1$ and $\beta_2$, with absolute value of correlation between those two parameter values greater than 0.90 in all three models. The $\beta_1$ parameter is also highly correlated with the $\beta_3$ parameter within model M2, but it is not as highly correlated with the $\beta_4$ parameter in model M3. \hh{It might therefore be advisable to consider only models that either allow $\beta_1$, or $\beta_2$. Looking at the high correlation with $\alpha$, we might swiths to a model without $\beta_1$.}
 
 <<corplotsSenate, eval = FALSE>>=
 senM4est <- read.csv("data/congress/senateM4ests.csv")
@@ -1541,12 +1542,31 @@ adjmatall3$frame <- adjmatall3$ms
 #plots <- list()
 #for(i in 0:55){
 #plots[[i + 1]] <- 
-  ggplot(data = adjmatall3 %>% filter(ms %in% c(1,3,5,7,9,11,13,43,45,47,49,51,53,55))) + 
-  geom_tile(aes(x = to, y = from, fill = as.factor(val)), color = 'black') + 
-  scale_fill_manual(values = c("white", "black")) + 
-  scale_x_discrete(position = "bottom", labels = str_replace(order1, "V", "")) + 
-  scale_y_discrete(labels = rev(str_replace(order1, "V", ""))) + 
-    labs(x = "alter node (j)", y = "ego node (i)") + 
+
+dat3 <- adjmatall3 %>% filter(ms %in% c(0,2,4,6,8,10,12,43,45,47,49,51,53,55))
+
+dat4 <- dat3 %>% select(-ms) %>% spread(frame, val) 
+dat5 <- dat4
+#p <- Sys.time()
+for(i in 4:16){
+  for(j in 1:nrow(dat5)){
+    if(dat4[j,i] != dat4[j,i-1]){
+      if(dat4[j,i] > dat4[j,i-1]){
+        dat5[j,i] <- 2
+      } else { dat5[j,i] <- 3}
+    }
+  }
+}
+#Sys.time() - p
+
+dat6 <- dat5 %>% gather(frame, val, 3:16) %>% mutate(frame = parse_number(frame))
+
+ggplot() + 
+  geom_tile(data = dat6, aes(x = to, y = from, fill = as.factor(val)), color = '#969696') +
+  scale_fill_manual(values = c("white", "black", "red", "white")) + 
+  geom_tile(data = dat6 %>% filter(val == 3), aes(x = to, y = from), fill = NA, color = 'red', size = .25) + 
+  scale_x_discrete(position = "bottom") + 
+  labs(x = "alter node (j)", y = "ego node (i)") + 
   ThemeNoNet + 
   theme(legend.position = 'none', axis.text.x.bottom = element_blank(), 
         axis.text.y.left = element_blank()) +
