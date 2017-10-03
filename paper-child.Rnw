@@ -1,3 +1,6 @@
+\newcommand{\st}[1]{{\color{orange} #1}}
+\newcommand{\hh}[1]{{\color{magenta} #1}}
+
 <<setup, echo = FALSE, message = FALSE, warning = FALSE>>=
 options(replace.assign=TRUE,width=70, digits=3)
 require(knitr)
@@ -1748,7 +1751,7 @@ We also combine 1,000 simulations from model M1 into a visualization like the on
 % \end{enumerate}}
 
 
-\section{Discussion} \label{sec:discussion}
+\section{Discussion}\label{sec:discussion}
 
 We have used novel visualization methods in order to better understand the family of models known as stochastic actor-oriented models for social network data. By looking at the underlying algorithms, visualizing collections of these models, and viewing the model in the data space, we have been able to gain knowledge and appreciation for these complicated models and everything that goes into them. 
 
