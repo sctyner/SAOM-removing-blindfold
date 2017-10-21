@@ -458,7 +458,7 @@ to_label <- c("Joseph R. Biden Jr.", "John S. McCain", "Ted Cruz","Marco Rubio",
 seobama$label <- as.factor(ifelse(seobama$source %in% to_label, seobama$source, ""))
 levels(seobama$label) <- c("", "Amy Klobuchar", "Bernie Sanders", "Harry Reid",
                            "Hillary Clinton", "Jim Webb", "John McCain", "Joe Biden",
-                           "Lindsey Graham", "Marco Rubio", "Mitch McConnel", 
+                           "Lindsey Graham", "Marco Rubio", "Mitch McConnell", 
                            "Rand Paul", "Ted Cruz")
 set.seed(56049382)
 ggplot(data = seobama) + 
@@ -577,7 +577,7 @@ clintonSenate <- rbind(se111clint, se111noclint)
 clintonSenate$Clinton <- as.factor(clintonSenate$Clinton)
 clintonSenate$Clinton <- ordered(clintonSenate$Clinton, levels = c("Yes", "No"))
 
-clintonSenate %>% filter(!(source %in% c("Roland Burris", "Bernard Sanders", "Frank R. Lautenberg", "Judd A. Gregg", "Mary L. Landrieu") & is.na(target))) %>%
+clintonSenate %>% filter(!(source %in% c("Roland Burris", "Bernard Sanders", "Frank R. Lautenberg", "Mary L. Landrieu") & is.na(target))) %>%
 ggplot() + 
   geom_net(directed = T, labelon=F, arrowsize = .3, singletons= F, fiteach = T, arrowgap = .01, layout.alg = 'fruchtermanreingold',
            aes(from_id = source, to_id = target, color = party, linewidth = gsw, shape = sex,size = n_au)) + 
