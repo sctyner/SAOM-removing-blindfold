@@ -1,0 +1,41 @@
+@1[general information about SIENA project s50:]
+3 [number of waves]
+50 [number of actors]
+1 [number of dependent network variables]
+1 [number of dependent actor variables]
+1 [number of files with constant actor covariates]
+2 [number of exogenous changing actor covariates]
+0 [number of constant dyadic covariates]
+0 [number of exogenous changing dyadic covariates]
+0 [indicator for file with composition change directives]
+
+@2[network files in temporal order; names follow:]
+s50-network1.dat
+1 [code for tie]
+9 [code for missing]
+s50-network2.dat
+1 [code for tie]
+9 [code for missing]
+s50-network3.dat
+1  [code for tie]
+9 [code for missing]
+friendship
+
+
+@3[dependent behavior files; names follow:]
+s50-alcohol.dat
+9 [code for missing]
+alcohol
+@4[files with constant actor covariates:]
+s50-familyevent.dat
+1 [number of covariates in this file; names follow:]
+9 [code for missing]
+family event
+
+@5[exogenous changing actor covariates; names follow:]
+s50-drugs.dat
+9 [code for missing]
+drug use
+s50-sport.dat
+9 [code for missing]
+sport
