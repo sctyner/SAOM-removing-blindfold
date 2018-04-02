@@ -522,14 +522,16 @@ ggplot(data = jTT, aes(from_id = from, to_id = to)) +
 \end{subfigure}\hfill
 \begin{subfigure}[t]{.45\textwidth}
 <<dab, echo=FALSE, fig.width=2, fig.height=2, message = FALSE, warning = FALSE, fig.align='center', out.width='.49\\textwidth'>>=
-dade <- data.frame(from = c('i', 'i', 'h', 'j'), to = c('h', 'j', 'k', 'k'))
+dade <- data.frame(from = c('i', 'i', 'h', 'j', 'i'), to = c('h', 'j', 'k', 'k','k'))
 dadn <- data.frame(id = letters[8:11], group = c(1,1,1,1))
 
 dad <- merge(dade, dadn, by.x = 'from', by.y = "id", all = T)
 
 set.seed(12345)
 ggplot(data = dad, aes(from_id = from, to_id = to)) +
-  geom_net(aes(shape = as.factor(group)), directed = T, labelon = T, labelcolour='grey80',vjust = 0.5, hjust =0.5, arrowgap = .15, colour = 'black', size=10, fontsize = 5) +
+  geom_net(directed = T, labelon = T,
+           ecolour = c("black", "black", "black","red", "black" ,"black" ),
+           labelcolour='grey80',vjust = 0.5, hjust =0.5, arrowgap = .15, size=10, fontsize = 5) +
   expand_limits(x=c(-0.1,1.1), y=c(-0.1,1.1)) +
   ThemeNet +
   theme(legend.position = "none")
@@ -679,10 +681,10 @@ combinedavgs %>% group_by(cat) %>%
   mutate(linewidth = weight / max(weight,na.rm = T)) -> combinedavgs
 
 combinedavgs %>% filter(cat == "Model1") %>% mutate(logweight = log(weight)) -> t1
-colors <- tweenr::tween_color(data = c("#969696", "#d73027"), n = 26, ease = 'linear')
+colors <- tweenr::tween_color(data = c("#969696", "#d73027"), n = table(t1$cat) %>% as.numeric, ease = 'linear')
 t1 %>% arrange(logweight) -> t1
 t1$color <- NA
-t1$color[1:26] <- colors[[1]]
+t1$color <- colors[[1]]
 
 p1 <- ggplot(data = t1) +
   geom_net(aes(from_id = from, to_id = to, linewidth= linewidth),
@@ -802,17 +804,17 @@ We have varied model settings already by choosing models M1, M2, M3 to fit to ou
 #friend.data.w2 <- as.matrix(read.table("s50_data/s50-network2.dat"))
 #friend.data.w3 <- as.matrix(read.table("s50_data/s50-network3.dat"))
 #drink <- as.matrix(read.table("s50_data/s50-alcohol.dat"))
-friendshipData <- array(c(fd2.w1, fd2.w2, fd2.w3), dim = c(16, 16, 3))
-friendship <- sienaDependent(friendshipData)
-alcohol <- varCovar(drink[20:35,])
-mydata <- sienaDataCreate(friendship, alcohol)
-M1eff <- getEffects(mydata)
-M2eff <- includeEffects(M1eff, jumpXTransTrip, interaction1 = "alcohol")
-M3eff <- includeEffects(M1eff, nbrDist2twice)
-data(M1ests_bigfriends)
-M1parms <- (means %>% filter(Model == "M1"))$means
-M2parms <- (means %>% filter(Model == "M2"))$means
-M3parms <- (means %>% filter(Model == "M3"))$means
+# friendshipData <- array(c(fd2.w1, fd2.w2, fd2.w3), dim = c(16, 16, 3))
+# friendship <- sienaDependent(friendshipData)
+# alcohol <- varCovar(drink[20:35,])
+# mydata <- sienaDataCreate(friendship, alcohol)
+# M1eff <- getEffects(mydata)
+# M2eff <- includeEffects(M1eff, jumpXTransTrip, interaction1 = "alcohol")
+# M3eff <- includeEffects(M1eff, nbrDist2twice)
+# data(M1ests_bigfriends)
+# M1parms <- (means %>% filter(Model == "M1"))$means
+# M2parms <- (means %>% filter(Model == "M2"))$means
+# M3parms <- (means %>% filter(Model == "M3"))$means
 # M1sims1000 <- saom_simulate(dat = mydata,
 #                             struct = M1eff,
 #                        parms = as.numeric(M1parms),
@@ -828,42 +830,42 @@ M3parms <- (means %>% filter(Model == "M3"))$means
 # M1simsdf <- sims_to_df(M1sims1000)
 # M2simsdf <- sims_to_df(M2sims1000)
 # M3simsdf <- sims_to_df(M3sims1000)
-M1avg <- M1simsdf %>% filter(!is.na(to) & wave == 1) %>%
-  group_by(from, to) %>%
-  summarise(count = n()) %>%
-  mutate(weight = ifelse(from == to, 0, count))
-M1avgW2 <- M1simsdf %>% filter(!is.na(to) & wave == 2) %>%
-  group_by(from, to) %>%
-  summarise(count = n()) %>%
-  mutate(weight = ifelse(from == to, 0, count))
-M1avg2 <- M1simsdf %>% filter(!is.na(to)) %>%
- group_by(from, to, wave) %>%
- summarise(count = n()) %>%
- mutate(weight = ifelse(from == to, 0, count))
-M2avg <- M2simsdf %>% filter(!is.na(to) & wave == 1) %>%
-  group_by(from, to) %>%
-  summarise(count = n()) %>%
-  mutate(weight = ifelse(from == to, 0, count))
-M2avgW2 <- M2simsdf %>% filter(!is.na(to) & wave == 2) %>%
-  group_by(from, to) %>%
-  summarise(count = n()) %>%
-  mutate(weight = ifelse(from == to, 0, count))
-M2avg2 <- M2simsdf %>% filter(!is.na(to)) %>%
- group_by(from, to, wave) %>%
- summarise(count = n()) %>%
- mutate(weight = ifelse(from == to, 0, count))
-M3avg <- M3simsdf %>% filter(!is.na(to) & wave == 1) %>%
-  group_by(from, to) %>%
-  summarise(count = n()) %>%
-  mutate(weight = ifelse(from == to, 0, count))
-M3avgW2 <- M3simsdf %>% filter(!is.na(to) & wave == 2) %>%
-  group_by(from, to) %>%
-  summarise(count = n()) %>%
-  mutate(weight = ifelse(from == to, 0, count))
-M3avg2 <- M3simsdf %>% filter(!is.na(to)) %>%
- group_by(from, to, wave) %>%
- summarise(count = n()) %>%
- mutate(weight = ifelse(from == to, 0, count))
+# M1avg <- M1simsdf %>% filter(!is.na(to) & wave == 1) %>%
+#   group_by(from, to) %>%
+#   summarise(count = n()) %>%
+#   mutate(weight = ifelse(from == to, 0, count))
+# M1avgW2 <- M1simsdf %>% filter(!is.na(to) & wave == 2) %>%
+#   group_by(from, to) %>%
+#   summarise(count = n()) %>%
+#   mutate(weight = ifelse(from == to, 0, count))
+# M1avg2 <- M1simsdf %>% filter(!is.na(to)) %>%
+#  group_by(from, to, wave) %>%
+#  summarise(count = n()) %>%
+#  mutate(weight = ifelse(from == to, 0, count))
+# M2avg <- M2simsdf %>% filter(!is.na(to) & wave == 1) %>%
+#   group_by(from, to) %>%
+#   summarise(count = n()) %>%
+#   mutate(weight = ifelse(from == to, 0, count))
+# M2avgW2 <- M2simsdf %>% filter(!is.na(to) & wave == 2) %>%
+#   group_by(from, to) %>%
+#   summarise(count = n()) %>%
+#   mutate(weight = ifelse(from == to, 0, count))
+# M2avg2 <- M2simsdf %>% filter(!is.na(to)) %>%
+#  group_by(from, to, wave) %>%
+#  summarise(count = n()) %>%
+#  mutate(weight = ifelse(from == to, 0, count))
+# M3avg <- M3simsdf %>% filter(!is.na(to) & wave == 1) %>%
+#   group_by(from, to) %>%
+#   summarise(count = n()) %>%
+#   mutate(weight = ifelse(from == to, 0, count))
+# M3avgW2 <- M3simsdf %>% filter(!is.na(to) & wave == 2) %>%
+#   group_by(from, to) %>%
+#   summarise(count = n()) %>%
+#   mutate(weight = ifelse(from == to, 0, count))
+# M3avg2 <- M3simsdf %>% filter(!is.na(to)) %>%
+#  group_by(from, to, wave) %>%
+#  summarise(count = n()) %>%
+#  mutate(weight = ifelse(from == to, 0, count))
 
 # M1avg$from <- paste0("V", M1avg$from)
 # M1avg$to <- paste0("V", M1avg$to)
