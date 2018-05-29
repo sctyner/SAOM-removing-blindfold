@@ -524,7 +524,7 @@ The model family, the model form, and the fitted model can each be visualized ac
 
 \subsection{The Models}\label{sec:models}
 
-We first consider the 16 actor subset of the teenage friends and lifestyle data show in Figures \ref{fig:adjmatviz, fig:alldataviz}. To this data, we fit three different SAOMs. Each SAOM used a simple rate function, $\alpha_m$, and an objective function with two or three parameters. The first model, M1, contains the absolute minimum number of parameters in the objective function $f_i(x)$:  $$f_i(x)^{M1} = \beta_1s_{i1} + \beta_2s_{i2},$$ where $s_{i1}$ is the density network statistic and $s_{i2}$ is the reciprocity network statistic for actor $i$ at the current network state $x$. The second and third models, M2 and M3, contain one additional parameter each in the objective function which were determined by a Wald-type test provided in the \texttt{RSiena} software to be significant, with $p$-values less than 0.05 \citep{RSienaTest}. The M2 model contains an actor-level covariate parameter, and the M3 model contains an additional strutural effect in the objective function.
+We first consider the 16 actor subset of the teenage friends and lifestyle data show in Figure~\ref{fig:alldataviz}. To this data, we fit three different SAOMs. Each SAOM used a simple rate function, $\alpha_m$, and an objective function with two or three parameters. The first model, M1, contains the absolute minimum number of parameters in the objective function $f_i(x)$:  $$f_i(x)^{M1} = \beta_1s_{i1} + \beta_2s_{i2},$$ where $s_{i1}$ is the density network statistic and $s_{i2}$ is the reciprocity network statistic for actor $i$ at the current network state $x$. The second and third models, M2 and M3, contain one additional parameter each in the objective function which were determined by a Wald-type test provided in the \texttt{RSiena} software to be significant, with $p$-values less than 0.05 \citep{RSienaTest}. The M2 model contains an actor-level covariate parameter, and the M3 model contains an additional strutural effect in the objective function.
 \begin{align*}
 f_i(x)^{M2} & = \beta_1s_{i1} + \beta_2s_{i2} + \beta_3s_{i3} \\
 f_i(x)^{M3} & = \beta_1s_{i1} + \beta_2s_{i2} + \beta_4s_{i4},
@@ -971,17 +971,15 @@ numordersf$from <- factor(numordersf$from)
 levels(numordersf$from) <-  1:16
 numordersf$to <- factor(numordersf$to)
 levels(numordersf$to) <- 1:16
-numordersf$from <- as.numeric(as.character(numordersf$from))
-numordersf$to <- as.numeric(as.character(numordersf$to))
 
-p1 <- ggplot(data = numordersf, aes(y = -from, x = to)) + geom_tile(color = 'black', aes(fill = as.factor(value))) +
+p1 <- ggplot(data = numordersf, aes(y = rev(from), x = to)) + geom_tile(color = 'black', aes(fill = as.factor(value))) +
   scale_fill_manual(values = c('white', 'black')) +
-  scale_x_continuous(breaks = 1:16) +
-  scale_y_continuous(breaks = (1:16)*-1, labels =1:16)  +
+  scale_x_discrete(labels = 1:16, position = "top") +
+  scale_y_discrete(labels =16:1, name = "from")  +
   ThemeNoNet +
   theme(legend.position = 'none', panel.grid = element_blank(), 
         panel.border = element_blank(), 
-        panel.spacing = unit(rep(0,4),"cm")) +
+        axis.text.y = element_text(margin = margin(r=0))) +
   coord_fixed()
 
 # histogram of number of MS in 1000 reps
@@ -1005,15 +1003,21 @@ rownames(allmsrep1_adjmat) <- paste0("V", 1:16)
 
 pca1 <- prcomp(allmsrep1_adjmat)
 order1 <- names(sort(pca1$rotation[,1], decreasing = T))
-order2 <- names(sort(abs(pca1$rotation[,1]), decreasing = T))
+order1 <- gsub("V", "",order1)
+# order2 <- names(sort(abs(pca1$rotation[,1]), decreasing = T))
 
-pcaordersf$from <- factor(pcaordersf$from, levels = rev(order1))
-pcaordersf$to <- factor(pcaordersf$to, levels = order1)
+pcaordersf$from <- as.factor(pcaordersf$from)
+levels(pcaordersf$from) <- 1:16
+pcaordersf$from <- factor(pcaordersf$from , levels = levels(pcaordersf$from)[match( order1,levels(pcaordersf$from) )])
+pcaordersf$to <- as.factor(pcaordersf$to)
+levels(pcaordersf$to) <- 1:16
+pcaordersf$to <- factor(pcaordersf$to , levels = levels(pcaordersf$to)[match( order1,levels(pcaordersf$to) )])
 
-p2 <- ggplot(data = pcaordersf, aes(x = to, y = from)) + geom_tile(color = 'black', aes(fill = as.factor(value))) +
+p2 <- ggplot(data = pcaordersf, aes(x = to, y = from)) +
+  geom_tile(color = 'black', aes(fill = as.factor(value))) +
   scale_fill_manual(values = c('white', 'black')) +
-  scale_x_discrete(position = "top", labels = str_replace(order1, "V", "")) +
-  scale_y_discrete(labels = rev(str_replace(order1, "V", ""))) +
+  scale_x_discrete(position = "top") +
+  #scale_y_discrete(name = "from",labels = rev(str_replace(order1, "V", ""))) +
   ThemeNoNet +
   theme(legend.position = 'none') +
   coord_fixed()
@@ -1028,6 +1032,9 @@ We then performed a principal component analysis (PCA) on $\mathbf{A}^{cum}$, an
 Using PCA on $\mathbf{A}^{cum}$ to order the rows and columns of the adjacency matrix visualization clearly shows the two distinct connected components in the first wave of the network, which are difficult to find in the arbitrarily ordered visualization. We also use the PCA seriated layout to fix the layout in the animation of one of the microstep process simulations. This animation, some frames of which are shown in Figure~\ref{fig:adjmatani} of the Appendix is very simple: a square appears or disappears in the animation as that edge appears or disappears in the microstep process. Through this animation, which can be viewed at \url{https://vimeo.com/240092677}, we can see edges appearing, and then later on disappearing. These in-between steps are not shown when we look at the network at our discrete observation points, so by viewing this animation we can gain a better understanding of the underlying dynamics of this model. 
 
 <<histogramalters, fig.width = 7, fig.height=9, fig.cap="Each panel shows the theoretical (as lines) and empirical (as points) probabilities of the chosen ego node changing its tie to each of the other nodes. The color of the line indicates whether the tie from the ego to the alter node is being added, removed, or if there is no change to the network in this step.">>=
+set.seed(823746)
+load("data/ansnullpaper.rda")
+ansnullchains <- get_chain_info(ansnull)
 ansnullchains %>% group_by(period, rep) %>%
   mutate(ms = row_number()) %>%
   filter(ms == 1, period == 1) %>%
@@ -1048,7 +1055,7 @@ cumprobs$alter <- factor(paste0("V",cumprobs$alter+1), levels = paste0("V", 1:16
 # is the tie that's added new, removed, or does the network stay the same
 
 changes <- cumprobs %>% dplyr::select(ego, alter) %>% unique
-
+wave1friends <- fortify(as.adjmat(fd2.w1))
 wave1friends2 <- wave1friends[,-3]
 wave1friends2$type <- "remove"
 changes2 <- left_join(changes, wave1friends2, c("ego" = "from", "alter" = "to"))
@@ -1109,22 +1116,23 @@ ansnullchains %>%
   group_by(rep) %>%
   mutate(msno = row_number()) %>%
   filter(msno == 1) %>%
-  mutate(ego = paste0("V",as.numeric(as.character(ego))+1),
-         alter = paste0("V",as.numeric(as.character(alter))+1),
+  mutate(ego = as.numeric(as.character(ego))+1,
+         alter = as.numeric(as.character(alter))+1,
          prob = exp(logAlterProb)) -> probsDat
 
 # probsDat %>% group_by(ego, alter) %>% summarize(count = n()) %>% dim
 # 103, 3
 ggplot(data = probsDat,
        aes(y = factor(ego, levels = order1),
-             x = factor(alter, levels = rev(order1)),
+             x = factor(alter, levels = order1),
              fill = prob)) +
   geom_tile(color = 'black') +
   scale_fill_gradient(low = 'white', high = 'blue', limits = c(0,1)) +
   labs(y = "ego", x = "alter")+
-  scale_x_discrete(position = 'top', labels = str_replace(order1, "V", "")) +
-  scale_y_discrete(labels = rev(str_replace(order1, "V", ""))) +
-  ThemeNoNet + theme(panel.grid = element_blank()) +
+  scale_x_discrete(position = 'top') +
+  #scale_y_discrete(labels = rev(str_replace(order1, "V", ""))) +
+  ThemeNoNet + 
+  theme(panel.grid = element_blank()) +
   coord_fixed()
 @
 
@@ -1134,6 +1142,13 @@ of the $16^2 = 256$ possible steps for the CTMC to take, only 103, or about 40\%
 <<allsteps, fig.cap="Two simulations (out of 1,000) of the microstep process from wave 1 to wave 2. The $x$ axis is the microstep number, with step 0 representing the first wave of data and the final step representing the second wave of data. We can see that many edges are underrepresented in this process: they are in the second wave, but never appear in the microsteps.", fig.height=2.5>>=
 smallfriends <- read_csv("data/smallfriends4Geomnet.csv")
 names(smallfriends)[1:2] <- c("from", "to")
+ansnullchains %>%
+  dplyr::filter(period == 1) %>%  #only look at chains from wave 1 to wave 2
+  #dplyr::group_by(rep) %>%
+  dplyr::select(rep, from = ego, to = alter) %>%
+  dplyr::mutate(val = as.numeric(!from == to),
+         from = paste0("V", parse_number(from)+1), # make the chains
+         to = paste0("V", parse_number(to)+1)) -> ansnullchainsw1w2
 msall1 <- netvizinf::listMicrosteps(dat = wave1friends,
                       microsteps = filter(ansnullchainsw1w2, rep == 1))
 msall1_df <- plyr::rbind.fill(lapply(X = seq_along(msall1), FUN = function(i, x) {
@@ -1306,7 +1321,7 @@ We have only just begun to scratch the surface of these complicated and multi-la
 
 \section*{Appendix: Additional visualizations}
 
-<<sigtesting, fig.show = 'hold', out.width='\\textwidth', fig.height=2, fig.cap="From Section~\ref{sec:allpossible}. Significant effects for the two data sets, at a significance level of 0.10 or lower as calculated by the Wald-type test available in the SIENA software.">>=
+<<sigtesting, fig.show = 'hold', out.width='\\textwidth', fig.height=2, fig.cap="From Section~\ref{sec:allpossible}. Significant effects for the two data sets, at a significance level of 0.10 or lower as calculated by the Wald-type test available in the SIENA software.", error=FALSE>>=
 smfr_effs <- read_csv("data/effects_significance_smallFriends.csv")
 smfr_effs$inter1[is.na(smfr_effs$inter1)] <- "none"
 library(ggrepel)
@@ -1478,13 +1493,18 @@ for(i in 0:55){
 }
 
 adjmatall2 <- cbind(adjmatall2, rep(0:55, each = 16))
-adjmatall2 <- data.frame(adjmatall2)
+rownames(adjmatall2) <- NULL
+adjmatall2 <- as.data.frame(adjmatall2)
 adjmatall2$from <- rep(paste0("V", 1:16), 56)
 names(adjmatall2)[17] <- "ms"
 adjmatall2 %>% gather(to, val, V1:V16) -> adjmatall3
 
+adjmatall3$to <- as.factor(adjmatall3$to)
+levels(adjmatall3$to) <- gsub("V", "", levels(adjmatall3$to))
+adjmatall3$from <- as.factor(adjmatall3$from)
+levels(adjmatall3$from) <- gsub("V", "", levels(adjmatall3$from))
 adjmatall3$to <- factor(adjmatall3$to, levels = order1)
-adjmatall3$from <- factor(adjmatall3$from, levels = rev(order1))
+adjmatall3$from <- factor(adjmatall3$from, levels = order1)
 
 adjmatall3$frame <- adjmatall3$ms
 #plots <- list()
