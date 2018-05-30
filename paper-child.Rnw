@@ -230,13 +230,15 @@ For any time point, $T$, where $t_{m} \leq T < t_{m+1}$, the waiting time to the
  \tau(i|x,m) | x_{i1}(m), \dots, x_{in}(m) \stackrel{\text{iid}}{\sim} Exp(\alpha_m)
 \end{equation}
 
- The waiting time to the next change opportunity by \textit{any} actor in the network is also exponentially distributed with expected value $(n\alpha_m)^{-1}$. The distribution of waiting time for the whole network to change, $\tau(x|m) = \sum_i \tau_i(m) |x_{i1}(m), \dots, x_{in}(m) $ can then be written as
-
-\begin{equation} \label{eq:c2}
- \tau(x|m) \sim Exp(n\alpha_m)
+ The waiting time to the next change opportunity by \textit{any} actor in the network is also exponentially distributed with expected value $(n\alpha_m)^{-1}$. %The distribution of waiting time for the whole network to change, $\tau(x|m) = \sum_i \tau_i(m) |x_{i1}(m), \dots, x_{in}(m) $ can then be written as
+%\begin{equation} \label{eq:c2}
+% \tau(x|m) \sim Exp(n\alpha_m)
+%\end{equation}
+The parameter for the wait time for the whole network $n\alpha_m$ is the rate at which any tie change occurs. The estimation of this parameter is straightforward: the method of moments is used to estimate the rate with the statistic 
+\begin{equation}\label{eq:cdiff}
+C = \sum_i\sum_j |x_{ij}(t_{m+1}) - x_{ij}(t_m)|
 \end{equation}
-
-The parameter for the wait time for the whole network $n\alpha_m$ is the rate at which any tie change occurs. The estimation of this parameter is straightforward: a the method of moments is used to estimate the rate with the statistic $$C = \sum_i\sum_j |x_{ij}(t_{m+1}) - x_{ij}(t_m)|$$ which is the total number of changes from observation at time $t_m$ to the observation at time $t_{m+1}$. %In order to achieve the memorylessness property of a Markov process,
+which is the total number of changes from observation at time $t_m$ to the observation at time $t_{m+1}$. %In order to achieve the memorylessness property of a Markov process,
 
 % \hh{XXX we tried to estimate the rate based on the simulations - you could include a histogram of the number of changes for the 1000 simulations in the viz part XXX}
 % \st{XXX see line 1257 for plot. where should I put it? }
@@ -277,14 +279,12 @@ same covariate & $s_{i6}(x) = \sum_j x_{ij} \mathbb{I}(z_i = z_j)$ & \includegra
 \end{table}
 
 When node $i$ is given the chance to change a tie, %\hh{`we assume that they wish' sounds strange - don't assume wishes, state assumptions}
-it attempts to maximize the value of its objective function $f_i(\boldsymbol{\beta}, x)$ %as well as a random element, $U_i(x)$, to account for unknown attraction between nodes. The additional random element is included to account for any random, unexplainable change in the network ties. \citet{modelsSnijders} recommends that the $U_i(x)$ be random draws from a type 1 extreme value distribution.  % XX What is the thought behind that? } ``the type 1 extreme value distribution (or Gumbel distribution) with mean 0 and scale parameter 1" \citep[p. 368]{snijders01}.
+it acts to maximize the value of its objective function $f_i(\boldsymbol{\beta}, x)$ %as well as a random element, $U_i(x)$, to account for unknown attraction between nodes. The additional random element is included to account for any random, unexplainable change in the network ties. \citet{modelsSnijders} recommends that the $U_i(x)$ be random draws from a type 1 extreme value distribution.  % XX What is the thought behind that? } ``the type 1 extreme value distribution (or Gumbel distribution) with mean 0 and scale parameter 1" \citep[p. 368]{snijders01}.
 %This distribution, which is also known as the log-Weibull distribution, has probability distribution function of:
-
 %\begin{equation} \label{eq:dist1}
 %g(u|\mu, \sigma) = \frac{1}{\sigma}\exp\left\{-\left(\frac{u-\mu}{\sigma} + \exp^{-\frac{u-\mu}{\sigma}}\right)\right\}.
 %\end{equation}
 %using $\mu$ for the mean parameter and $\sigma$ for the scale parameter.
-
 <<logweibull, eval = FALSE, fig.align='center', out.width = '.5\\textwidth', fig.height = 4, fig.cap='The probability distribution function for the type 1 extreme value distribution, also known as the log-Weibull or Gumbel distribution with location parameter $ \\mu = 0$ and scale parameter $ \\sigma = 0$.'>>=
 library(reliaR)
 x <- seq(-3,10,.01)
@@ -295,9 +295,8 @@ qplot(x = x, y= y, geom = "line") +
   theme(text = element_text(size = 20, family = "Times New Roman")) +
   labs(x = "u", y = "density of g(u)")
 @
-
 %The probability density function for the type 1 extreme value distribution is shown in Figure~\ref{fig:logweibull}. For mean $\mu = 0$ and scale $\sigma = 1$ as \citet{modelsSnijders} suggests %\hh{XXX I'm not following - which distribution do you mean by `this' distribution? The density above is the type 1 extreme value density. I got lost at the  ``objective function $f_i(\boldsymbol{\beta}, x)$ plus a random element, $U_i(x)$"} \st{XXX I hope it is clearer now above}
-%is convenient because it \st{leads to a simple probability formula for} the probability that actor $i$ chooses to change its tie to actor $j$ \st{that can be written \textit{only}} in terms of the objective function. 
+%is convenient because it \st{leads to a simple probability formula for} the probability that actor $i$ chooses to change its tie to actor $j$ \st{that can be written \textit{only}} in terms of the objective function.
 We can use this objective function to define the probability that actor $i$, once selected with the rate function, chooses to change its tie to actor $j$, $p_{ij}(\boldsymbol{\beta}, x)$. Let $x(i \leadsto j)$, denote the network identical to $x$ with only one change: the tie $x_{ij}$ has changed to $1-x_{ij}$. Then, the probility that the tie $x_{ij}$ changes is
 
 \begin{equation}\label{eq:pij}
@@ -571,7 +570,8 @@ ggplot(data = dad, aes(from_id = from, to_id = to)) +
 \caption{The additional network effects included in our models fit to the friends data. On the left, a jumping transitive triplet (JTT). On the right, a doubly achieved distance between $i$ and $k$.}
 \end{figure}
 
-where $s_{i3} = \sum_{j \neq h} x_{ij}x_{ih}x_{hj} \mathbb{I}(z_i = z_h \neq z_j)$, and $s_{i4} =  |\{j : x_{ij} = 0, \sum\limits_h x_{ih}x_{hj} \geq 2\}|$. These statistics are known as the \emph{number of jumping transitive triplets} and the \emph{number of doubly achieved distances two effect}, respectively. The first statistic emphasizes triad relationships that are formed between actors from different covariate groups, while the other emphasizes indirect ties between actors. The covariate groups are determined by the student's drinking behavior, the values of which are converted to numeric then mean-centered. The four values in our data are $\{\text{never, 1-2 times per year, once per month, once per week}\}$, which after being converted to numeric and mean-centered become $\{-0.8125,-1.8125,0.1875,1.1875\}$. The two additional effects are visually represented and further described in Figure~\ref{fig:jtt} and Figure~\ref{fig:dad}, respectively.
+where $s_{i3} = \sum_{j \neq h} x_{ij}x_{ih}x_{hj} \mathbb{I}(z_i = z_h \neq z_j)$, and $s_{i4} =  |\{j : x_{ij} = 0, \sum\limits_h x_{ih}x_{hj} \geq 2\}|$. These statistics are known as the \emph{number of jumping transitive triplets} and the \emph{number of doubly achieved distances two effect}, respectively. The first statistic emphasizes triad relationships that are formed between actors from different covariate groups, while the other emphasizes indirect ties between actors. The covariate groups are determined by the student's drinking behavior, the values of which are converted to numeric then mean-centered. The four values in our data are $\{\text{never, 1-2 times per year, once per month, once per week}\}$.%, which after being converted to numeric and mean-centered become $\{-0.8125,-1.8125,0.1875,1.1875\}$. 
+The two additional effects are visually represented and further described in Figure~\ref{fig:jtt} and Figure~\ref{fig:dad}, respectively.
 
 In Section~\ref{sec:samemoddiffdat}, we also fit models M1, M2, and M3 to the senate collaboration data for comparison. To fit M2 to the senate data, we use the number of bills authored by each senator as the node covariate for the jumping transitive triplet variable. In terms of the senate data, then, the value of $\beta_3$ should dictate how willing a senator is to coauthor a bill on which the author of the bill has a different level of authorship, assuming there is an intermediary between the two who has the same authorship level as the first. %Comparison of the parameter estimates of these models fit to the two different data sets is given in Table~\ref{tab:meanests}.
 %In addition, we fit two more models, M4 and M5 to the senate data that were found to be significant according to the Wald-type test:
@@ -947,8 +947,8 @@ ggpairs(senM45est2, columns = 3:9, ggplot2::aes(colour=Model, alpha = .5))
 
 The last principle of model visualization we use is exploring the process of fitting the model, instead of just focusing on the end result. This principle is perhaps the most important for SAOMs because the model fitting process in \texttt{RSiena} involves several simulation steps that are hidden from the user. Hiding the MCMC steps is practical and efficient if a researcher is primarily interested in fitting one model to a set of longitudinal network data, obtaining parameter estimates, and drawing conclusions or making predictions. We are more interested in \textit{how} the models are fit, so we extracted and explored the different steps of that process instead of allowing them stay hidden.
 
-A key component of each step of the SIENA method of moments algorithm is the ``microstep" process. A series of microsteps is obtained by simulating from the model in its current state, $x(t_m)$ with current parameter values $\mathbf{\theta}_{0} = \{\alpha_{1_0}, \dots \alpha_{{m-1}_0}, \beta_{1_0}, \dots, \beta_{K_0}\}$, to the next state, $x(t_{m+1})$. This microstep process stops when the simulated network has achieved the same number of differences, $C$, from $x(t_m)$ as $x(t_{m+1})$, where
-$$C = \sum_{i \neq j} |x_{ij}(t_{m+1}) - x_{ij}(t_{m})|.$$
+A key component of each step of the SIENA method of moments algorithm is the ``microstep" process. A series of microsteps is obtained by simulating from the model in its current state, $x(t_m)$ with current parameter values $\mathbf{\theta}_{0} = \{\alpha_{1_0}, \dots \alpha_{{m-1}_0}, \beta_{1_0}, \dots, \beta_{K_0}\}$, to the next state, $x(t_{m+1})$. This microstep process stops when the simulated network has achieved the same number of differences, $C$, from $x(t_m)$ as $x(t_{m+1})$, where $C$ is definined in Equation~\ref{eq:cdiff}. 
+
 This simulation process follows the steps of the continuous-time Markov chain. Each tie change in the CTMC is referred to as one ``microstep". At each microstep, an ``ego node" is selected to make a change, and the chosen ego node randomly makes one change in its ties according to the probabilities, $\{p_{ij}: i\neq j \in \{1, \dots, n\}\}$ defined in Equation~\ref{eq:pij}, determined by its objective function. The options for change are (1) removing a current tie, (2) adding a new tie, or (3) making no change at all. Between two network observations $x(t_m)$ and $x(t_{m+1})$, there can be dozens, hundreds, or even thousands of microsteps, depending on the size of the network and the number of changes between two network observations. We want to view these in-between steps in order to better understand the behavior of the underlying continuous-time Markov chain.
 
 The first vizualization we present here is an animation of the simulated microsteps that form the transition steps of the CTMC from wave 1 to wave 2 of the small friendship network example shown in Figure~\ref{fig:alldataviz} when fitting model M1. Movies similar to this animation were used to visualize the changes of dynamic networks in \citet{dynnetviz}. When each ego node is selected in a microstep, it is emphasized in the animation, then the associated edge either appears or disappears. If there are no changes at a particular microstep, no changes are seen. Some frames of the animations are shown in Figure~\ref{fig:makinggif} in the Appendix, and the full movie can be viewed at \url{https://vimeo.com/240089108}.
@@ -1105,12 +1105,16 @@ ggplot(data = changes3) +
 #              ncol = 2, padding = unit(0, 'line'))
 @
 
-We also attempt to better understand the microstep process by visualizing the observed transition probabilites for the first microstep in the process. We only do the first step of many because the \texttt{RSiena} transition probabilities for any two edges $i,j$ after the first step are only directly comparable for identical microsteps due to the conditioning on the current network state in the model. %By ego node state, we mean the current set of incoming and outgoing ties to the ego node, $i$. Put more precisely, let the vector $X_i = (\{x_{ik}\}, \{x_{ki}\})_{k \neq i} \in \{0,1\}^{2(n-1)}$ represent the set of all tie variables involving node $i$ in the current network. For $p_{ij}$ to be comparable for any two network states $x$ and $x'$, the value of the vector $X_i$ must be the same in both states. It is possible to incorporate this information into our visualizations, but for now we look at only the first step, because we know without needing any complicated conditioning steps that the previous node state $X_i$ is identical in all cases. 
+We also attempt to better understand the microstep process by visualizing the observed transition probabilites for the first microstep in the process. These probabilities are defined in Equation~\ref{eq:pij}. We only do the first step of many because the \texttt{RSiena} transition probabilities for any two edges $i,j$ after the first step are only directly comparable for identical microsteps due to the conditioning on the current network state in the model. %By ego node state, we mean the current set of incoming and outgoing ties to the ego node, $i$. Put more precisely, let the vector $X_i = (\{x_{ik}\}, \{x_{ki}\})_{k \neq i} \in \{0,1\}^{2(n-1)}$ represent the set of all tie variables involving node $i$ in the current network. For $p_{ij}$ to be comparable for any two network states $x$ and $x'$, the value of the vector $X_i$ must be the same in both states. It is possible to incorporate this information into our visualizations, but for now we look at only the first step, because we know without needing any complicated conditioning steps that the previous node state $X_i$ is identical in all cases. 
 Thus we have 1,000 transition probabilities to examine: one transition probability for the first microstep taken for each of the simulations.
 %Put more precisely, let the vector $X_i = (x_{ij}|_{j \neq i}, x_{ji}|_{j \neq i}$ for $i \neq j \neq k \neq \ell \in \{1, \dots, n\}$, $p_{ij}$ is not necessarily the same \st{ARGH NOT SURE THIS IS TRUE } if the current state of the network achieved from the first microstep, denoted $X(1)$, is $X(1) = x(i \leadsto \ell)$ than is different in the case of $x_{ij}$ changing in the first step from the case of $x_{ij}$ not changing in the first step.
 %In Figure~\ref{fig:histogramalters}, we present each ego node and the resulting probabilities of tie changes. The probability shown by the bars is the theoretical probability, according to the objective function, of the ego node changing its tie to the alter node, while the probability shown by the points is the empirical probability of that change being made. The empirical probability is calculated by counting all instances of the ego node first, then computing the proportion of each different alter node change. In most cases, they are almost identical, which demonstrates that the algorithm is performing as expected. There are, however, many steps that are never taken. Some ego nodes, like 1, 4, and 16, really explore the space of all possible outgoing ties. On the other hand, nodes like 13 and 15 explore very few possible outgoing ties.  It is unclear why this would be happening; it may have something to do with the ties in wave 1, where 13 and 15 have multiple connections, while 1 and 16 have none, but there are counterexamples of well connected nodes, such as 12, that explore the space more. In addition, we can see that the ties changed most often are removing ties, not adding ties. This matches the overall pattern of the data: we see the most ties in the first wave of data, and the least ties in the third wave.
 
 <<heatmap, fig.align='center', fig.cap='A heatmap showing the empirical transition probabilities for the first microstep in 1,000 simulations. The acting ego node is on the y-axis, and the alter node is on the x-axis. There were many ties with empirical probability zero.', fig.height=2.5>>=
+library(dplyr)
+set.seed(823746)
+load("data/ansnullpaper.rda")
+ansnullchains <- get_chain_info(ansnull)
 ansnullchains %>%
   filter(period == 1) %>%
   group_by(rep) %>%
@@ -1420,10 +1424,6 @@ friendshipData <- array(c(fd2.w1, fd2.w2,fd2.w3), dim = c(16, 16, 3))
 #mydata <- sienaDataCreate(friendship, alcohol)
 #myeffnull <- getEffects(mydata)
 #myalgorithm <- sienaAlgorithmCreate(projname = 's16_3')
-library(dplyr)
-set.seed(823746)
-load("data/ansnullpaper.rda")
-ansnullchains <- get_chain_info(ansnull)
 ansnullchains %>%
   dplyr::filter(period == 1) %>%  #only look at chains from wave 1 to wave 2
   #dplyr::group_by(rep) %>%
