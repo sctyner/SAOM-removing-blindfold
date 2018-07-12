@@ -805,8 +805,8 @@ ggplot(allDataEsts %>% filter(str_detect(parameter, "beta"))) +
 
 Looking at Figure~\ref{fig:compareModels} and Table~\ref{tab:meanests}, we see a few patterns in the estimates from both models. First, the table and the density plots demonstrate the same relationship between the outdegree parameter, $\beta_1$, and the reciprocity parameter, $\beta_2$. In both data sets and across all three models, the estimates of $\beta_1$ are all negative and hover between -5 and -3, while the estimates of $\beta_2$ are all positive and hover between four and five. This suggests that in both data sets, nodes are \textit{encouraged} to form outgoing ties that are reciprocated and \textit{discouraged} from forming ties that are not. Actors in these networks want reciprocated relationships: the students want to have close mutual friendships, and senators want mutual support for their bills. We explore the relationship between $\beta_1$ and $\beta_2$ further in Section~\ref{sec:samemodsamedat}.
 
-The inclusion of $\beta_3$, the JTT parameter, for the friendship data had a noticeable effect on the other parameters in the model. This is not true in the senate data. %The covariate used in the senate data for the JTT calculation was the number of bills authored by the ego node in the given year. The number of bills authored by a senator varies wildly, from no bills to 114 bills authored in two years, so this effect could simply be nonsensical for the senate data, since senators are less likely to have the same number of bills authors than teenage girls are to have the same drinking behavior.
-Looking at the estimates of $\beta_4$, we see that the estimates for the senate data are near zero, suggesting that this effect, which considers indirect ties, is not important for the senate data. It is, however, much stronger in the friendship data, suggesting that indirect ties are discouraged from forming: teenage girls want to have direct friendships. This indirect relationship variable does not impact the senate collaboration structure, but it does affect teenage friendship structure.
+The inclusion of $\beta_3$ for the friendship data had a noticeable effect on the other parameters in the model. This is not true in the senate data. %The covariate used in the senate data for the JTT calculation was the number of bills authored by the ego node in the given year. The number of bills authored by a senator varies wildly, from no bills to 114 bills authored in two years, so this effect could simply be nonsensical for the senate data, since senators are less likely to have the same number of bills authors than teenage girls are to have the same drinking behavior.
+Looking at the estimates of $\beta_4$, we see that the estimates for the senate data are nearer to zero, suggesting that this effect, which considers indirect ties, is not important for the senate data. This effect is, however, very strong in the friendship data with a mean of about -7.5, suggesting that indirect ties are discouraged from forming: teenage girls want to have direct friendships. This indirect relationship variable does not help explain the senate collaboration structure, but it does help clarify the teenage friendship structure.
 
 %We look at collections produced ``from exploring the space of all possible models," ``by varying model settings", ``by fitting the same model to different datasets", and ``by treating each iteration as a model" \citep[p.~210-11]{modelvis}. Because fitting a SAOM requires MCMC methods, we also fit the same model many times, resulting in distributions of fitted parameters for one data set.
 
@@ -823,7 +823,7 @@ ggplot(data = simu2) +
   theme(legend.position = 'bottom')
 @
 
-After fitting models M1, M2, and M3 to the friendship network 1,000 times each, we examine the distribution of the fitted values, which are shown in Figure~\ref{fig:distests}. We can see from these distributions that the inclusion of the jumping transitive triplet parameter, $\beta_3$ is obviously affecting the distributions of the other four parameters included in all models, $\alpha_1$, $\alpha_2$, $\beta_1$, and $\beta_2$. When $\beta_3$ is included, its estimate is postitive, meaning that friendships between two girls with different drinking behaviors tend to form when there is an intermediary who is already friends with the two girls. The inclusion of this parameter leads to increases in the rate parameters' estimates, suggesting that encouraging the transitive triplet behavior means that the girls would also change friends more frequently. The outegree parameter, $\beta_1$ decreases when $\beta_3$ is included, while the reciprocity parameter, $\beta_2$ increases. This implies the girls in the data prefer to form closer friend groups, as indicated by reciprocated ties and jumping transitive triplet formation, as opposed to being popular and having many friends. Having many friends who do not reciprocate is more stronlgy discouraged by M2 than in the other models. In comparison with models M1 and M3, model M2 typically has higher estimates of the rate parameter, meaning that the inclusion of the covariate statistic in the model leads to higher estimates of the number of times, on average, a node gets to change its ties. It is not clear, however, that the addition of a parameter to the objective function \textit{should} effect the estimation of the rate parameters. The strong correlations between the estimates of the rate parameters and of the objective function parameters are shown in Figure~\ref{fig:corplots} in the Appendix. 
+After fitting models M1, M2, and M3 to the friendship network 1,000 times each, we examine the distribution of the fitted values, which are shown in Figure~\ref{fig:distests}. We can see from these distributions that the inclusion of the jumping transitive triplet parameter, $\beta_3$ is obviously affecting the distributions of the other four parameters included in all models, $\alpha_1$, $\alpha_2$, $\beta_1$, and $\beta_2$. When $\beta_3$ is included, its estimate is postitive, meaning that friendships between two girls with different drinking behaviors tend to form when there is an intermediary who is already friends with the two girls. The inclusion of this parameter leads to increases in the rate parameters' estimates, suggesting that the presence of the transitive triplet behavior means that the girls would also change friends more frequently. It is not clear, however, that the addition of a parameter to the objective function \textit{should} effect the estimation of the rate parameters. The strong correlations between the estimates of the rate parameters and of the objective function parameters are shown in Figure~\ref{fig:corplots} in the Appendix. In addition, the outegree parameter, $\beta_1$ decreases when $\beta_3$ is included, while the reciprocity parameter, $\beta_2$ increases. This implies the girls in the data prefer to form small, closely knit friend groups, as indicated by reciprocated ties and jumping transitive triplet formation, as opposed to being popular and having many friends. Having many friends who do not reciprocate is more stronlgy discouraged by M2 than in the other models. %In comparison with models M1 and M3, model M2 typically has higher estimates of the rate parameter, meaning that the inclusion of the covariate statistic in the model leads to higher estimates of the number of times, on average, a node gets to change its ties. 
 
 <<getdatam, eval = FALSE>>=
 nulls <- read.csv("data/distribution_null_model.csv")
@@ -855,13 +855,13 @@ ggpairs(senM45est2, columns = 3:9, ggplot2::aes(colour=Model, alpha = .5))
 
 \subsection{Explore algorithms, not just end result}\label{sec:algorithms}
 
-The last principle of model visualization we use is exploring the process of fitting the model, instead of just focusing on the end result. This principle is perhaps the most important for SAOMs because the model fitting process in \texttt{RSiena} involves several simulation steps that are hidden from the user. Hiding the MCMC steps is practical and efficient if a researcher is primarily interested in fitting one model to a set of longitudinal network data, obtaining parameter estimates, and drawing conclusions or making predictions. We are more interested in \textit{how} the models are fit, so we extracted and explored the different steps of that process instead of allowing them stay hidden.
+The last principle of model visualization we use is to explore the process of fitting the model, instead of just focusing on the end result. This principle is perhaps the most important for SAOMs because the model fitting process in \texttt{RSiena} involves several simulation steps that are hidden from the user. Hiding the MCMC steps is practical and efficient if a researcher is primarily interested in fitting one model to a set of longitudinal network data, obtaining parameter estimates, and drawing conclusions or making predictions. We are more interested in \textit{how} the models are fit, so we extracted and explored the different steps of that process instead of allowing them stay hidden.
 
-A key component of each step of the SIENA method of moments algorithm is the ``microstep" process. A series of microsteps is obtained by simulating from the model in its current state, $x(t_m)$ with current parameter values $\mathbf{\theta}_{0} = \{\alpha_{1_0}, \dots \alpha_{{m-1}_0}, \beta_{1_0}, \dots, \beta_{K_0}\}$, to the next state, $x(t_{m+1})$. This microstep process stops when the simulated network has achieved the same number of differences, $C$, from $x(t_m)$ as $x(t_{m+1})$, where $C$ is definined in Equation~\ref{eq:cdiff}. 
+One of the hidden steps in the SIENA method of moments algorithm is the ``microstep" process. A series of microsteps is obtained by simulating from the model in its current state, $x(t_m)$ with current parameter values $\mathbf{\theta}_{0} = \{\alpha_{1_0}, \dots \alpha_{{m-1}_0}, \beta_{1_0}, \dots, \beta_{K_0}\}$, to the next state, $x(t_{m+1})$. One tie changes at a time until the simulated network has achieved the same number of differences, $C$, from $x(t_m)$ as $x(t_{m+1})$, where $C$ is definined in Equation~\ref{eq:cdiff}. 
 
-This simulation process follows the steps of the continuous-time Markov chain. Each tie change in the CTMC is referred to as one ``microstep". At each microstep, an ``ego node" is selected to make a change, and the chosen ego node randomly makes one change in its ties according to the probabilities, $\{p_{ij}: i\neq j \in \{1, \dots, n\}\}$ defined in Equation~\ref{eq:pij}, determined by its objective function. The options for change are (1) removing a current tie, (2) adding a new tie, or (3) making no change at all. Between two network observations $x(t_m)$ and $x(t_{m+1})$, there can be dozens, hundreds, or even thousands of microsteps, depending on the size of the network and the number of changes between two network observations. We want to view these in-between steps in order to better understand the behavior of the underlying continuous-time Markov chain.
+This simulation process follows the steps of the continuous-time Markov chain. Each tie change in the CTMC is referred to as one ``microstep". At each microstep, an ``ego node" is selected to make a change, and the chosen ego node randomly makes one change in its ties according to the probabilities, $\{p_{ij}: i\neq j \in \{1, \dots, n\}\}$ defined in Equation~\ref{eq:pij}, determined by its objective function. The options for change are (1) removing a current tie, (2) adding a new tie, or (3) making no change at all. Between two network observations $x(t_m)$ and $x(t_{m+1})$, there can be dozens, hundreds, or even thousands of microsteps, depending on the size of the network and the number of changes between two network observations. We want to simulate and view these in-between steps in order to better understand the behavior of the underlying continuous-time Markov chain.
 
-The first vizualization we present here is an animation of the simulated microsteps that form the transition steps of the CTMC from wave 1 to wave 2 of the small friendship network example shown in Figure~\ref{fig:alldataviz} when fitting model M1. Movies similar to this animation were used to visualize the changes of dynamic networks in \citet{dynnetviz}. When each ego node is selected in a microstep, it is emphasized in the animation, then the associated edge either appears or disappears. If there are no changes at a particular microstep, no changes are seen. Some frames of the animations are shown in Figure~\ref{fig:makinggif} in the Appendix, and the full movie can be viewed at \url{https://vimeo.com/240089108}.
+The first vizualization we present here is an animation of the simulated microsteps, when fitting model M1, that form the transition steps of the CTMC from wave 1 to wave 2 of the small friendship network example shown in Figure~\ref{fig:alldataviz}. . Movies similar to this animation were used to visualize the changes of dynamic networks in \citet{dynnetviz}. When each ego node is selected in a microstep, it is emphasized in the animation, then the associated edge either appears or disappears. If there are no changes at a particular microstep, no changes are seen. Some frames of the animations are shown in Figure~\ref{fig:makinggif} in the Appendix, and the full movie, created with \texttt{tweenr} and \texttt{gganimate} can be viewed at \url{https://vimeo.com/240089108} \citep{tweenr, gganimate}. 
 
 In the network animation, we see the possible steps of the unobserved CTMC process that is underlying the SAOM fit to the data. We see each part of the model come into play. First, we see the rate at which the nodes are selected to change. Then, we see the result of the actor maximizing its objective function by either deleting or adding a node. In addition, the layout of the nodes changes as edges are removed or added, which gives us a better sense of how the overall network structure changes with these individual tie changes.
 
@@ -935,7 +935,7 @@ p2 <- ggplot(data = pcaordersf, aes(x = to, y = from)) +
 grid.arrange(p1,p2, nrow = 1)
 @
 
-To reorder the vertices for the matrix visualization, we first constructed a cumulative adjaceny matrix, $\mathbf{A}^{cum}$, for the series of microsteps simulating the network from $x(t_m)$ to $x(t_{m+1})$. A single entry in the cumulative adjacency matrix, $\mathbf{A}^{cum}_{ij}$, is the total number of times the edge from node $i$ to node $j$ appears in the network from the initial observation, $x(t_m) \equiv X(0)$ to the final result of the last microstep, $X(R)$, where $R$ is the total number of microsteps taken:
+To reorder the vertices for the matrix visualization, we first constructed a cumulative adjaceny matrix, $\mathbf{A}^{cum}$, for the series of microsteps simulating the network from $x(t_m)$ to $x(t_{m+1})$. A single entry in the cumulative adjacency matrix, $\mathbf{A}^{cum}_{ij}$, is the total number of times the edge $i \righarrow j$ appears in the network from the initial observation, $x(t_m) \equiv X(0)$ to the final result of the last microstep, $X(R)$, where $R$ is the total number of microsteps taken:
 $$ \mathbf{A}^{cum}_{ij} = \sum_{r = 0}^R X_{ij}(r). $$
 We then performed a principal component analysis (PCA) on $\mathbf{A}^{cum}$, and used the values of the first principal component to order the vertices on the $x$ and $y$ axes for the adjacency matrix animation. For one such series of microsteps simulated by \texttt{RSiena}, we present the adjacency matrix ordered by the (arbitrary) vertex id alongside the seriated adjacency matrix using the first principal component loading on the cumulative adjacency matrix, $\mathbf{A}^{cum}$, in Figure~\ref{fig:adjmatorder}.
 
@@ -1015,7 +1015,7 @@ ggplot(data = changes3) +
 #              ncol = 2, padding = unit(0, 'line'))
 @
 
-We also attempt to better understand the microstep process by visualizing the observed transition probabilites for the first microstep in the process. These probabilities are defined in Equation~\ref{eq:pij}. We only do the first step of many because the \texttt{RSiena} transition probabilities for any two edges $i,j$ after the first step are only directly comparable for identical microsteps due to the conditioning on the current network state in the model. %By ego node state, we mean the current set of incoming and outgoing ties to the ego node, $i$. Put more precisely, let the vector $X_i = (\{x_{ik}\}, \{x_{ki}\})_{k \neq i} \in \{0,1\}^{2(n-1)}$ represent the set of all tie variables involving node $i$ in the current network. For $p_{ij}$ to be comparable for any two network states $x$ and $x'$, the value of the vector $X_i$ must be the same in both states. It is possible to incorporate this information into our visualizations, but for now we look at only the first step, because we know without needing any complicated conditioning steps that the previous node state $X_i$ is identical in all cases. 
+We also attempt to better understand the microstep process by visualizing the empirical transition probabilites for the first microstep in the process. These probabilities are defined in Equation~\ref{eq:pij}. We only do the first step of many because the \texttt{RSiena} transition probabilities for any two edges $i,j$ after the first step are only directly comparable for identical microsteps due to the conditioning on the current network state in the model. %By ego node state, we mean the current set of incoming and outgoing ties to the ego node, $i$. Put more precisely, let the vector $X_i = (\{x_{ik}\}, \{x_{ki}\})_{k \neq i} \in \{0,1\}^{2(n-1)}$ represent the set of all tie variables involving node $i$ in the current network. For $p_{ij}$ to be comparable for any two network states $x$ and $x'$, the value of the vector $X_i$ must be the same in both states. It is possible to incorporate this information into our visualizations, but for now we look at only the first step, because we know without needing any complicated conditioning steps that the previous node state $X_i$ is identical in all cases. 
 Thus we have 1,000 transition probabilities to examine: one transition probability for the first microstep taken for each of the simulations.
 %Put more precisely, let the vector $X_i = (x_{ij}|_{j \neq i}, x_{ji}|_{j \neq i}$ for $i \neq j \neq k \neq \ell \in \{1, \dots, n\}$, $p_{ij}$ is not necessarily the same \st{ARGH NOT SURE THIS IS TRUE } if the current state of the network achieved from the first microstep, denoted $X(1)$, is $X(1) = x(i \leadsto \ell)$ than is different in the case of $x_{ij}$ changing in the first step from the case of $x_{ij}$ not changing in the first step.
 %In Figure~\ref{fig:histogramalters}, we present each ego node and the resulting probabilities of tie changes. The probability shown by the bars is the theoretical probability, according to the objective function, of the ego node changing its tie to the alter node, while the probability shown by the points is the empirical probability of that change being made. The empirical probability is calculated by counting all instances of the ego node first, then computing the proportion of each different alter node change. In most cases, they are almost identical, which demonstrates that the algorithm is performing as expected. There are, however, many steps that are never taken. Some ego nodes, like 1, 4, and 16, really explore the space of all possible outgoing ties. On the other hand, nodes like 13 and 15 explore very few possible outgoing ties.  It is unclear why this would be happening; it may have something to do with the ties in wave 1, where 13 and 15 have multiple connections, while 1 and 16 have none, but there are counterexamples of well connected nodes, such as 12, that explore the space more. In addition, we can see that the ties changed most often are removing ties, not adding ties. This matches the overall pattern of the data: we see the most ties in the first wave of data, and the least ties in the third wave.
@@ -1053,7 +1053,7 @@ ggplot(data = probsDat,
 %Another way to view these transition probabilities is through the adjacency matrix visualization. 
 In Figure~\ref{fig:heatmap}, we build on the concept of the ordered adjacency matrix of Figure~\ref{fig:adjmatorder}. This heatmap shows the transition probabilities of all ties that are changed in the first microstep of the 1,000 simulations. The heatmap is noticeably sparse: %showing the lack of coverage in the model.
 of the $16^2 = 256$ possible steps for the CTMC to take, only 103, or about 40\%, are taken in the 1,000 simulated chains. This leaves %reinforces what we saw in Figure~\ref{fig:histogramalters}, where there are many paths not taken. This effect could only be exacerbated as more steps are taken in the CTMC, leading to 
-a very large area of our network space, $\mathcal{X}$, completely unexplored by the SAOM model fitting process.
+a very large area of our network space, $\mathcal{X}$, unexplored by the first steps in the SAOM model fitting process. We present additional evidence for lack of coverage in Figure~\ref{fig:alledgests} the Appendix. The Figures~\ref{fig:heatmap} and \ref{fig:alledgests} show that the model M1 and the SAOM fitting process do not explore the data space enough to adequately capture the network change mechanism, a finding we were only able to discern thanks to model visualization techniques. 
 
 <<allsteps, fig.cap="Two simulations (out of 1,000) of the microstep process from wave 1 to wave 2. The $x$ axis is the microstep number, with step 0 representing the first wave of data and the final step representing the second wave of data. We can see that many edges are underrepresented in this process: they are in the second wave, but never appear in the microsteps.", fig.height=2.5, eval = FALSE>>=
 smallfriends <- read_csv("data/smallfriends4Geomnet.csv")
@@ -1159,54 +1159,7 @@ grid.arrange(p1, p2, nrow = 2)
 
 %We also wanted to better understand the entire microstep process from the first wave, all the way through to the second wave. The number of steps taken from wave 1 to wave 2 varies. In one set of 1,000 simulations from Model 1, the smallest number of steps taken was 58, and the longest was 248, with a mean of 106 and a median of 103. In the 1,000 simulations, the standard deviation of the number of microsteps was 22.8. In Figure~\ref{fig:allsteps}, we see two simulations of the process from wave 1 to wave 2, with wave 1 shown on the left, and wave 2 shown on the right. In each of the three plots, the $y$-axis contains the edges sorted by how often they appear in the networks along the way. We can see that some edges are there in the beginning, but disappear and never come back, while others appear a few steps in, only to dispappear again. There are also some edges that were observed in wave 2 that don't appear at all in the microstep process in a given simulation. \st{So, even though the CTMC makes about the right \textit{number} of changes as it was designed to do, the changes it is making are not necessarily in the right direction.}
 
-<<alledgests, fig.height = 4, fig.cap="Visualizing all microsteps taken in 1,000 simulations from the model M1. The occurrence percent is split up into groups to correspond with its distribution: only about 10\\% of the edges appear more than 10\\% of the time in the 1,000 simulations, while about 60\\% appear less than 1\\% of the time. The first wave network is shown at microstep 0, and the second wave of the network is shown as the last microstep for comparison. We see that it is rare for a microstep process to last longer than 150 steps, and also that the edges that appear past the 150th step tend to be in either the first wave or the second wave.">>=
-# get a plot of all microsteps from w1 to w2 by edge
-alledges <- expand.grid(from = paste0("V", 1:16), to = paste0("V", 1:16))
-alledges$eid <- 1:nrow(alledges)
-
-sfmsall %>% left_join(alledges) -> sfmsall2
-
-sfmsall2 %>% group_by(rep) %>% mutate(isWave2 = (ms == max(ms))) -> sfmsall2
-
-sfmsall2 %>% group_by(from, to, eid) %>%
-  summarize(total =n()) %>%
-  arrange(desc(total)) %>%
-  ungroup %>%
-  mutate(plotorder = row_number()) -> sfmsallorder
-
-sfmsall2 %>% group_by(ms, eid) %>%
-  summarise(count = n()) %>%
-  mutate(alpha = count/1000) %>%
-  arrange(ms, eid) -> sfmsall3
-
-left_join(sfmsall3, sfmsallorder, by = "eid") -> sfmsall4
-
-#add true wave 2 to plot
-wave2 <- na.omit(actual2)
-wave2$from <- paste0("V", wave2$from)
-wave2$to <- paste0("V", wave2$to)
-wave2 <- left_join(wave2, alledges)
-wave2 <- left_join(wave2, sfmsallorder)
-
-sfmsall5 <- sfmsall4 %>% ungroup %>% add_row(ms = max(sfmsall4$ms) + 1,
-        eid = wave2$eid,
-        count = NA,
-        alpha = 1,
-        from = wave2$from,
-        to = wave2$to,
-        total = wave2$total,
-        plotorder = wave2$plotorder)
-sfmsall5$alphaFctr <- cut(sfmsall5$alpha, c(0,.01, .05, .10, .25, .5, .75, 1, 1.1))
-ggplot(data = sfmsall5) +
-  geom_tile(aes(x = ms, y = reorder(eid,-plotorder), fill = alphaFctr)) +
-  #scale_fill_gradient(low = 'grey90', high = '#0868ac', name = "occurrence %") +
-  scale_fill_brewer(palette = "Blues", name = "Occurrence %", labels = c("(0-1]%", "(1-5]%", "(5-10]%","(10-25]%", "(25-50]%", "(50-75]%", "(75-100]%")) +
-  labs(x = "Microstep No.", y = "Edges (ordered by total # occurrences)") +
-  ThemeNoNet +
-  theme(axis.ticks.y = element_blank(), axis.text.y = element_blank(), panel.grid = element_blank())
-@
-
-Finally, we combine 1,000 simulations from model M1 into a visualization that displays the entire microstep process for all simulations in Figure ~\ref{fig:alledgests}. To make this visualization, we first assign each possible edge an edge ID number so that we can keep track of it throughout all the microsteps and all the simlations. Then, we count up the total number of times each edge appears in the microstep process in each of the 1,000 simulations for use as an ordering variable later. We also count up the number of times an edge occurs in each microstep number in the 1,000 simulations. Since the number of microsteps in the process varies, the number of times an edge occurs decreases as the microstep number increases. Next, we compute a proportion, which we call the occurrence percentage, which is the number of times the edge occurred in a microstep divided by 1,000. Finally, we visualize all this information together in Figure~\ref{fig:alledgests}. In this plot, all possible edges are shown, and we see that every one of the $16 \times 15 = 240$ possible edges in the network occurs at some point in the simulation process. We also see, however, that the process struggles to focus in on the edges in the second wave of the data. Ideally, we would like to see more occurrences of the edges which appear in the second wave of data. But, about half of the edges in wave two are in the bottom half when ordered by number of occurrences, meaning they do not appear as much as they would if the model was truly excellent at capturing the mechanisms of tie change in the network. This solidifies what we found in Figure~\ref{fig:heatmap}: the model M1 and the SAOM fitting process do not explore the data space enough to adequately capture the network change mechanism. %In addition, there is not a distinct pattern or structure that we can see in this particular edge visualization. The edges that the model starts with appear more often in the first 50 or so microsteps than any other set of edges. This makes sense, because we condition on the first wave, but it would be better if the model explored the space of possible edges more than it currently does. It could be that the simple model M1 is not complicated enough for the friendship dynamics in the data, or it could be that the chains in the MCMCs ``get stuck" when exploring the parameter space, but we cannot know this .}
+ %In addition, there is not a distinct pattern or structure that we can see in this particular edge visualization. The edges that the model starts with appear more often in the first 50 or so microsteps than any other set of edges. This makes sense, because we condition on the first wave, but it would be better if the model explored the space of possible edges more than it currently does. It could be that the simple model M1 is not complicated enough for the friendship dynamics in the data, or it could be that the chains in the MCMCs ``get stuck" when exploring the parameter space, but we cannot know this .}
 
 % \st{The algorithms here are many!
 % \begin{enumerate}
@@ -1453,3 +1406,54 @@ ggplot() +
 #}
 #plots
 @
+
+Finally, we combine 1,000 simulations from model M1 into a visualization that displays the entire microstep process for all simulations in Figure ~\ref{fig:alledgests}. To make this visualization, we first assign each possible edge an edge ID number so that we can keep track of it throughout all the microsteps and all the simlations. Then, we count up the total number of times each edge appears in the microstep process in each of the 1,000 simulations for use as an ordering variable later. We also count up the number of times an edge occurs in each microstep number in the 1,000 simulations. Since the number of microsteps in the process varies, the number of times an edge occurs decreases as the microstep number increases. Next, we compute a proportion, which we call the occurrence percentage, which is the number of times the edge occurred in a microstep divided by 1,000. Finally, we visualize all this information together in Figure~\ref{fig:alledgests}. In this plot, all possible edges are shown, and we see that every one of the $16 \times 15 = 240$ possible edges in the network occurs at some point in the simulation process. We also see, however, that the process struggles to focus in on the edges in the second wave of the data. Ideally, we would like to see more occurrences of the edges which appear in the second wave of data. But, about half of the edges in wave two are in the bottom half when ordered by number of occurrences, meaning they do not appear as much as they would if the model was truly excellent at capturing the mechanisms of tie change in the network. This solidifies what we found in Figure~\ref{fig:heatmap}: the model M1 and the SAOM fitting process do not explore the data space enough to adequately capture the network change mechanism.
+
+<<alledgests, fig.height = 4, fig.cap="Visualizing all microsteps taken in 1,000 simulations from the model M1. The occurrence percent is split up into groups to correspond with its distribution: only about 10\\% of the edges appear more than 10\\% of the time in the 1,000 simulations, while about 60\\% appear less than 1\\% of the time. The first wave network is shown at microstep 0, and the second wave of the network is shown as the last microstep for comparison. We see that it is rare for a microstep process to last longer than 150 steps, and also that the edges that appear past the 150th step tend to be in either the first wave or the second wave.">>=
+# get a plot of all microsteps from w1 to w2 by edge
+alledges <- expand.grid(from = paste0("V", 1:16), to = paste0("V", 1:16))
+alledges$eid <- 1:nrow(alledges)
+
+sfmsall %>% left_join(alledges) -> sfmsall2
+
+sfmsall2 %>% group_by(rep) %>% mutate(isWave2 = (ms == max(ms))) -> sfmsall2
+
+sfmsall2 %>% group_by(from, to, eid) %>%
+  summarize(total =n()) %>%
+  arrange(desc(total)) %>%
+  ungroup %>%
+  mutate(plotorder = row_number()) -> sfmsallorder
+
+sfmsall2 %>% group_by(ms, eid) %>%
+  summarise(count = n()) %>%
+  mutate(alpha = count/1000) %>%
+  arrange(ms, eid) -> sfmsall3
+
+left_join(sfmsall3, sfmsallorder, by = "eid") -> sfmsall4
+
+#add true wave 2 to plot
+wave2 <- na.omit(actual2)
+wave2$from <- paste0("V", wave2$from)
+wave2$to <- paste0("V", wave2$to)
+wave2 <- left_join(wave2, alledges)
+wave2 <- left_join(wave2, sfmsallorder)
+
+sfmsall5 <- sfmsall4 %>% ungroup %>% add_row(ms = max(sfmsall4$ms) + 1,
+        eid = wave2$eid,
+        count = NA,
+        alpha = 1,
+        from = wave2$from,
+        to = wave2$to,
+        total = wave2$total,
+        plotorder = wave2$plotorder)
+sfmsall5$alphaFctr <- cut(sfmsall5$alpha, c(0,.01, .05, .10, .25, .5, .75, 1, 1.1))
+ggplot(data = sfmsall5) +
+  geom_tile(aes(x = ms, y = reorder(eid,-plotorder), fill = alphaFctr)) +
+  #scale_fill_gradient(low = 'grey90', high = '#0868ac', name = "occurrence %") +
+  scale_fill_brewer(palette = "Blues", name = "Occurrence %", labels = c("(0-1]%", "(1-5]%", "(5-10]%","(10-25]%", "(25-50]%", "(50-75]%", "(75-100]%")) +
+  labs(x = "Microstep No.", y = "Edges (ordered by total # occurrences)") +
+  ThemeNoNet +
+  theme(axis.ticks.y = element_blank(), axis.text.y = element_blank(), panel.grid = element_blank())
+@
+
+Much of the code used to create these plots has been packaged an posted online at https://github.com/sctyner/netvizinf and https://github.com/sctyner/geomnet (also on CRAN). Additional, non-packaged code can be found at https://github.com/sctyner/SAOM-removing-blindfold. 
