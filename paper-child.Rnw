@@ -87,7 +87,7 @@ ThemeNet <- theme_net() %+replace%
                   strip.background = element_rect(colour = "black", fill = "white"))
 @
 
-\section{Introduction}
+\section{Introduction \& Background}
 
 Social networks, such as collaboration networks between academic researchers or friendship networks in a school or university have been studied for decades. Statistical models such as exponential random graph models (ERGM) and latent space models (LSM) are often used when studying one observation of a network when trying to model its structure. Social networks can also be observed at many points in time, and ERGM or LSM may not be appropriate for modelling the changes because they do not model network change as time passes. When studying \textit{dynamic networks}, networks observed at many time points, we need a model that allows for variation in the network over time. Models for dynamic social networks hold a great deal of potential because of how realistic they can be. Social networks do not form spontaneously, but rather they \textit{evolve} over time as edges are formed and dissolved, and new nodes join the social structure. Modeling the underlying mechanisms that create network changes in time is very complex but also provides potential to uncover hidden truths.
 
@@ -99,17 +99,17 @@ Social networks, such as collaboration networks between academic researchers or 
 
 The remainder of this paper is organized as follows: In Section~\ref{sec:netintro}, we introduce basic concepts of networks and network visualizations. In Section~\ref{sec:saoms}, we formally define the family of stochastic actor-oriented models for social network analysis. In Section~\ref{sec:ModelVis}, we combine concepts from Sections~\ref{sec:netintro} and \ref{sec:saoms} in an application of the model-vis paradigm, and conclude with a discussion in Section~\ref{sec:discussion}.
 
-\section{Networks and their Visualizations} \label{sec:netintro}
+\subsection{Networks and their Visualizations} \label{sec:netintro}
 
 We provide a brief introduction to the structure of network data and common network visualization methods. 
 
-\subsection{Introduction to Network Structures}
+\subsubsection{Introduction to Network Structures}
 
 Network data across fields have similar data structures. There are always units of observation and connections between those units. In a social network, the units of observations, called \textit{nodes} or \textit{actors}, may be people, while the connections, called \textit{edges} or \textit{ties}, are the relationships between people. Networks often change over time, like when new relationships are formed in a social network. The nodes and edges themselves can also have inherent variables of interest, e.g.\ the age, gender, and political affiliation of people in a social network and the type of relationship (friends, married, etc.).
 
 These two network data structures pose unique problems to analysts, such as, ``How does the strength of a tie between two nodes affect the overall structure of the network?" or ``Do differences in node variables affect the formation of edges?" We propose to answer these questions and more through visual exploration of network data and models.
 
-\subsection{Visualizing Network Data} \label{sec:netvizintro}
+\subsubsection{Visualizing Network Data} \label{sec:netvizintro}
 
 Network visualization, also called network mapping, is a prominent subfield of network analysis. Visualizing network data is uniquely difficult because of the structure of the data itself.  Most data visualizations rely on well-defined axes inherited from the data, such as Cartesian coordinates or spatial locations. Network data, however, carry no such inherent structure. 
 
@@ -165,19 +165,17 @@ We only consider the presence or absence of an edge, but if the network has weig
 \par Each visualization comes with its own advantages and disadvantages. For instance, paths between two nodes in a network are easier to determine with node-link diagrams than with adjacency matrix visualizations \citep{adjmatviz}. In node-link diagrams, node-level information can be incorporated into the visualization by coloring or changing the shape of the points, and edge-level information can be incorporated by coloring the lines, or changing their thickness or linetype. Incorporating a node-level variable into an adjacency matrix visualization is not as straightforward or simple, because this type of visualization features the edges. Adjacency matrix visualization can, however, be useful when the network is very complex, dense, or large \citep{adjmatviz}.% Experimental studies have shown adjacency matrix visualization to be superior to node-link diagrams for large networks. For example, for basic perceptual tasks on networks, including node and edge count, adjacency matrix visualizations outperform node-link diagrams as the size and density of the network increases \citep{adjmatviz}. One drawback of the adjacency matrix visualization that \citeauthor{adjmatviz} found was that edges are overrepresented for undirected graphs, due to the symmetry of $\mathbf{A}$: the edge $i \rightarrow j$ for $i \neq j$ appears in $\mathbf{A}$ twice: in $A_{ij}$ and $A_{ji}$, and so it also appears twice in the adjacency matrix visualization. This is an advantage, however, for \emph{directed} graphs, where exactly the correct number of edges is represented in a matrix visualization. A node-link diagram, however, may underrepresent the edge count if the edges $x_{ij}$ and $x_{ji}$ both exist and are drawn on top of one another. 
 Ultimately, there is no one ``correct" way to visualize network information, and we will be using both the node-link and adjacency matrix visualization methods throughout this paper to explore social networks and stochastic actor-oriented models.
 
-\section{Defining SAOMs} \label{sec:saoms}
+\subsection{Defining SAOMs} \label{sec:saoms}
 
 A Stochastic Actor-Oriented Model (SAOM) is a model that incorporates all three data levels of dynamic networks: actor, tie, and temporal information. It models the change of a network in time, while accounting for changes in network structure due to actor-level covariates. This model was first introduced by Snijders in 1996 \citep{saompaper}. The two titular properties of SAOMs, stochasticity and actor-orientation, are key to understanding networks as they exist naturally. Most social networks, even holding constant the set of actors over time, are ever-changing as relationships decay or grow in seemingly random ways. Actors in social networks also have inherent properties that could affect how they change their role within the network, and existing ties may affect formation or dissolution of other ties.
 
-\subsection{Definitions, Terminology, and Notation}
+\subsubsection{Definitions, Terminology, and Notation}
 
 We use the term \textit{dynamic network} to refer to a network, consisting of a fixed set of $n$ nodes, that is changing over time, and is observed at $M$ discrete time points, $t_1, \dots, t_M$ with $t_1 \le t_2 \le \dots \le t_M$. We denote the network observation at timepoint $t_k$ by $x(t_k)$. The SAOM assumes that this longitudinal network of discrete observations is embedded within a continuous time Markov chain (CTMC), which we will denote $X(T)$. This process is almost entirely unobserved: we assume that the beginning of the process, $X(0)$, is equivalent to the first network observation $x(t_1)$, while the end of the process, $X(\infty)$, is equivalent to the last observation $x(t_M)$. Nearly all other steps in the chain are unseen, with the exception of $x(t_2), \dots, x(t_{M-1})$. Unlike the first and last observations of the network, these ``in-between" observations do not have direct correspondence with steps in the continuous time Markov chain. Thus, the ``in-between" observations are considered to be ``snapshots" of the network at some point between two steps in the CTMC. 
 
-The CTMC process $X(T)$ is a series of single tie changes that happen according to some pre-defined rate function (Section \ref{sec:saomratefn}), where one actor at a time is selected and it adds or removes one outgoing tie, or does nothing. Once an actor is chosen at random according to the rate function, it is ``given" the chance to change a tie, and it tries to maximize its utility function (Section \ref{sec:saomobjfn}) based on the current and possible future states of the network. 
+The CTMC process $X(T)$ is a series of single tie changes that happen according to a pre-defined rate function, where one actor at a time is selected and it adds or removes one outgoing tie, or does nothing. Once an actor is chosen at random according to the rate function, it is ``given" the chance to change a tie, and it tries to maximize its utility function based on the current and possible future states of the network. 
 
-\subsubsection{The Rate Function}\label{sec:saomratefn}
-
-In general, each actor $i$ in the network $x$ may change its ties, $x_{ij}$, to other nodes $j \neq i$ according to the SAOM's  \emph{rate function}, $\rho(x, \mathbf{z}, \boldsymbol{\alpha})$, where $\boldsymbol{\alpha}$ are the parameters in the function $\rho$, and $x$ is the current network state, with covariates of interest $\mathbf{z}$. With this general formulation, it is possible that each node will have a different rate of change. We assume a simple rate function, $\rho(x, \mathbf{z}, \boldsymbol{\alpha}) = \alpha_m$ that is constant across all actors between time $t_m$ and $t_{m+1}$. With this simple rate function, we have just one set of rate parameters in the overall model. In this simple model, the rate parameters dictate how often an actor $i$ ``gets an opportunity" to change one of its ties, $x_{ij}$, for $j \in \{1, \dots, n\}$ in the time period from $t_{m}$ to $t_{m+1}$ for $m = 1, \dots, M-1$ (Note that when $j = i$, no change is made.) We also assume that the actors $i$ are conditionally independent given their ties, $x_{i1}, \dots, x_{in}$ at the current network state. Let $\tau(i|x,m) $ be the wait time until actor $i$ gets to the opportunity to change its current set of ties. For any time point, $T$, where $t_{m} \leq T < t_{m+1}$, the waiting time to the next change made by actor $i$ is exponentially distributed with expected value $\alpha_m^{-1}$. Then, we express this in Equation~\ref{eq:c1}.
+\textbf{The Rate Function} In general, each actor $i$ in the network $x$ may change its ties, $x_{ij}$, to other nodes $j \neq i$ according to the SAOM's  \emph{rate function}, $\rho(x, \mathbf{z}, \boldsymbol{\alpha})$, where $\boldsymbol{\alpha}$ are the parameters in the function $\rho$, and $x$ is the current network state, with covariates of interest $\mathbf{z}$. With this general formulation, it is possible that each node will have a different rate of change. We assume a simple rate function, $\rho(x, \mathbf{z}, \boldsymbol{\alpha}) = \alpha_m$ that is constant across all actors between time $t_m$ and $t_{m+1}$. With this simple rate function, we have just one set of rate parameters in the overall model. In this simple model, the rate parameters dictate how often an actor $i$ ``gets an opportunity" to change one of its ties, $x_{ij}$, for $j \in \{1, \dots, n\}$ in the time period from $t_{m}$ to $t_{m+1}$ for $m = 1, \dots, M-1$ (Note that when $j = i$, no change is made.) We also assume that the actors $i$ are conditionally independent given their ties, $x_{i1}, \dots, x_{in}$ at the current network state. Let $\tau(i|x,m) $ be the wait time until actor $i$ gets to the opportunity to change its current set of ties. For any time point, $T$, where $t_{m} \leq T < t_{m+1}$, the waiting time to the next change made by actor $i$ is exponentially distributed with expected value $\alpha_m^{-1}$. Then, we express this in Equation~\ref{eq:c1}.
 
 \begin{equation} \label{eq:c1}
  \tau(i|x,m) | x_{i1}(m), \dots, x_{in}(m) \stackrel{\text{iid}}{\sim} Exp(\alpha_m)
@@ -189,9 +187,7 @@ C = \sum_i\sum_j |x_{ij}(t_{m+1}) - x_{ij}(t_m)|
 \end{equation}
 which is the total number of changes from observation at time $t_m$ to the observation at time $t_{m+1}$. 
 
-\subsubsection{The Objective Function}\label{sec:saomobjfn}
-
-Because of the conditional independence assumptions given in Equation~\ref{eq:c1}, we can consider the objective function for each node separately, as only one tie from one node is changing at a time in the CTMC. The node $i$, which is the node that is given the opportunity to change at the current time point, is called the \textit{ego} node. It has the potential to interact with all other nodes in the network, $j \neq i$. These nodes $j$, are referred to as \textit{alter} nodes, and do not change any of their ties when $i$ may change. For the ego node $i$ in the current network state $x$, its \emph{objective function}, which it tries to maximize, is written as
+\textbf{The Objective Function} Because of the conditional independence assumptions given in Equation~\ref{eq:c1}, we can consider the objective function for each node separately, as only one tie from one node is changing at a time in the CTMC. The node $i$, which is the node that is given the opportunity to change at the current time point, is called the \textit{ego} node. It has the potential to interact with all other nodes in the network, $j \neq i$. These nodes $j$, are referred to as \textit{alter} nodes, and do not change any of their ties when $i$ may change. For the ego node $i$ in the current network state $x$, its \emph{objective function}, which it tries to maximize, is written as
 \begin{equation} \label{eq:of1}
 f_i(\boldsymbol{\beta}, x) = \sum_k \beta_k s_{ik}(x, \mathbf{Z}),
 \end{equation}
@@ -261,7 +257,7 @@ When $i = j$, the numerator represents the exponential of the value of the objec
 % $$e^{(t_m - t_{m-1})\mathbf{Q}},$$
 % where $\mathbf{Q}$ is the matrix defined above and $e^X$ for a real or complex square matrix $X$ is equal to $\sum_{k=0}^{\infty} \frac{1}{k!} X^k$.
 
-\subsection{Fitting Models to Data}
+\subsubsection{Fitting Models to Data}
 
 To fit a SAOM to dynamic network data, we apply the \texttt{RSiena} software, which uses simulation methods to estimate parameter values using either MoM or maximum likelihood (ML) estimation \citep{RSiena}. We chose to use MoM estimation, so we describe that fitting process here, and more information on ML estimation can be found in \citet{SienaAlgs}. %because the theory behind it was established in \citet{saompaper}, while the maximum likelihood estimation methods were not fully established until \citet{saomsml2010}, though \texttt{RSiena} contains capabilities to use maximum likelihood estimation. We also use the score function method for estimating the derivatives of the expected values, as opposed to the finite differences method, both of which are outlined in detail in .
 
@@ -339,9 +335,9 @@ In each of the the first two phases of the algorithm, the procedure uses ``micro
 %This function draws a box plot and a violin plot at each value of the statistic of interest observed in the simulations: \st{on the $x$-axis, the out(in)degrees observed in the data ($0, 1, 2, 3, \dots$), and on the $y$-axis, the cumulative number of times that out(in)degree value appears in the simulations and the data.} In order to compare the distribution of the counts of nodes with the specified degree as calculated on the simulated networks to the counts observed in the true data, red points connected by red lines representing the observed values are superimposed on the boxplots. If the red points lie "well within" the simulated values, the model is a good fit to the data. \st{This plot is not shown because it is not intuitive for understanding network data. Boxplots separated by the many outdegree values observed do not communicate \textit{how} the nodes are connected, just that some have more connections than others. In order to understand the fit of the model, we should try to understand how well the model captures the\textit{overall} structure of the network, not just one or two summary measurements of that structure.} %The model examined in Figure~\ref{fig:sienagof} appears to do a better job of capturing the outdegree distribution than the indegree distribution of the data.
 %In Section~\ref{sec:minds}, we propose a new way of visualizing goodness-of-fit that uses the traditional node-link diagram to visualize the entire network instead of numerical summaries of the the network.
 
-\subsection{Example Data}
+\section{Example Data and Models}
 
-<<adjmatviz, fig.align='center', fig.cap="A visualization of the adjacency matrices of the three waves of network observations in the ``Teenage Friends and Lifestyle Study'' data. The subset we will be using is outlined in red.", results='hide',fig.show='asis', fig.width=8, fig.height=3>>=
+<<adjmatviz, fig.align='center', fig.cap="A visualization of the adjacency matrices of the three waves of network observations in the ``Teenage Friends and Lifestyle Study'' data. The subset we will be using is outlined in red.", results='hide',fig.show='asis', fig.width=8, fig.height=3, eval = FALSE>>=
 source("code/00e_small_friends.R")
 view_rs2$wave <- factor(view_rs2$wave)
 levels(view_rs2$wave) <- c("Wave 1", "Wave 2", "Wave 3")
@@ -358,6 +354,9 @@ ggplot(data= view_rs2, aes(x = y, y=-x)) +
 @
 
 <<alldataviz, fig.cap="The smaller friendship network data we will be modelling throughout the paper. The nodes change color as their drinking behavior changes, and the network becomes less densely connected over time. These are the mechanisms we hope to capture with SAOMs.", out.width='.99\\textwidth', fig.height=3>>=
+source("code/00e_small_friends.R")
+view_rs2$wave <- factor(view_rs2$wave)
+levels(view_rs2$wave) <- c("Wave 1", "Wave 2", "Wave 3")
 actual1 <- merge(data.frame(as.edgelist(as.network(fd2.w1))),
                  data.frame(id = 1:16, drink = drink2[,1]),
                  by.x = "X1", by.y = "id", all = T)
@@ -390,7 +389,8 @@ alldataviz
 @
 
 To guide our visual exploration of SAOMs, we use two example data sources. The first is a subset of the 50 actor dataset from the ``Teenage Friends and Lifestyle Study" that is provided on the \texttt{RSiena} webpage. These data come from \citet{friendsdata}, and we chose to only work with a subset of the data to make node-link diagrams easier to see and to make any changes in the network more noticeable. %To determine which subset to select, we visualized all waves of the full network using the adjacency matrix visualization approach, which we show in Figure~\ref{fig:adjmatviz}. This adjacency matrix visualization is different from the one in Figure~\ref{fig:toyplots} because it does not show the node IDs on the axes. The network in Figure~\ref{fig:adjmatviz} is much larger than our toy data example, so we remove the node labels to remove clutter. In all three adjacency matrices, the ego and the alter nodes are ordered by node ID, 1-50, which were determined arbitrarily by the relationships in wave 1. 
-In Figure~\ref{fig:adjmatviz}, we show the adjacency matrix visualization of all three observations of this network, with the subset we selected for analysis outlined in red. This subset contains 16 actors, their ties and their drinking behavior for three timepoints. The node-link visualization of the data is provided in Figure~\ref{fig:alldataviz}. For model fitting, we condition on wave 1 and estimate the parameters of the models for the second and third waves. The actor-level categorical covariate, drinking behavior, has four values: (1) does not drink, (2) drinks once or twice a year, (3) drinks once a month, and (4) drinks once a week. In Figure~\ref{fig:alldataviz}, the nodes are colored according to the drinking behavior of that student. Over time, we can see that the students tend to drink more and become increasingly isolated into smaller groups. An analysis of this type of data with a SAOM should capture these dynamics in a way that allows the researcher to draw conclusions about the nature of the network and behavioral forces at play.
+%In Figure~\ref{fig:adjmatviz}, we show the adjacency matrix visualization of all three observations of this network, with the subset we selected for analysis outlined in red. This subset contains 16 actors, their ties and their drinking behavior for three timepoints. 
+The node-link visualization of this data is provided in Figure~\ref{fig:alldataviz}. For model fitting, we condition on wave 1 and estimate the parameters of the models for the second and third waves. The actor-level categorical covariate, drinking behavior, has four values: (1) does not drink, (2) drinks once or twice a year, (3) drinks once a month, and (4) drinks once a week. In Figure~\ref{fig:alldataviz}, the nodes are colored according to the drinking behavior of that student. Over time, we can see that the students tend to drink more and become increasingly isolated into smaller groups. An analysis of this type of data with a SAOM should capture these dynamics in a way that allows the researcher to draw conclusions about the nature of the network and behavioral forces at play.
 
 The second data example we use is a collaboration network in the United States Senate during the $111^{th}$ through $114^{th}$ Congresses. These sessions of congress correspond to the years of Barack Obama's presidency, from 2009-2016. (Details of how this data can be downloaded are provided by François Briatte at \url{https://github.com/briatte/congress}). In this network, ties are directed from senator $i$ to senator $j$ when senator $i$ cosponsors the bill that senator $j$ authored. There are hundreds of ties between senators when they are connected in this way, so we simplify the network by computing a single value for each pair of senators called the \textit{weighted propensity to cosponsor} (WPC). This value is defined in \citet{senate} as
 \begin{equation}\label{eq:sen1}
@@ -431,17 +431,7 @@ Because we require binary edges for SAOMs, we focus only on very strong collabor
 \end{equation}
 The node-link diagram for the four senates during the Obama administration are shown in Figure~\ref{fig:senateplot}. We can see that Senate 111 is much more densely connected than the other three, which have one large, sparsely connected component with a few smaller connected groups throughout. Some prominent names are shown to demonstrate their place in the network. 
 
-We use these two example newtoks to demonstrate our model visualization methods for SAOMs in section~\ref{sec:ModelVis}
-
-\section{Model Visualizations} \label{sec:ModelVis}
-
-Every good data analysis includes both numerical and visual summaries of the data, so why restrict model description and diagnostics to numerical summaries? The concept of model visualization was developed to complement traditional model diagnostic tools such as $R^2$ values and residual plots \citep{modelvis}. When performing analyses, there are three different types of ``model": the model family, the model form, and the fitted model. The latter is primarily what one thinks of first when considering a model in a data analysis, where a specified model is fit to data, and parameter estimates are reported.% In the context of SAOMs, the \emph{fitted model} contains the form of the rate and objective functions, the estimated rate parameters, and the estimated objective function parameters. 
-The \textit{model form} describes the the model \textit{before} the fitting process, defining which parameters are in the model within the context of the larger model family.% In SAOMs, the \emph{model form} includes description of the rate and objective functions and the variables therein that describe how the network evolves over time. 
-Finally, the \textit{model family} is the broadest description of the model. This is the type of model that you wish to fit to the data, and is chosen based on the problem, data, and knowledge at hand. %For example, we chose to use a SAO \emph{model family} to model our network data over an exponential random graph model (ERGM) because we believe that actor-level variables effect network structure and formation, and we wanted to model the network changes over time.
-
-The model family, the model form, and the fitted model can each be visualized according to the three principles of model visualization: we can view the model in the data space, visualize collections of models, and explore the process of fitting the model, not just the end result. Since we have already decided on our model family, SAOMs, we shift our focus to the fitted model and the model form. Specifically, we want to learn more about how the \emph{model form} we choose affects the \emph{fitted model} by using our example data sets and our visualization toolbox. We begin by introducing the five models that we fit to our example data. We then use the five models to guide our visual explorations of SAOMs under the three principles of model visualization. %We begin with novel tools and ideas to view a SAOM in the data space of a dynamic network. We then explore collections of the same models fit many times to the example data to see how the simulation processes in the \texttt{RSiena} ``black-box" affect the model fits. Finally, we look behind the scenes and into the individual steps of the continuous time Markov chain to learn more about how this ``hidden data" mechanism works and how it results in a fitted model.
-
-\subsection{The Models}\label{sec:models}
+\subsection{Models}
 
 We first consider the 16 actor subset of the teenage friends and lifestyle data show in Figure~\ref{fig:alldataviz}. To this data, we fit three different SAOMs. Each SAOM used a simple rate function, $\alpha_m$, and an objective function with two or three parameters. The first model, M1, contains the absolute minimum number of parameters in the objective function $f_i(x)$: 
 \begin{equation}\label{eq:m1}
@@ -509,7 +499,13 @@ In Section~\ref{sec:samemoddiffdat}, we also fit models M1, M2, and M3 to the se
 %In M4, $s_{i5} = \mathbb{I}(x_{i+} = x_{+i} = 0)$ is an indicator variable for isolated nodes, called the network-isolate effect. This parameter attempts to measure the effect of a node being completely isolated in the network. If the value of the parameter $\beta_5$ is high, nodes are encouraged to remain isolated. In M5,  $s_{i6} = \sum\limits_j x_{ij}x_{ji}\mathbb{I}(z_i = z_j)$ is a measure of reciprocity between senators in the same party, $z_i, z_j \in \{\text{Democrat, Independent, Republican}\}$, generally called the same covariate reciprocity effect. The values of the covariate are converted to numeric, $\{1,2,3\}$, respectively, and mean-centered within \texttt{RSiena}. The mean-centered values of $z \in \{\text{Democrat, Independent, Republican}\}$ are $\{-0.96, 0.04, 1.04\}$. The parameter $\beta_6$ attempts to measure the propensity for forming reciprocal ties between nodes with the same covariate value. If the value of the parameter $\beta_6$ is high, nodes belonging to the same covariate group are encourage to reciprocate incoming ties.
 
 
-\subsection{View the model in the data space}\label{sec:minds}
+\section{Model in the data space}\label{sec:minds}
+
+Every good data analysis includes both numerical and visual summaries of the data, so why restrict model description and diagnostics to numerical summaries? The concept of model visualization was developed to complement traditional model diagnostic tools such as $R^2$ values and residual plots \citep{modelvis}. When performing analyses, there are three different types of ``model": the model family, the model form, and the fitted model. The latter is primarily what one thinks of first when considering a model in a data analysis, where a specified model is fit to data, and parameter estimates are reported.% In the context of SAOMs, the \emph{fitted model} contains the form of the rate and objective functions, the estimated rate parameters, and the estimated objective function parameters. 
+The \textit{model form} describes the the model \textit{before} the fitting process, defining which parameters are in the model within the context of the larger model family.% In SAOMs, the \emph{model form} includes description of the rate and objective functions and the variables therein that describe how the network evolves over time. 
+Finally, the \textit{model family} is the broadest description of the model. This is the type of model that you wish to fit to the data, and is chosen based on the problem, data, and knowledge at hand. %For example, we chose to use a SAO \emph{model family} to model our network data over an exponential random graph model (ERGM) because we believe that actor-level variables effect network structure and formation, and we wanted to model the network changes over time.
+
+The model family, the model form, and the fitted model can each be visualized according to the three principles of model visualization: we can view the model in the data space, visualize collections of models, and explore the process of fitting the model, not just the end result. Since we have already decided on our model family, SAOMs, we shift our focus to the fitted model and the model form. Specifically, we want to learn more about how the \emph{model form} we choose affects the \emph{fitted model} by using our example data sets and our visualization toolbox. We begin by introducing the five models that we fit to our example data. We then use the five models to guide our visual explorations of SAOMs under the three principles of model visualization. %We begin with novel tools and ideas to view a SAOM in the data space of a dynamic network. We then explore collections of the same models fit many times to the example data to see how the simulation processes in the \texttt{RSiena} ``black-box" affect the model fits. Finally, we look behind the scenes and into the individual steps of the continuous time Markov chain to learn more about how this ``hidden data" mechanism works and how it results in a fitted model.
 
 The first way we hope to better understand SAOMs is by viewing the model(s) in the data space. In \citeauthor{modelvis}, they chose define the \textit{data space} as ``the region over which we can reliably make inferences, usually a hypercube containing the data" \citep[p.~206]{modelvis}. But what does this definition mean for network models? We define the data space as the combined data structures of the network: the node, edge, and time information.
 %We want to make inferences on parameters in the model, but the multi-level data structure of networks makes the ``region of inference" difficult to define.
@@ -572,21 +568,35 @@ M1parms <- (means %>% filter(Model == "M1"))$means
 M2parms <- (means %>% filter(Model == "M2"))$means
 M3parms <- (means %>% filter(Model == "M3"))$means
 set.seed(4231352)
-M1sims1000 <- netvizinf::saom_simulate(dat = mydata,
-                            struct = M1eff,
-                       parms = as.numeric(M1parms),
-                       N = 1000)
-M2sims1000 <- netvizinf::saom_simulate(dat = mydata,
-                            struct = M2eff,
-                       parms = as.numeric(M2parms),
-                       N = 1000)
-M3sims1000 <- netvizinf::saom_simulate(dat = mydata,
-                            struct = M3eff,
-                       parms = as.numeric(M3parms),
-                       N = 1000)
-M1simsdf <- netvizinf::sims_to_df(M1sims1000)
-M2simsdf <- netvizinf::sims_to_df(M2sims1000)
-M3simsdf <- netvizinf::sims_to_df(M3sims1000)
+#M1sims1000 <- netvizinf::saom_simulate(dat = mydata,
+#                            struct = M1eff,
+#                       parms = as.numeric(M1parms),
+#                       N = 1000)
+#save(M1sims1000, file = "data/M1sims1000.RData")
+load("data/M1sims1000.RData")
+# M2sims1000 <- netvizinf::saom_simulate(dat = mydata,
+#                             struct = M2eff,
+#                        parms = as.numeric(M2parms),
+#                        N = 1000)
+# save(M2sims1000, file = "data/M2sims1000.RData")
+load("data/M1sims1000.RData")
+# M3sims1000 <- netvizinf::saom_simulate(dat = mydata,
+#                             struct = M3eff,
+#                        parms = as.numeric(M3parms),
+#                        N = 1000)
+# save(M3sims1000, file = "data/M3sims1000.RData")
+load("data/M3sims1000.RData")
+
+#M1simsdf <- netvizinf::sims_to_df(M1sims1000)
+# write_csv(M1simsdf, "data/M1simsdf.csv")
+M1simsdf <- read_csv("data/M1simsdf.csv")
+#M2simsdf <- netvizinf::sims_to_df(M2sims1000)
+#write_csv(M2simsdf, "data/M2simsdf.csv")
+M2simsdf <- read_csv("data/M2simsdf.csv")
+# M3simsdf <- netvizinf::sims_to_df(M3sims1000)
+# write_csv(M3simsdf, "data/M3simsdf.csv")
+M3simsdf <- read_csv("data/M3simsdf.csv")
+
 M1avgW2 <- M1simsdf %>% filter(!is.na(to) & wave == 1) %>%
   group_by(from, to) %>%
   summarise(count = n()) %>%
@@ -672,7 +682,59 @@ grid.arrange(p2, p1, p3, nrow = 1)
 Another way to view the model in the data space is through simulation from the model. No one network simulated from a SAOM is going to look like the data or represent the model, so we might want to look at an ``average network" or ``expected network" value. We frequently rely on averages and expected values in data analyses, but network models, especially those as complex as SAOMs, lack a expected network value measure. We could talk about expected values of parameters, but the parameters can be hard to interpret. %Expected values of parameters can be computed, but if they cannot directly tell us anything about our dependent variable, they lose value. 
 There is no defined expected value of an simulation from a network model, though there are with most other model simulations. How then, can we arrive at an ``average" network? We answer this question through visualization.
 
-For network data, one way we view an ``average" network is through a sory of summary network drawn using the traditional node-link diagram. In Figure~\ref{fig:summnetM1}, we show an \textit{average network} created with 1,000 simulations of the second wave of the network from Model 1. To make this average network, we first simulated 1,000 wave 2 and wave 3 observations of our small friendship example data from model M1, for which parameters had previously been estimated. We then combine the 1,000 simulated instances of wave 2, and count up the number of times each edge appears in a network simulation. Then, we combine these 1,000 networks into a single network with edgeweight equal to the proportion of time that edge appears in our 1,000 simulations. This weighted edgelist is the network we draw in Figure~\ref{fig:summnetM1}. An edge is only drawn in the average network if it appears in at least 51 of the 1000 simulations, with edges that appear with greater frequency emphasized by thicker linewidths and a darker color. On either side of the average network in Figure~\ref{fig:summnetM1}, we show the actual data, wave 1 on the left, and wave 2 on the right. We can see that the structure of the average network is much more similar to the first wave than to the second wave. However, the simulations are supposed to represent the second wave of data on the right of Figure~\ref{fig:summnetM1}. This is an indication that the simple model, M1, is doing a very poor job of capturing the change mechanism from the first to the second wave of observation. The average network can thus be used to help determine model goodness-of-fit. Because the the average network looks more like the first wave than the second wave, we can use the visualization in Figure~\ref{fig:summnetM1} as evidence of poor model fit.  
+For network data, we view an ``average" network through a sort of summary network drawn using the traditional node-link diagram. In Figure~\ref{fig:summnetM1}, we show an \textit{average network} created with 1,000 simulations of the second wave of the network from Model 1. To make this average network, we first simulated 1,000 wave 2 and wave 3 observations of our small friendship example data from model M1, for which parameters had previously been estimated. We then combine the 1,000 simulated instances of wave 2, and count up the number of times each edge appears in a network simulation. Then, we combine these 1,000 networks into a single network with edgeweight equal to the proportion of time that edge appears in our 1,000 simulations. This weighted edgelist is the network we draw in Figure~\ref{fig:summnetM1}. An edge is only drawn in the average network if it appears in at least 51 of the 1000 simulations, with edges that appear with greater frequency emphasized by thicker linewidths and a darker color. On either side of the average network in Figure~\ref{fig:summnetM1}, we show the actual data, wave 1 on the left, and wave 2 on the right. We can see that the structure of the average network is much more similar to the first wave than to the second wave. However, the simulations are supposed to represent the second wave of data on the right of Figure~\ref{fig:summnetM1}. This is an indication that the simple model, M1, is doing a very poor job of capturing the change mechanism from the first to the second wave of observation. The average network can thus be used to help determine model goodness-of-fit. Because the the average network looks more like the first wave than the second wave, we can use the visualization in Figure~\ref{fig:summnetM1} as evidence of poor model fit.  
+
+<<summary2, fig.height=2.5, fig.cap="Network differences between the average network from M1 and the first and second data waves. The green edges represent edges in the average network that are not in the data, while red edges are in the data but not in the average network. Black edges are in both the data and the average, and the edgeweight represents the rate at which that edge shows up in simulations.">>=
+am_t1 <- as.matrix(igraph::as_adj(igraph::graph_from_data_frame(arrange(t1, parse_number(from), parse_number(to)))))[-17,-17]
+
+diff1 <- am_t1 - fd2.w1
+diff1[which(diff1==1)] <- 2
+diff1[which(fd2.w1 == 1 & am_t1 == 1)]  <- 1
+diff1 <- diff1 %>% dplyr::as_data_frame() 
+names(diff1) <- paste0("V", 1:16)
+diff1 %>% mutate(from =paste0("V", 1:16)) %>% gather(to, value, -from) %>%
+  mutate(from = as.character(parse_number(from)), to = as.character(parse_number(to)), 
+         var = recode(value, `0` = "Neither", `2` = "InAvgNotW1",  `1`= "InBoth"),
+         color2 = recode(value, `0`="white", `1`= "black", `2` = "green")) %>%
+  filter(value !=0) %>% 
+  full_join(t1, c("from","to")) -> t1_1 
+t1_1 <- arrange(t1_1, from, to)
+p1 <- ggplot(data = t1_1) +
+  geom_net(aes(from_id = from, to_id = to, linewidth= linewidth),
+           directed = T, curvature = .2, labelon=T, size = 5,
+           arrow = arrow(angle = 20, type = "open", length = unit(.2, "cm")), ecolour = t1_1$color2,
+           color = "#252525", hjust = .5, vjust = .5, labelcolour = 'white', fontsize = 4, arrowgap = .02,
+           singletons = T) +
+  labs(title = "Difference between Wave 1 and Average from M1") + ThemeNet +
+  theme(plot.background = element_rect(color = 'black'))
+
+diff2 <- -am_t1 + fd2.w2 
+diff2[which(diff2==1)] <- 2
+diff2[which(fd2.w2 == 1 & am_t1 == 1)]  <- 1
+diff2 <- dplyr::as_data_frame(diff2)
+names(diff2) <- paste0("V", 1:16)
+diff2 %>% mutate(from =paste0("V", 1:16)) %>% gather(to, value, -from) %>% 
+  mutate(from = as.character(parse_number(from)), to = as.character(parse_number(to)), 
+         var = recode(value, `0` = "Neither", `-1` = "InAvgNotW2",  `1`= "InBoth", `2` = "InW2notAvg"),
+         color2 = recode(value, `0`="white", `1`= "black", `2` = "red", `-1` = "green")) %>% 
+  filter(value !=0) %>% 
+  full_join(t1, c("from","to")) -> t1_2 
+t1_2$linewidth[is.na(t1_2$linewidth) & !is.na(t1_2$to)] <- 1
+t1_2 <- arrange(t1_2, from, to)
+t1_2 <- t1_2 %>% filter(!(from == 16 & is.na(to)))
+p2 <- ggplot(data = t1_2) +
+  geom_net(aes(from_id = from, to_id = to, linewidth= linewidth),
+           directed = T, curvature = .2, labelon=T, size = 5,
+           arrow = arrow(angle = 20, type = "open", length = unit(.2, "cm")), ecolour = t1_2$color2,
+           color = "#252525", hjust = .5, vjust = .5, labelcolour = 'white', fontsize = 4, arrowgap = .02,
+           singletons = T) +
+  labs(title = "Difference between Wave 2 and Average from M1") + ThemeNet +
+  theme(plot.background = element_rect(color = 'black'))
+grid.arrange(p1, p2, nrow = 1)
+@
+
+In Figure~\ref{fig:summary2}, we show \textit{difference networks} between the average network from M1 and the first and second waves of data. The lack of model fit is very obvious here, with the green edges representing ties that only show up in the average network, and the red edges representing ties in the data that the model misses completely.  Again, the edgeweights demonstrate the frequency of the ties in the simulations from M1. On the left in Figure~\ref{fig:summary2}, we see the difference between the first wave of data and the average network. We only see green and black edges, meaning that the simulated networks consist primarily of edges in wave 1, plus some new edges that aren't in the first wave of data that are reciprocating the ties that are in the data. On the right in Figure~\ref{fig:summary2}, we see the difference between the second wave of data and the average network. Remember, the model is simulating the second wave of data, which is how the average network is created. There are six red edges, which are edges in wave 2 that do not appear at all in the average network. In addition, there are several green edges that are in the average network, but not in wave 2. Finally, there are a few black edges that appear in both. For all edges but the red ones, the linewidth represents the frequency of the edge in the simulations.
+
 
 <<gof2, fig.cap="An example of viewing the distribution of a statistic of interest from a SAOM. Here, the Mahalanobis distance of the cumulative outdegree values computed on a simulated network to the mean value simulated is shown. The distance computed from the data is shown as a vertical line.", fig.height=3, out.width='.6\\textwidth', eval = FALSE>>=
 load("data/ansnullpaper.rda")
@@ -691,21 +753,7 @@ ggplot(histdat) + geom_histogram(aes(x = x), binwidth = .1, fill = 'white', colo
 %Figure~\ref{fig:sienagof},
 %summary statistics such as outdegree and indegree distribution computed on the network are of interest, we can look at the computed distances between the data and the model simulations. distributions of these statistics computed on networks simulated from the model show the model in the edge data space. For an example, see Figure~\ref{fig:gof2}, where the distribution of the log of the Mahalanobis distance is shown for the outdegree distribution auxiliary statistics, and the log Mahalanobis distance for the observed data is shown as a vertical line. }
 
-\begin{figure}
-\centering
-\includegraphics[width=.75\linewidth]{img/Model1LUSmallFriends.png}
-\caption{\label{fig:lineup} A small lineup of node-link diagrams showing the second wave of our small friendship network among five networks simulated from model M1.}
-\end{figure}
 
-Another potential goodness-of-fit visualization that places the fitted model in the node and edge data space is a lineup like those proposed in \citet{buja:2009}. A \textit{lineup} ``asks the witness to identify the plot of the real data from among a set of decoys, the null plots, under the veil of ignorance" \citep[p. 4369]{buja:2009}. It can be thought of like a police lineup, where the ``suspect" is in a lineup among several innocent similar looking people, and if the witness picks the suspect out of the lineup, that is evidence the suspect is guilty. 
-
-In data and model visualization, the ``suspect" is a plot of the true data, while the ``filler" is composed of several plots of ``mock data", simulated from a hypothesized model. If the true data stands out among the simulated data, that is taken as evidence agains the hypothesised model. If, however, the true data is difficult to identify among the simulated data, that is taken as evidence in favor of the hypothesized model. 
-% An application of the lineup protocal can be found in \citet{hofmann2012graphical}, where the authors examine, for instance, the differences between polar and cartesian coordinates for plotting categorical data, and density plots and box plots for determining distributional differences. They pose questions to experiment participants such as, ``Which plot is most different from the others?" or, ``In which plot is the blue group furthest to the right?"
-
-The data visualizations examined in previous applications such as  \citet{hofmann2012graphical} are less complex than a node-link network diagram. Typically, the lineup viewers have to pick out the most different plot, which is hard for network data. As an example, consider the network lineup shown in Figure~\ref{fig:lineup}. In this small network lineup, the second wave of the small friendship network is shown among five simulated networks from model M1 using parameter values estimated from the data. It seems possible to argue for any one of the six plots in Figure~\ref{fig:lineup} as most different. So, we suggest guiding participants to look at the overall structure of the graphs to determine which has the most or least connected or complex structure.% The least complex plot, number six, has no triangles (3-cycles), while the most complex plot, number three, has three 3-cycles. The most complex plot, number three, is in fact the data. We have found that when shown lineups like that of Figure~\ref{fig:lineup}, online survey participants %where all the node-link diagrams shown are based on simulated data, %one observation from an ``alternative" model and the rest from a ``null" model, %pick up on the triangular shape of the 3-cycles most often. 
-In a future paper, we will use the lineup protocol to help better understand SAOMs by allowing us to view the model in the data space. %Lineups place observations simulated from the model side-by-side with the data and let the viewer examining the differences. This can also help us determine the significant structural effects, if any, of the parameters in the model on observations simulated from the model. The triangular shape mentioned above becomes more prevalent when a transitive triplet parameter ($\beta_3$ in Section~\ref{sec:models}) is included in a model, indicating that it may have a significant effect on network structure. %, but it does not always cause triplets to form in the simulated data. This requires more investigation with larger data sets and more complex models, but is promising for the development of additional goodness-of-fit measures for network models.
-
-% \st{
 % \begin{itemize}
 % \item WHat is the model? the network model (SAOM model is just one of many)
 % \item What is the data? Edge data, node data, observed time points, unobserved timepoints (CTMC)
@@ -714,7 +762,7 @@ In a future paper, we will use the lineup protocol to help better understand SAO
 % What are some things that could go in here? need more data examples; not just the friends data.
 % Harry Potter data??? I want to find my own data, too.}
 
-\subsection{Visualizing collections of models}
+\section{Collections of models}
 
 The second method of model visualization we use is visualizing collections of models. There are many possible ways to collect SAO models together, so %. We could look at the same model fit to different data, different models fit to the same data, or we could fit the same models to the same data many times to see how the simulations change. F
 for the SAOMs, we decided that there were four ways to create collections of models that would give us the most insight:
@@ -726,15 +774,15 @@ for the SAOMs, we decided that there were four ways to create collections of mod
 \end{enumerate}
 We chose these four collections because they each explore something different about SAOMs. The first considers the many parameters to include in a SAOM. The second collection shows how those many parameters affect the parameter values of the fitted models. The third looks at how the same model behaves when fit to different data. Finally, the results from fitting the same model to the same data may lead to different parameter estimates, so we want to see how the parameter estimates can vary.
 
-\subsubsection{Exploring the space of all possible models}\label{sec:allpossible}
+\subsection{Exploring the space of all possible models}\label{sec:allpossible}
 
 The \texttt{RSiena} manual contains over eighty effects to include in a SAOM. In order to select parameters to include in the models for our example data, we searched through the possible effects available to model given the data structure to find \textit{significant} effects. We tested for significance using the Wald-type tests built into \texttt{RSiena} for one-at-a-time effects testing. We start with the outdegree and reciprocity measures as the foundation of the models we fit, then add one effect, fit the model, test the additional effect for significance, and repeat for all possible parameters to add to the model. We performed this procedure for both the small friendship and the senate collaboration data. A visualization of the significant effects for the two example data sets are shown in Figure~\ref{fig:sigtesting} in the Appendix. %We see in both the friendship data and the senate data results that most of the significant effects have absolute value less than ten. In addition, the $p$-values for the effects from the friendship data are more spread out than the $p$-values for the senate data, which are concentrated at about 0.02 or less. This may suggest that larger data sets tend to result generally in smaller $p$-values, just like a larger sample size results in smaller $p$-values in a $t$-test.
 
-\subsubsection{Varying model settings}
+\subsection{Varying model settings}
 
 We have varied model settings already by choosing models M1, M2, M3 to fit to our small friendship network data set. In Section~\ref{sec:samemodsamedat}, we fit these models to the data 1,000 times, and in this section, we explore simulations from these three models given the mean values of from the 1,000 fitted parameter values as the parameters in our models. From each of these three models using the means of parameter estimates as our fixed parameter values, we simulated 1,000 observations from each of the three models. From these simulations, we create visualizations that represents an average network using the same method described in Section~\ref{sec:minds}, shown in Figure~\ref{fig:averagenet} in the Appendix. 
 
-\subsubsection{Fitting the same model to different data}\label{sec:samemoddiffdat}
+\subsection{Fitting the same model to different data}\label{sec:samemoddiffdat}
 
 In addition to fitting M1, M2, and M3 to the friendship data 1,000 times, we also fit them to the senate data 100 times. The means and standard deviations of the parameter estimates for each combination of model and data are given in Table~\ref{tab:meanests}, while the density plots of each parameter in the model for each data set is given in Figure~\ref{fig:compareModels}.
 
@@ -810,7 +858,7 @@ Looking at the estimates of $\beta_4$, we see that the estimates for the senate 
 
 %We look at collections produced ``from exploring the space of all possible models," ``by varying model settings", ``by fitting the same model to different datasets", and ``by treating each iteration as a model" \citep[p.~210-11]{modelvis}. Because fitting a SAOM requires MCMC methods, we also fit the same model many times, resulting in distributions of fitted parameters for one data set.
 
-\subsubsection{Fitting the same model to the same data}\label{sec:samemodsamedat}
+\subsection{Fitting the same model to the same data}\label{sec:samemodsamedat}
 
 <<distests, fig.cap="Distribution of fitted parameter values for our three SAOMs. The inclusion of $\\beta_3$ or $\\beta_4$ clearly has an effect on the distribution of the rate parameters, $\\alpha_1$ and $\\alpha_2$.", fig.height=3>>=
 
@@ -853,7 +901,7 @@ senM45est %>% spread(parameter, estimate)-> senM45est2
 ggpairs(senM45est2, columns = 3:9, ggplot2::aes(colour=Model, alpha = .5))
 @
 
-\subsection{Explore algorithms, not just end result}\label{sec:algorithms}
+\section{Explore algorithms, not just end result}\label{sec:algorithms}
 
 The last principle of model visualization we use is to explore the process of fitting the model, instead of just focusing on the end result. This principle is perhaps the most important for SAOMs because the model fitting process in \texttt{RSiena} involves several simulation steps that are hidden from the user. Hiding the MCMC steps is practical and efficient if a researcher is primarily interested in fitting one model to a set of longitudinal network data, obtaining parameter estimates, and drawing conclusions or making predictions. We are more interested in \textit{how} the models are fit, so we extracted and explored the different steps of that process instead of allowing them stay hidden.
 

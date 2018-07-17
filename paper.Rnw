@@ -83,7 +83,7 @@
 
 \bigskip
 \begin{abstract}
-Stochastic actor-oriented models, first introduced by Snijders (1996), are a type of statistical network model for dynamic social networks. Unlike other network models, SAOMs are not very well understood. We use model visualization techniques introduced in Wickham et al (2015) in order to make them a little less murky. The SAOMs are a prime example of a set of models that can benefit greatly from application of model visualization. With the help of static and dynamic visualizations, we bring the hidden model fitting processes into the foreground, eventually leading to a better understanding and higher accessibility of stochastic actor-oriented models for social network analysts.
+Stochastic actor-oriented models (SAOMs), first introduced by Snijders (1996), are a type of statistical network model for dynamic social networks. Unlike other network models, SAOMs are not very well understood. We use model visualization techniques introduced in Wickham et al (2015) in order to gain a better understanding of the models and their behavior. Viewing the model in the data space places these models into the field of network drawing, while exploring collections of models helps with parameter interpretation. Finally, delving into the fitting algorithms provides more insight into the underlying mechanisms. With the help of static and dynamic visualizations, we bring the hidden SAOM fitting processes into the foreground, eventually leading to a better understanding and higher accessibility of SAOMs for social network analysts.
 \end{abstract}
 
 \noindent%
