@@ -833,14 +833,16 @@ SFE <- simu2 %>% group_by(Model, parameter) %>%
 % table of fitted M1 M2 M3
 \begin{table}
 \scalebox{0.9}{
-\begin{tabular}{l|ccc|ccc }
-  \hline
+\begin{tabular}{lcccccc }
+
   & \multicolumn{3}{|c|}{Friendship Data} & \multicolumn{3}{|c|}{Senate Data} \\
   \hline
   & M1 & M2 & M3 & M1 & M2 & M3 \\
+  \hline
   $\alpha_1$ & \Sexpr{SFE$M1[1]} & \Sexpr{SFE$M2[1]} & \Sexpr{SFE$M3[1]} & \Sexpr{SSE$M1[1]} & \Sexpr{SSE$M2[1]} & \Sexpr{SSE$M3[1]} \\
   $\alpha_2$ & \Sexpr{SFE$M1[2]} & \Sexpr{SFE$M2[2]} & \Sexpr{SFE$M3[2]} & \Sexpr{SSE$M1[2]} & \Sexpr{SSE$M2[2]} & \Sexpr{SSE$M3[2]}  \\
   $\alpha_3$ & -- & -- & -- & \Sexpr{SSE$M1[3]} & \Sexpr{SSE$M2[3]} & \Sexpr{SSE$M3[3]} \\
+  \hline
   $\beta_1$ & \Sexpr{SFE$M1[3]} & \Sexpr{SFE$M2[3]} & \Sexpr{SFE$M3[3]} & \Sexpr{SSE$M1[4]} & \Sexpr{SSE$M2[4]} & \Sexpr{SSE$M3[4]} \\
   $\beta_2$ & \Sexpr{SFE$M1[4]} & \Sexpr{SFE$M2[4]} & \Sexpr{SFE$M3[4]} & \Sexpr{SSE$M1[5]} & \Sexpr{SSE$M2[5]} & \Sexpr{SSE$M3[5]}\\
 $\beta_3$ & -- & \Sexpr{SFE$M2[5]} & -- & -- & \Sexpr{SSE$M2[6]} & -- \\
