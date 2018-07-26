@@ -835,7 +835,7 @@ SFE <- simu2 %>% group_by(Model, parameter) %>%
 \scalebox{0.9}{
 \begin{tabular}{lcccccc }
 
-  & \multicolumn{3}{|c|}{Friendship Data} & \multicolumn{3}{|c|}{Senate Data} \\
+  & \multicolumn{3}{c}{Friendship Data} & \multicolumn{3}{c}{Senate Data} \\
   \hline
   & M1 & M2 & M3 & M1 & M2 & M3 \\
   \hline
