@@ -61,8 +61,7 @@
 \if0\blind
 {
   \title{\bf Model Visualization Techniques for a Social Network Model}
-  \author{Samantha Tyner\thanks{
-    The authors gratefully acknowledge funding from the National Science Foundation Grant \# DMS 1007697. All data collection has been conducted with approval from the Institutional Review Board IRB 10-347}\hspace{.2cm}\\
+  \author{Sam Tyner \hspace{.2cm}\\
     Department of Statistics and Statistical Laboratory, Iowa State University\\
     and \\
     Heike Hofmann\\
@@ -87,7 +86,7 @@ Stochastic actor-oriented models (SAOMs), first introduced by Snijders (1996), a
 \end{abstract}
 
 \noindent%
-{\it Keywords:} social network analysis, model visualization, dynamic networks, network visualization, network mapping, animation
+{\it Keywords:} social network analysis, dynamic networks, network mapping, animation, statistical graphics
 \vfill
 
 \newpage
