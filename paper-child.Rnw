@@ -468,8 +468,8 @@ ggplot(data = jTT, aes(from_id = from, to_id = to)) +
            linetype = c("solid", "solid","dotted", "solid")) +
   expand_limits(x=c(-0.1,1.1), y=c(-0.1,1.1)) +
   ThemeNet +
-  theme(legend.position = "none") + 
-  labs(title = expression(paste(s[i3], "(x,z)", "=",Sigma[j != h], x[ij], x[ih], x[hj] %.% 
+  theme(legend.position = "none", plot.title = element_text(size = rel(0.9))) + 
+  labs(title = expression(paste(s[i3], "(x,z)", "=",Sigma[j != h], x[ij], x[ih], x[hj] %*% 
                                 I, "(", z[i], "=", z[h]!= z[j], ")")
                           )
        )
@@ -1095,7 +1095,7 @@ To reorder the vertices for the matrix visualization, we first constructed a cum
 \begin{equation}\label{eq:acum}
 \mathbf{A}^{cum}_{ij} = \sum_{r = 0}^R X_{ij}(r). 
 \end{equation}
-We then performed a principal component analysis (PCA) on $\mathbf{A}^{cum}$, and used the values of the first principal component to order the vertices on the $x$ and $y$ axes for the adjacency matrix animation. In Figure~\ref{fog:adjmatorder}, we present the first wave of data ordered by the arbitrary node ID order alongside the seriated adjacency matrix ordered by the first principal component loading on the cumulative adjacency matrix, $\mathbf{A}^{cum}$. Using PCA on $\mathbf{A}^{cum}$ to order the rows and columns of the adjacency matrix visualization clearly shows the two distinct connected components in the first wave of the network, which are difficult to find in the arbitrarily ordered visualization. 
+We then performed a principal component analysis (PCA) on $\mathbf{A}^{cum}$, and used the values of the first principal component to order the vertices on the $x$ and $y$ axes for the adjacency matrix animation. In Figure~\ref{fig:adjmatorder}, we present the first wave of data ordered by the arbitrary node ID order alongside the seriated adjacency matrix ordered by the first principal component loading on the cumulative adjacency matrix, $\mathbf{A}^{cum}$. Using PCA on $\mathbf{A}^{cum}$ to order the rows and columns of the adjacency matrix visualization clearly shows the two distinct connected components in the first wave of the network, which are difficult to find in the arbitrarily ordered visualization. 
 
 We also use the PCA seriated layout to fix the layout in the animation of one of the microstep process simulations, some frames of which are shown in Figure~\ref{fig:adjmatani}. This animation is very simple: a square appears or disappears in the animation as that edge appears or disappears in the microstep process. Through this animation, which can be viewed at \url{https://vimeo.com/240092677}, we can see edges appearing, and then later on disappearing. These in-between steps are not shown when we look at the network at our discrete observation points, so by viewing this animation we can gain a better understanding of the underlying dynamics of this model. 
 

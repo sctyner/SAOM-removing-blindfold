@@ -97,6 +97,7 @@ Stochastic actor-oriented models (SAOMs), first introduced by Snijders (1996), a
 
 <<child-demo, child='paper-child.Rnw'>>=
 @
+Github PW: a5%ST25t4rzM*L3F
 
 \bibliographystyle{asa}
 \bibliography{references}
