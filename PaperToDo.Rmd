@@ -37,10 +37,10 @@ Don't spend any time placing the figures!!!!! Place figure just in front of the 
 ## Section 4 
 
 - [X] Add another example of a data set for M-in-DS (Sect 4.1) (Congress)
-- [ ] Make node-link gif available online
-- [ ] Insert link to full node-link gif in paper
-- [ ] Make adjmat gif available online
-- [ ] Insert link to full adjmat gif in paper
+- [X] Make node-link gif available online
+- [X] Insert link to full node-link gif in paper
+- [X] Make adjmat gif available online
+- [X] Insert link to full adjmat gif in paper
 - [ ] Beef up transition before Sect 4.4
 - [X] Figure 6: reverse order of adjacency matrix y-axis
 - [X] Figure 5: get rid of Vs on node labels, make font bigger
