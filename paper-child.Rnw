@@ -702,16 +702,23 @@ p3 <- ggplot(data = filter(combinedavgs, cat == "2nd Wave")) +
 grid.arrange(p2, p1, p3, nrow = 1)
 @
 
-Another way to view the model in the data space is through simulation from the model. No one network simulated from a SAOM is going to look like the data or represent the model, so we might want to look at an ``average network" or ``expected network" value. We frequently rely on averages and expected values in data analyses, but network models, especially those as complex as SAOMs, lack a expected network value measure. We could talk about expected values of parameters, but the parameters can be hard to interpret. %Expected values of parameters can be computed, but if they cannot directly tell us anything about our dependent variable, they lose value. 
-There is no defined expected value of an simulation from a network model, though there are with most other model simulations. How then, can we arrive at an ``average" network? We answer this question through visualization.
+Another way to view the model in the data space is through simulation from the model. No one network simulated from a SAOM is going to look like the data or represent the model, so we might want to look at an \textit{expectation} from the network model. We frequently rely on expected values in data analyses, but network models, especially those as complex as SAOMs, lack an expected network value measure. We could talk about expected values of parameters, but the parameters can be hard to interpret. %Expected values of parameters can be computed, but if they cannot directly tell us anything about our dependent variable, they lose value. 
+There is no defined expected value of a network model, though there are with most other statistical models. How then, can we arrive at an ``average" network? We answer this question through visualization.
 
 %For network data, we view an ``average" network through a sort of summary network drawn using the traditional node-link diagram. 
-In Figure~\ref{fig:summnetM1}, we show an \textit{average network} created with 1,000 simulations of the second wave of the network from Model 1. To make this average network, we first simulated 1,000 wave 2 and wave 3 observations of our small friendship example data from model M1, for which parameters had previously been estimated. We then aggregate the 1,000 simulated instances of wave 2, and by counting up the number of times each edge $i \rightarrow j$ appears in a network simulation. Then, we construct a single network for each time point with edge weights equal to the proportion of time the edge appears in our 1,000 simulations. This weighted network is shown in the middle panel of Figure~\ref{fig:summnetM1}, with edges present only in the average network if it appears in at least 51 of the 1,000 simulations. The edges that appear most frequently in the model are drawn with darker, thicker lines. On either side of the average network in Figure~\ref{fig:summnetM1}, we show the actual data, wave 1 on the left, and wave 2 on the right. We can see that the structure of the average network is much more similar to the first wave than to the second wave. However, the simulations are supposed to represent the second wave of data on the right of Figure~\ref{fig:summnetM1}. This is an indication that the simple model, M1, is doing a very poor job of capturing the change mechanism from the first to the second wave of observation. The average network can thus be used to help determine model goodness-of-fit. Because the the average network looks more like the first wave than the second wave, we can use the visualization in Figure~\ref{fig:summnetM1} as evidence of poor model fit.  
+In Figure~\ref{fig:summnetM1}, we show the \textit{expected network} of M1, created with 1,000 simulations of the second wave of the network from the model. To make this expected network, we first simulated 1,000 wave 2 and wave 3 observations of our small friendship example data from model M1, for which parameters had previously been estimated. We then aggregate the 1,000 simulated instances of wave 2, and by counting up the number of times each edge $i \rightarrow j$ appears in a network simulation. Then, we construct a single network for each time point with edge weights equal to the proportion of time the edge appears in our 1,000 simulations. This weighted network is shown in the middle panel of Figure~\ref{fig:summnetM1}, with edges present only in the average network if it appears in at least 51 of the 1,000 simulations. The edges that appear most frequently in the model are drawn with darker, thicker lines. On either side of the average network in Figure~\ref{fig:summnetM1}, we show the actual data, wave 1 on the left, and wave 2 on the right. We can see that the structure of the average network is much more similar to the first wave than to the second wave. However, the simulations are supposed to represent the second wave of data on the right of Figure~\ref{fig:summnetM1}. This is an indication that the simple model, M1, is doing a very poor job of capturing the change mechanism from the first to the second wave of observation. The average network can thus be used to help determine model goodness-of-fit. Because the the expected  network looks more like the first wave than the second wave, we can use the visualization in Figure~\ref{fig:summnetM1} as evidence of poor model fit.  
 
-<<summary2, fig.height=2.5, fig.cap="Network differences between the average network from M1 and Wave 1 and Wave 2 of the data. Some edges appear in both the data and the average Wave 2 from M1, while others only appear in the data or only in the average. Width of edges in the average network represent the proportion of appearances in the 1,000 simulations. The FR layout is used.">>=
+<<summary2, fig.height=2.5, fig.cap="Network differences between the expected network from M1 and Wave 1 and Wave 2 of the data. Some edges appear in both the data and the expected Wave 2 from M1, while others only appear in the data or only in the exectation. Width of edges in the represent the proportion of appearances in the 1,000 simulations. The FR layout is used.">>=
 
-red <- "#e41a1c"
-green <- "#4daf4a"
+red <- "#fd8d3c"
+green <- "#41ab5d"
+
+#762a83
+#af8dc3
+#e7d4e8
+#d9f0d3
+#7fbf7b
+#1b7837
 
 am_t1 <- as.matrix(igraph::as_adj(igraph::graph_from_data_frame(arrange(t1, parse_number(from), parse_number(to)))))[-17,-17]
 
@@ -733,12 +740,12 @@ p1 <- ggplot(data = t1_1) +
            arrow = arrow(angle = 20, type = "open", length = unit(.2, "cm")), ecolour = t1_1$color2,
            color = "#252525", hjust = .5, vjust = .5, labelcolour = 'white', fontsize = 4, arrowgap = .02, layout.alg = "fruchtermanreingold",
            singletons = T) +
-  labs(title = "Difference between Wave 1 &\nWave 2 average from M1") + ThemeNet +
+  labs(title = "Difference between Wave 1 &\nWave 2 expectation from M1") + ThemeNet +
   theme(plot.background = element_rect(color = 'black'))
 
 pforleg <- ggplot(data = mtcars) + 
   geom_line(aes(x = mpg, drat, group = as.factor(cyl), color = as.factor(cyl)), size = 1.5) + 
-  scale_color_manual(values = c("black", red, green), name = "Tie is...", labels = c("in data,\nin average", "in data,\nnot in average", "not in data,\nin average")) + 
+  scale_color_manual(values = c("black", red, green), name = "Tie is...", labels = c("in data,\nin expectation", "in data,\nnot in expectation", "not in data,\nin expectation")) + 
   theme_grey() + 
   theme(legend.key = element_rect(color = "black", fill = "white"), 
         legend.key.height = unit(25, "pt"))
@@ -764,7 +771,7 @@ p2 <- ggplot(data = t1_2) +
            arrow = arrow(angle = 20, type = "open", length = unit(.2, "cm")), ecolour = t1_2$color2,
            color = "#252525", hjust = .5, vjust = .5, labelcolour = 'white', fontsize = 4, arrowgap = .02, layout.alg = "fruchtermanreingold",
            singletons = T) +
-  labs(title = "Difference between Wave 2 &\nWave 2 average from M1") + ThemeNet +
+  labs(title = "Difference between Wave 2 &\nWave 2 expectation from M1") + ThemeNet +
   theme(plot.background = element_rect(color = 'black'))
 legendsumm <- cowplot::get_legend(pforleg)
 ggdraw() + draw_plot(p1, width = .4) +  draw_plot(p2, width = .4, x=.4) + 
@@ -1008,7 +1015,7 @@ to_ani +
 
 To visualize the underlying algorithm, we animate the microsteps that form the transition steps of the CTMC from wave 1 to wave 2 of the small friendship network example shown in Figure~\ref{fig:alldataviz}. The microstep animation, some frames of which are shown in Figure~\ref{fig:makinggif}, represent one possible path from wave 1 to wave 2 according to the model M1. We show each change in the network as follows: we first increase the size and change the color of the ego node to focus attention to its ties. Then, the changing tie either fades in or fades out. If there are no changes at a particular microstep, the microstep does not appear. Some frames of the animations are shown in Figure~\ref{fig:makinggif}, and the full movie, created with \texttt{tweenr} and \texttt{gganimate} can be viewed at \url{https://vimeo.com/240089108} \citep{tweenr, gganimate}. Movies similar to this animation were used to visualize the changes of dynamic networks in \citet{dynnetviz}. Frames 15-28 of Figure~\ref{fig:makinggif} show a deleted tie, while frames 71-84 show an added tie. For both changes, the ego node is emphasized with color and size. When a tie is removed, it is emphasized with the same color and size as the node. As the animation proceeds, the tie shrinks and disappears as the ego node shrinks and changes color back to black. If a tie is being added, the it appears red from nothing, grows large for emphasis, then changes color and size to match the rest of the edges. In this network animation, we see the modeled steps of the \textit{unobserved} CTMC process between two observed networks. We see each part of the SAOM come into play: we first see the selection of nodes to change via the rate function, then we see the result of the actor maximizing its objective function by either deleting or adding a node. Finally, the layout of the nodes changes as edges are removed or added, which demonstrates how the overall network structure changes with each of the individual tie changes. Combining the tie changes in this animation makes the CTMC process the focus and demonstrates the underlying change mechanism of the dynamic network according to the chosen model. 
 
-<<adjmatorder, message = FALSE, warning = FALSE, fig.cap="On the left, the starting friendship network represented in adjacency matrix form, ordered by vertex id. On the right, the same adjacency matrix is presented after ordering the vertices by one repetition of the microstep simulation process from wave one to wave two.", fig.width=8, fig.height=3, fig.align='center'>>=
+<<adjmatorder, message = FALSE, warning = FALSE, fig.cap="On the left, the starting friendship network represented in adjacency matrix form, ordered by node ID. On the right, the same adjacency matrix is presented after ordering the vertices by one repetition of the microstep simulation process from wave one to wave two.", fig.width=8, fig.height=3, fig.align='center'>>=
 # first present the original wave 1 adj mat, then present the adj mat after being ordered by the 1st pc of the big adjmat A.
 fd.w12 <- data.frame(fd2.w1)
 fd.w12 <- data.frame(fd2.w1)
@@ -1095,7 +1102,8 @@ To seriate the matrix, we first constructed a cumulative adjaceny matrix, $\math
 \mathbf{A}^{cum}_{ij} = \sum_{r = 0}^R X_{ij}(r). 
 \end{equation}
 We then performed a principal component analysis (PCA) on $\mathbf{A}^{cum}$, and used the values of the first principal component to order the vertices on the $x$ and $y$ axes for the adjacency matrix animation. The resulting visualization for the first wave of data is shown in Figure~\ref{fig:adjmatorder}. %we present the first wave of data ordered by the arbitrary node ID order alongside the seriated adjacency matrix ordered by the first principal component loading on the cumulative adjacency matrix, $\mathbf{A}^{cum}$. 
-Using PCA on $\mathbf{A}^{cum}$ to order the rows and columns of the adjacency matrix visualization clearly shows the two distinct connected components in the first wave of the network, which are difficult to find in the visualization ordered by node ID. We continue to use the seriated matrix in another animation of the microstep process, which is avaiable at \url{https://vimeo.com/240092677}. A few frames of the video are shown in Figure~\ref{fig:adjmatani}. In the animation, a square appears or disappears as that edge appears or disappears in the microstep process. Through this animation, we can see edges appearing, and then later on disappearing. This visualization also shows the microsteps where the nodes do not make a change. From start to finish, we see network evolve according to the model: sometimes ties are removed right after they are created, and sometimes several ties are removed or created in a row. The adjacency matrix animation shows the many ways the algorithm explores the data space. By viewing this animation, we can gain a better understanding of the dynamics of this model. 
+Using PCA on $\mathbf{A}^{cum}$ to order the rows and columns of the adjacency matrix visualization clearly shows the two distinct connected components in the first wave of the network, which are difficult to find in the visualization ordered by node ID. We continue to use the seriated matrix in another animation of the microstep process, which is avaiable at \url{https://vimeo.com/240092677}. A few frames of the video are shown in Figure~\ref{fig:adjmatani}. In the animation, a square appears or disappears as that edge appears or disappears in the microstep process. %Through this animation, we can see edges appearing, and then later on disappearing. 
+This visualization also shows the microsteps where the nodes do not make a change. From start to finish, we see network evolve according to the model: sometimes ties are removed right after they are created, and sometimes several ties are removed or created in a row. The adjacency matrix animation shows the many ways the algorithm explores the data space. By viewing this animation, we can gain a better understanding of the dynamics of this model. 
 
 <<adjmatani, fig.cap='A selection of frames from the adjacency matrix visualization animation for one series of microsteps. The node lables are removed to declutter the figure. Starting at frame 0, there are two clearly connected components: one in the bottom left corner, and one in the top right corner. By the end, the component in the bottom left has spread out and become sparsely connected, while the top right component has shrunk, but remains closely connected.', warning = FALSE, message = FALSE, results='hide', fig.height=2.5>>=
 adjmatall <- matrix(0, nrow = 16, ncol = 16)
@@ -1280,7 +1288,7 @@ p1 <- ggplot(data = probsDat,
   scale_x_discrete(position = 'top') +
   #scale_y_discrete(labels = rev(str_replace(order1, "V", ""))) +
   ThemeNoNet + 
-  theme(panel.grid = element_blank()) +
+  theme(panel.grid = element_blank(), axis.text = element_text(size=rel(.8))) +
   coord_fixed() + 
   ggtitle("Theoretical Probabilities")
 p2 <- ggplot(data = empprobsDat,
@@ -1293,7 +1301,7 @@ p2 <- ggplot(data = empprobsDat,
   scale_x_discrete(position = 'top') +
   #scale_y_discrete(labels = rev(str_replace(order1, "V", ""))) +
   ThemeNoNet + 
-  theme(panel.grid = element_blank()) +
+  theme(panel.grid = element_blank(), axis.text = element_text(size=rel(.8))) +
   coord_fixed() + 
   ggtitle("Empirical Probabilities")
 gridExtra::grid.arrange(p1, p2, nrow = 1)
