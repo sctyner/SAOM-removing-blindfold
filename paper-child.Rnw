@@ -817,7 +817,7 @@ Now that we have assessed model fit, we next want to learn about model behavior 
 
 %\subsection{Varying model settings}
 
-\noindent \textbf{Varying model settings:} We now view collections of models by varying model settings. We have done this already by choosing three different models M1, M2, M3 to fit to our example data sets. To explore the behavior of these three models, we simulate from them. Using the parameter values given in Table~\ref{tab:meanests} for the friendship data, we simulated 1,000 observations from each of the three models and created expected network visualizations from models M1, M2, and M3 using the same method as in Section~\ref{sec:minds}. These averages are shown in Figure~\ref{fig:averagenet} in the Appendix. We see that all models are failing to capture the structure of the second wave. %In Section~\ref{sec:samemodsamedat}, we fit these three models to the data 1,000 times, and examine the parameter densities. Here, . For simulation, we used the mean parameter values from the 1,000 fits of the corresponding model. 
+\noindent \textbf{Varying model settings:} The second method for viewing collections of models is varying model settings. We have done this already by choosing three different models M1, M2, M3 to fit to our example data sets. To explore the behavior of these three models, we simulate from them. Using the parameter values given in Table~\ref{tab:meanests} for the friendship data, we simulated 1,000 observations from each of the three models. From the simulations, we created an expected network for wave 2 from models M1, M2, and M3 using the same method described in Section~\ref{sec:minds}. These expected networks are shown in Figure~\ref{fig:averagenet} in the Appendix. We see that all models are failing to capture the structure of the second wave, even though the individual parameters were all significant. %In Section~\ref{sec:samemodsamedat}, we fit these three models to the data 1,000 times, and examine the parameter densities. Here, . For simulation, we used the mean parameter values from the 1,000 fits of the corresponding model. 
 
 %\subsection{Fitting the same model to the same data}\label{sec:samemodsamedat}
 
@@ -832,11 +832,9 @@ ggplot(data = simu2) +
   theme(legend.position = 'bottom')
 @
 
-\noindent \textbf{Fitting the same model to the same data:} After fitting models M1, M2, and M3 to the friendship network 1,000 times each, we examine the distribution of the fitted values, which are shown in Figure~\ref{fig:distests}. We can see from these distributions that the inclusion of the JTT parameter, $\beta_3$ is obviously affecting the distributions of the other four parameters included in all models, $\alpha_1$, $\alpha_2$, $\beta_1$, and $\beta_2$, while these parameters are less affected by the inclusion of $\beta_4$. When $\beta_3$ is included, its estimate is postitive, meaning that friendships between two girls with different drinking behaviors tend to form when there is an intermediary who is already friends with the two girls. The inclusion of this parameter leads to increases in the rate parameters' estimates, suggesting that the presence of the transitive triplet behavior means that the girls would also change friends more frequently. It is not clear, however, that the addition of a parameter to the objective function \textit{should} effect the estimation of the rate parameters. The strong correlations between the estimates of the rate parameters and of the objective function parameters are shown in Figure~\ref{fig:corplots} in the Appendix. In addition, the outegree parameter, $\beta_1$ decreases when $\beta_3$ is included, while the reciprocity parameter, $\beta_2$ increases. This implies the girls in the data prefer to form small, closely knit friend groups, as indicated by reciprocated ties and jumping transitive triplet formation, as opposed to being popular and having many friends. Thus, having many friends who do not reciprocate is more stronlgy discouraged by M2 than in the other models. %In comparison with models M1 and M3, model M2 typically has higher estimates of the rate parameter, meaning that the inclusion of the covariate statistic in the model leads to higher estimates of the number of times, on average, a node gets to change its ties. 
+\noindent \textbf{Fitting the same model to the same data:} The simulations performed to fit a SAOM lead to inherent variability in the fitted model. To examine this variability, we fit models M1, M2, and M3 to the friendship network 1,000 times each. The distributions of the fitted model parameters are shown in Figure~\ref{fig:distests}. Clearly, the inclusion of the JTT parameter, $\beta_3$, results in very different estimates the of the other four parameters in all models, $\alpha_1$, $\alpha_2$, $\beta_1$, and $\beta_2$. On the other hand, the inclusion of the indirect tie parameter, $\beta_4$, does not lead to different estimates of other model parameters. When $\beta_3$ is included, its estimate is postitive, meaning that friendships between two girls with different drinking behaviors tend to form when there is an intermediary who is already friends with the two girls. The inclusion of this parameter leads to increases in the rate parameters' estimates. Thus, when modeling the transitive triplet behavior in this way, we conclude that girls change friends more frequently. It is not clear, however, that the addition of a parameter to the objective function \textit{should} effect the estimates of the rate parameters. The strong relationship between rate parameter estimates and objective function parameters is further shown in Figure~\ref{fig:corplots} in the Appendix. After visualizing the results of the same models fit many times to the same data, we were able to see potential model behavior problems right away.   %In comparison with models M1 and M3, model M2 typically has higher estimates of the rate parameter, meaning that the inclusion of the covariate statistic in the model leads to higher estimates of the number of times, on average, a node gets to change its ties. 
 
 %\subsection{Fitting the same model to different data}\label{sec:samemoddiffdat}
-
-\noindent \textbf{Fitting the same model to different data:} In addition to fitting M1, M2, and M3 to the friendship data 1,000 times, we also fit them to the senate data 100 times. The means and standard deviations of the parameter estimates for each combination of model and data are given in Table~\ref{tab:meanests}, while the density plots of each parameter in the model for each data set is given in Figure~\ref{fig:compareModels}.
 
 <<tableofmeans>>=
 simu2 <- read.csv("data/simulation-1000-M1-M2-M3.csv")
@@ -892,10 +890,12 @@ $\beta_3$ & -- & \Sexpr{SFE$M2[5]} & -- & -- & \Sexpr{SSE$M2[6]} & -- \\
 \caption{\label{tab:meanests} The means (std. dev.) of parameter values estimated from repeated fittings of $M1, M2, M3$ to the two example data sets.}
 \end{table}
 
-Looking at Table~\ref{tab:meanests} and Figure~\ref{fig:compareModels} in the Appendix, we see a few patterns in the estimates from both models. First, the table and the density plots demonstrate the same relationship between the outdegree parameter, $\beta_1$, and the reciprocity parameter, $\beta_2$. In both data sets and across all three models, the estimates of $\beta_1$ are all negative and hover between -5 and -3, while the estimates of $\beta_2$ are all positive and hover between four and five. This suggests that in both data sets, nodes are \textit{encouraged} to form outgoing ties that are reciprocated and \textit{discouraged} from forming ties that are not. Actors in these networks want reciprocated relationships: the students want to have close mutual friendships, and senators want mutual support for their bills. %We explore the relationship between $\beta_1$ and $\beta_2$ further in Section~\ref{sec:samemodsamedat}.
+\noindent \textbf{Fitting the same model to different data:} The final procedure for viewing collections of models is to fit the same model to different data to understand how the model behaves in different contexts. As we did for the friendship data, we estimated the parameters for M1, M2, and M3, when fit to the senate data 100 times each. The means and standard deviations of the parameter estimates for all six model-data combinations are given in Table~\ref{tab:meanests}, while corresponding density plots of objective function parameters are given in Figure~\ref{fig:compareModels} in the Appendix. Looking at the estimates for both data sets, we can see a few patterns emerging. First, we can see the same relationship between the outdegree parameter, $\beta_1$, and the reciprocity parameter, $\beta_2$. In both data sets and across all three models, the estimates of $\beta_1$ are all negative and hover between -5 and -3, while the estimates of $\beta_2$ are all positive and hover between four and five. %In addition, the outegree parameter, $\beta_1$, \textit{decreases} when $\beta_3$ is included, while the reciprocity parameter, $\beta_2$ increases. This inverse relationship implies that the girls prefer to form small, closely knit friend groups, as opposed to being popular and having many friends. Tight-knit friend groups are more encouraged by model M2 than by models M1 and M3.
+This suggests that in both data sets, nodes prefer outgoing ties that are reciprocated to those that are not. When we Consider the context, this suddenly seems obvious: the students want to have close mutual friendships, and senators want mutual support for their bills. We are also concerned, however, with the extremely high correlation between the estimates of $\beta_1, \beta_2$. In all model-data combinations, the absolute correlation between the estimates is above 0.93. %We explore the relationship between $\beta_1$ and $\beta_2$ further in Section~\ref{sec:samemodsamedat}.
+% We have seen how the same model forms behave in different context, with some  differences and some similarities. 
+XXX NEED CONCLUDING SENTENCES XXX
 
-The inclusion of $\beta_3$ for the friendship data had a noticeable effect on the other parameters in the model. This is not true in the senate data. %The covariate used in the senate data for the JTT calculation was the number of bills authored by the ego node in the given year. The number of bills authored by a senator varies wildly, from no bills to 114 bills authored in two years, so this effect could simply be nonsensical for the senate data, since senators are less likely to have the same number of bills authors than teenage girls are to have the same drinking behavior.
-Looking at the estimates of $\beta_4$, we see that the estimates for the senate data are nearer to zero, suggesting that this effect, which considers indirect ties, is not important for the senate data. This effect is, however, very strong in the friendship data with a mean of about -7.5, suggesting that indirect ties are discouraged from forming: teenage girls want to have direct friendships. This indirect relationship variable does not help explain the senate collaboration structure, but it does help clarify the teenage friendship structure.
+We saw earlier that the inclusion of $\beta_3$ for the friendship data has a noticeable effect on the other parameters in the model. We see in Figure~\ref{fig:compareModels} that this effect is not present in the senate data. Furthermore, the estimates of $\beta_4$ for the senate data are near zero, suggesting that this effect, which considers indirect ties, is not informative for the senate data. But in the friendship data, the mean estimate of $\beta_4$ is about -7.5, which suggests that indirect ties are strongly discouraged from forming, probably because teenage girls want to have direct friendships with each other. Senators, on the other hand, have to wheel and deal to pass their legislation, and indirect relationships may be beneficial at times. %Although this indirect relationship variable does not help explain the senate collaboration structure, it does help clarify the teenage friendship structure.
 
 %We look at collections produced ``from exploring the space of all possible models," ``by varying model settings", ``by fitting the same model to different datasets", and ``by treating each iteration as a model" \citep[p.~210-11]{modelvis}. Because fitting a SAOM requires MCMC methods, we also fit the same model many times, resulting in distributions of fitted parameters for one data set.
 
@@ -915,19 +915,37 @@ alt_mod2_sv <- as.numeric(alt2nd[,-c(1,7,8)] %>% summarise_all(funs(mean)))
 
 % taken out
 <<corplotsSenate, eval = FALSE>>=
+senM1est <- read.csv("data/congress/senateM1ests.csv")
+senM2est <- read.csv("data/congress/senateM2ests.csv")
+senM3est <- read.csv("data/congress/senateM3ests.csv")
 senM4est <- read.csv("data/congress/senateM4ests.csv")
 senM5est <- read.csv("data/congress/senateM5ests.csv")
+names(senM1est) <- c("alpha1", "alpha2", "alpha3", "beta1", "beta2")
+names(senM2est) <- c("alpha1", "alpha2", "alpha3", "beta1", "beta2", "beta3")
+names(senM3est) <- c("alpha1", "alpha2", "alpha3", "beta1", "beta2", "beta4")
 names(senM4est) <- c("alpha1", "alpha2", "alpha3", "beta1", "beta2", "beta5")
 names(senM5est) <- c("alpha1", "alpha2", "alpha3", "beta1", "beta2", "beta6")
+senM1est$Model <- "M1"
+senM2est$Model <- "M2"
+senM3est$Model <- "M3"
 senM4est$Model <- "M4"
 senM5est$Model <- "M5"
+senM1est$Sim <- 1:nrow(senM1est)
+senM2est$Sim <- 1:nrow(senM2est)
+senM3est$Sim <- 1:nrow(senM3est)
 senM4est$Sim <- 1:nrow(senM4est)
 senM5est$Sim <- 1:nrow(senM5est)
+senM1est2 <- senM1est %>% gather(parameter, estimate, alpha1:beta2)
+senM2est2 <- senM2est %>% gather(parameter, estimate, alpha1:beta3)
+senM3est2 <- senM3est %>% gather(parameter, estimate, alpha1:beta4)
 senM4est2 <- senM4est %>% gather(parameter, estimate, alpha1:beta5)
 senM5est2 <- senM5est %>% gather(parameter, estimate, alpha1:beta6)
 senM45est <- rbind(senM4est2, senM5est2)
+senM123est <- rbind(senM1est2, senM2est2, senM3est2)
+senM123est %>% spread(parameter, estimate)-> senM123est2
+
 senM45est %>% spread(parameter, estimate)-> senM45est2
-ggpairs(senM45est2, columns = 3:9, ggplot2::aes(colour=Model, alpha = .5))
+ggpairs(senM123est2, columns = 3:9, ggplot2::aes(colour=Model, alpha = .5))
 @
 
 \section{Explore algorithms, not just end result}\label{sec:algorithms}
@@ -1525,7 +1543,7 @@ The density plots in Figure~\ref{fig:compareModels} show the distribution of the
 
 <<corplots, fig.cap="A matrix of plots demonstrating the strong correlations between parameter estimate in our SAOMs. The strongest correlation within each model is between $\\beta_1$ and $\\beta_2$.", fig.width=8>>=
 
-#simu2 <- read.csv("data/simulation-1000-M1-M2-M3.csv")
+simu2 <- read.csv("data/simulation-1000-M1-M2-M3.csv")
 simu_spread <- simu2 %>% spread(parameter, estimate)
 ggpairs(simu_spread, columns = 3:8, ggplot2::aes(colour=Model, alpha = .5)) + theme(plot.title = element_text(size = 12,
                                             face = 'plain', angle = 0, family = "Times New Roman"),
