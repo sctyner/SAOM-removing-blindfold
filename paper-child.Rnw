@@ -802,6 +802,7 @@ ggplot(data = simu2) +
   geom_density(aes(x = estimate, fill = Model), alpha = .5) +
   facet_wrap(~parameter, scales = 'free') +
   ThemeNoNet +
+  scale_fill_brewer(palette = "Greys") + 
   theme(legend.position = 'bottom')
 @
 
@@ -1456,24 +1457,24 @@ smfr_effs$inter1[is.na(smfr_effs$inter1)] <- "none"
 library(ggrepel)
 set.seed(12345678)
 smfr_effs %>% filter(type == "eval" & Waldpval <=0.10) %>%
-ggplot(aes(x = estimate, y = Waldpval, color = inter1)) +
+ggplot(aes(x = estimate, y = Waldpval, shape = inter1)) +
   #geom_errorbarh(aes(xmin = estimate - se, xmax = estimate + se), color = 'black') +
   geom_vline(xintercept = 0) +
-  geom_point(size = 3) +
+  geom_point(size = 3, alpha = .75) +
   #geom_text_repel(aes(label = shortName)) +
-  scale_color_brewer(palette = "Paired", name = "Interaction\nVariable") +
+  scale_shape(name = "Interaction\nVariable") +
   ggtitle("Significant effects at level 0.10 for friendship data") +
   coord_flip() +
   ThemeNoNet
 sen_effs <- read_csv("data/congress/senateModelSigEffects.csv")
 #sen_effs$Waldpval <- parse_number(sen_effs$Waldpval)
 sen_effs$inter1[is.na(sen_effs$inter1)] <- "none"
-ggplot(data = sen_effs %>% filter(Waldpval <=0.10), aes(x = estimate, y = Waldpval, color = inter1)) +
+ggplot(data = sen_effs %>% filter(Waldpval <=0.10), aes(x = estimate, y = Waldpval, shape= inter1)) +
   # geom_errorbarh(aes(xmin = estimate - se, xmax = estimate + se), color = 'black') +
   geom_vline(xintercept = 0) +
   geom_point(size = 3) +
   #geom_text_repel(aes(label = shortName)) +
-  scale_color_brewer(palette = "Paired", name = "Interaction\nVariable") +
+  scale_shape(name = "Interaction\nVariable") +
   ggtitle("Significant effects at level 0.10 for senate data") +
   coord_flip() +
   ThemeNoNet
@@ -1489,9 +1490,9 @@ combinedavgs$cat <- ordered(combinedavgs$cat, levels = c("Model1", "Model2", "Mo
 
 ggplot(data = combinedavgs) +
   geom_net(aes(from_id = from, to_id = to, linewidth= linewidth),
-           directed = T, curvature = .2, labelon=T, size = 4,
+           directed = T, curvature = .2, labelon=T, size = 3,
            arrow = arrow(angle = 20, type = "open", length = unit(.2, "cm")), ecolour = "#969696", fiteach = T,
-           color = "#252525", hjust = .5, vjust = .5, labelcolour = 'white', fontsize = 3, arrowgap = .02,
+           color = "#252525", hjust = .5, vjust = .5, labelcolour = 'white', fontsize = 2, arrowgap = .02,
            singletons = T) +
   ThemeNet + theme(panel.background = element_rect(color = 'black')) +
   facet_wrap(~cat)
@@ -1509,6 +1510,7 @@ allDataEsts$parameter <- ordered(allDataEsts$parameter, levels = c(paste0("alpha
 ggplot(allDataEsts %>% filter(str_detect(parameter, "beta"))) +
   geom_density(aes(x = estimate, fill = Model), alpha = .5) +
   facet_grid(data~parameter, scales = "free", labeller = "label_both") +
+  scale_fill_brewer(palette = "Greys") + 
   ThemeNoNet +
   theme(legend.position = 'bottom')
 @
@@ -1519,7 +1521,8 @@ The density plots in Figure~\ref{fig:compareModels} show the distribution of the
 
 simu2 <- read.csv("data/simulation-1000-M1-M2-M3.csv")
 simu_spread <- simu2 %>% spread(parameter, estimate)
-ggpairs(simu_spread, columns = 3:8, ggplot2::aes(colour=Model, alpha = .5)) + theme(plot.title = element_text(size = 10,
+ggpairs(simu_spread, columns = 3:8, aes(colour=Model, alpha = .5)) + 
+  theme(plot.title = element_text(size = 10,
                                             face = 'plain', angle = 0, family = "Times New Roman"),
                   axis.title.x = element_text(size = 10,
                                             face = 'plain', angle = 0, family = "Times New Roman", inherit.blank = T),
@@ -1587,7 +1590,7 @@ sfmsall5$alphaFctr <- cut(sfmsall5$alpha, c(0,.01, .05, .10, .25, .5, .75, 1, 1.
 ggplot(data = sfmsall5) +
   geom_tile(aes(x = ms, y = reorder(eid,-plotorder), fill = alphaFctr)) +
   #scale_fill_gradient(low = 'grey90', high = '#0868ac', name = "occurrence %") +
-  scale_fill_brewer(palette = "Blues", name = "Occurrence %", labels = c("(0-1]%", "(1-5]%", "(5-10]%","(10-25]%", "(25-50]%", "(50-75]%", "(75-100]%")) +
+  scale_fill_brewer(palette = "Greys", name = "Occurrence %", labels = c("(0-1]%", "(1-5]%", "(5-10]%","(10-25]%", "(25-50]%", "(50-75]%", "(75-100]%")) +
   labs(x = "Microstep No.", y = "Edges (ordered by total # occurrences)") +
   ThemeNoNet +
   theme(axis.ticks.y = element_blank(), axis.text.y = element_blank(), panel.grid = element_blank())
