@@ -449,7 +449,7 @@ The node-link diagram for the four senates during the Obama administration are s
 
 \noindent \textbf{Models:} To our example data, we fit three different SAOMs. Each SAOM uses a simple rate function, $\alpha_m$, and an objective function with two or three parameters. The first model, M1, contains the absolute minimum number of parameters in the objective function $f_i(x)$: 
 \begin{equation}\label{eq:m1}
-M2: \quad f_i(x) = \beta_1s_{i1}(x) + \beta_2s_{i2}(x),
+M1: \quad f_i(x) = \beta_1s_{i1}(x) + \beta_2s_{i2}(x),
 \end{equation}
 where $s_{i1}$ is the density network statistic and $s_{i2}$ is the reciprocity network statistic for actor $i$ at the current network state $x$ (see Table~\ref{tab:effects}). The second and third models, M2 and M3, contain one additional parameter each in the objective function. We chose the additional parameters because they were significant ($p$-value $<$ 0.05) according to a Wald-type test provided in the \texttt{RSiena} software \citep{RSienaTest}. The M2 model contains an actor-level covariate parameter, and the M3 model contains an additional strutural effect in the objective function.
 \begin{align}\label{eq:m2m3}
