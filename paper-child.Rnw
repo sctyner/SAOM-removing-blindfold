@@ -808,12 +808,13 @@ Now that we have assessed model fit, we next want to learn about model behavior 
 <<distests, fig.cap="Distribution of fitted parameter values for our three SAOMs. The inclusion of $\\beta_3$ or $\\beta_4$ clearly has an effect on the distribution of the rate parameters, $\\alpha_1$ and $\\alpha_2$, and on the other objective function parameters $\\beta_1, \\beta_2$.", fig.height=3>>=
 
 simu2 <- read.csv("data/simulation-1000-M1-M2-M3.csv")
-
+levels(simu2$parameter) <- c("alpha[1]","alpha[2]","beta[1]","beta[2]","beta[3]","beta[4]")
 ggplot(data = simu2) +
   geom_density(aes(x = estimate, fill = Model), alpha = .5) +
-  facet_wrap(~parameter, scales = 'free') +
+  facet_wrap(~parameter, scales = 'free', labeller= label_parsed) +
   ThemeNoNet +
   scale_fill_brewer(palette = "Greys") + 
+  xlab("estimate value") + 
   theme(legend.position = 'bottom')
 @
 
@@ -872,13 +873,13 @@ $\beta_3$ & -- & \Sexpr{SFE$M2[5]} & -- & -- & \Sexpr{SSE$M2[6]} & -- \\
   \hline
 \end{tabular}
 }
-\caption{\label{tab:meanests} The means (std. dev.) of parameter values estimated from repeated fittings of $M1, M2, M3$ to the two example data sets.}
+\caption{\label{tab:meanests} The means (std.\ dev.) of parameter values estimated from repeated fittings of $M1, M2, M3$ to the two example data sets.}
 \end{table}
 
 \noindent \textbf{Fitting the same model to different data:} Finally, we view collections of models by fitting the same models to different data to understand how the model behaves in different contexts. As we did for the friendship data, we estimated the parameters for M1, M2, and M3, when fit to the senate data (see Figure \ref{fig:senateplot}) 100 times each. The means and standard deviations of the repeated parameter estimates for all six model-data combinations are given in Table~\ref{tab:meanests}, while corresponding density plots of the objective function parameters are given in Figure~\ref{fig:compareModels} in the Appendix. Looking at the estimates for both data sets, a few patterns emerge. First, we can see the same relationship between the outdegree parameter, $\beta_1$, and the reciprocity parameter, $\beta_2$ in both data sets and across all three models. The estimates of $\beta_1$ are all negative and range from about -5 and -3, while the estimates of $\beta_2$ are all positive and range from about four to five. %In addition, the outegree parameter, $\beta_1$, \textit{decreases} when $\beta_3$ is included, while the reciprocity parameter, $\beta_2$ increases. This inverse relationship implies that the girls prefer to form small, closely knit friend groups, as opposed to being popular and having many friends. Tight-knit friend groups are more encouraged by model M2 than by models M1 and M3.
 This suggests that in both data sets, nodes prefer outgoing ties that are reciprocated to those that are not. When we consider the context, this seems obvious: the students want to have close mutual friendships, and senators want mutual support for their bills. We are also concerned, however, with the extremely high correlation between the estimates of $\beta_1, \beta_2$. In all six model-data combinations, the absolute correlation between $\hat{\beta}_1, \hat{\beta}_2$ is greater than 0.93. %We explore the relationship between $\beta_1$ and $\beta_2$ further in Section~\ref{sec:samemodsamedat}.
 % We have seen how the same model forms behave in different context, with some  differences and some similarities. 
-After seeing the high correlation between parameter estimates in very different data contexts, we question the guideline that both parameters need to be included in the objective function. 
+After seeing the high correlation between parameter estimates in very different data contexts, we might question the guideline that both parameters need to be included in the objective function. 
 
 In Figure~\ref{fig:distests}, we saw that the inclusion of $\beta_3$ for the friendship data has a noticeable effect on the other parameters in the model. In Figure~\ref{fig:compareModels}, however, we see that this effect is not present in the senate data. Furthermore, the estimates of $\beta_4$ for the senate data are near zero, suggesting that this effect, which considers indirect ties, is not informative for the senate data. In contrast for the friendship data, the mean estimate of $\beta_4$ is about -7.5, which suggests that indirect ties are \textit{strongly} discouraged from forming. Again, this is fairly intuitive given the context: teenage girls likely want to have direct friendships with each other. Senators, on the other hand, have to wheel and deal to pass their legislation, and indirect relationships may be beneficial at times. By examining the results of models fitted to different data, we better understand the interpretation of the objective function parameters, and we have learned of some potential parameter correlation problems affecting the fit of the models. All in all, we have used four different ways of viewing collections of models, which have given us insight into the behavior of SAOMs.
 
@@ -1101,15 +1102,15 @@ ggdraw() + draw_plot(p1, width = .4) +  draw_plot(p2a, width = .4, x=.4) +
 @
 
 We continue to use animation to view the changing structure of the network via adjacency matrix visualizations. In the first adjacency matrix visualization in Figure~\ref{fig:adjmatorder}, we use the node ID to order the rows and columns. This arbitrary ordering does not easily convey the underlying structure of the network. We use \textit{matrix seriation} to reorder the rows and columns of the adjacency matrix visualization so that the structure of the network is apparent \citep{seriation}. %This lack of perceived structure would contribute to further confusion as the network chages, so we adjust the ordering so that the viewer can better perceive the structure of the network. This process is known as matrix seriation 
-To seriate the matrix, we first constructed a cumulative adjaceny matrix, $\mathbf{A}^{cum}$, for the series of microsteps simulating the network from $x(t_m)$ to $x(t_{m+1})$. A single entry in the cumulative adjacency matrix, $\mathbf{A}^{cum}_{ij}$, is the total number of times the edge $i \rightarrow j$ appears in the network from the initial observation, $x(t_m) \equiv X(0)$ to the final result of the last microstep, $X(R)$, where $R$ is the total number of microsteps taken:
+To seriate the matrix, we first construct a cumulative adjaceny matrix, $\mathbf{A}^{cum}$, for the series of microsteps simulating the network from $x(t_m)$ to $x(t_{m+1})$. A single entry in the cumulative adjacency matrix, $\mathbf{A}^{cum}_{ij}$, is the total number of times the edge $i \rightarrow j$ appears in the network from the initial observation, $x(t_m) \equiv X(0)$ to the final result of the last microstep, $X(R)$, where $R$ is the total number of microsteps taken:
 \begin{equation}\label{eq:acum}
 \mathbf{A}^{cum}_{ij} = \sum_{r = 0}^R X_{ij}(r). 
 \end{equation}
-We then performed a principal component analysis (PCA) on $\mathbf{A}^{cum}$, and used the values of the first principal component to order the vertices on the $x$ and $y$ axes for the adjacency matrix animation. The resulting visualization for the first wave of data is shown in Figure~\ref{fig:adjmatorder}. %we present the first wave of data ordered by the arbitrary node ID order alongside the seriated adjacency matrix ordered by the first principal component loading on the cumulative adjacency matrix, $\mathbf{A}^{cum}$. 
-Using PCA on $\mathbf{A}^{cum}$ to order the rows and columns of the adjacency matrix visualization clearly shows the two distinct connected components in the first wave of the network, which are difficult to find in the visualization ordered by node ID. We continue to use the seriated matrix in another animation of the microstep process, which is avaiable at \url{https://vimeo.com/240092677}. A few frames of the video are shown in Figure~\ref{fig:adjmatani}. In the animation, a square appears or disappears as that edge appears or disappears in the microstep process. %Through this animation, we can see edges appearing, and then later on disappearing. 
+We then perform a principal component analysis (PCA) on $\mathbf{A}^{cum}$, and use the values of the first principal component to order the vertices on the $x$ and $y$ axes for the adjacency matrix animation. The resulting visualization for the first wave of data is shown in Figure~\ref{fig:adjmatorder}. %we present the first wave of data ordered by the arbitrary node ID order alongside the seriated adjacency matrix ordered by the first principal component loading on the cumulative adjacency matrix, $\mathbf{A}^{cum}$. 
+Using PCA on $\mathbf{A}^{cum}$ to order the rows and columns of the adjacency matrix visualization clearly shows the two distinct connected components in the first wave of the network, which are difficult to find in the visualization ordered by node ID. We continue to use the seriated matrix in another animation of the microstep process, which is available at \url{https://vimeo.com/240092677}. A few frames of the video are shown in Figure~\ref{fig:adjmatani}. In the animation, a square appears or disappears as that edge appears or disappears in the microstep process. %Through this animation, we can see edges appearing, and then later on disappearing. 
 This visualization also shows the microsteps where the nodes do not make a change. From start to finish, we see network evolve according to the model: sometimes ties are removed right after they are created, and sometimes several ties are removed or created in a row. The adjacency matrix animation shows the many ways the algorithm explores the data space. By viewing this animation, we can gain a better understanding of the dynamics of this model. 
 
-<<adjmatani, fig.cap='A selection of frames from the adjacency matrix visualization animation for one series of microsteps. The node lables are removed to declutter the figure. Starting at frame 0, there are two clearly connected components: one in the bottom left corner, and one in the top right corner. By the end, the component in the bottom left has spread out and become sparsely connected, while the top right component has shrunk, but remains closely connected.', warning = FALSE, message = FALSE, results='hide', fig.height=2.5>>=
+<<adjmatani, fig.cap='A selection of frames from the adjacency matrix visualization animation for one series of microsteps. The node labels are removed to declutter the figure. Starting at frame 0, there are two clearly connected components: one in the bottom left corner, and one in the top right corner. By the end, the component in the bottom left has spread out and become sparsely connected, while the top right component has shrunk, but remains closely connected.', warning = FALSE, message = FALSE, results='hide', fig.height=2.5>>=
 adjmatall <- matrix(0, nrow = 16, ncol = 16)
 rownames(adjmatall) <- paste0("V", 1:16)
 colnames(adjmatall) <- paste0("V", 1:16)
@@ -1139,15 +1140,11 @@ adjmatall3$to <- factor(adjmatall3$to, levels = order1)
 adjmatall3$from <- factor(adjmatall3$from, levels = order1)
 
 adjmatall3$frame <- adjmatall3$ms
-#plots <- list()
-#for(i in 0:55){
-#plots[[i + 1]] <-
 
 dat3 <- adjmatall3 %>% filter(ms %in% c(0,2,4,6,8,10,12,43,45,47,49,51,53,55))
 
 dat4 <- dat3 %>% select(-ms) %>% spread(frame, val)
 dat5 <- dat4
-#p <- Sys.time()
 for(i in 4:16){
   for(j in 1:nrow(dat5)){
     if(dat4[j,i] != dat4[j,i-1]){
@@ -1179,7 +1176,8 @@ ggplot() +
         strip.text.x = element_text(size = rel(.75)),
         strip.text.y = element_text(size = rel(.75)),
         legend.text = element_text(size = rel(.75)), 
-        legend.title = element_text(size = rel(.75))) +
+        legend.title = element_text(size = rel(.75)), 
+        legend.position = "bottom") +
   coord_fixed() +
   facet_wrap(~frame, labeller = 'label_both', nrow = 2)
 #}
@@ -1259,7 +1257,7 @@ ggplot(data = changes3) +
 
 @
 
-<<heatmap, fig.align='center', fig.cap='Adjacency matrix visualizations showing the theoretical (left) and empirical (right) transition probabilities for the first microstep observed in 1,000 simulations. The ego node is on the y-axis, and the alter node is on the x-axis. There were many ties with empirical probability zero.', fig.height=2.5>>=
+<<heatmap, fig.align='center', fig.cap='Adjacency matrix visualizations showing the theoretical (left) and empirical (right) transition probabilities for the first microstep observed in 1,000 simulations. The ego node is on the y-axis, and the alter node is on the x-axis. There are many ties with empirical probability zero.', fig.height=2.5>>=
 
 ansnullchains %>%
   filter(period == 1) %>%
@@ -1287,12 +1285,13 @@ p1 <- ggplot(data = probsDat,
              x = factor(alter, levels = order1),
              fill = prob)) +
   geom_tile(color = 'black') +
-  scale_fill_gradient(low = 'white', high = 'black', limits = c(0,1)) +
+  scale_fill_gradient(low = 'white', high = 'black', limits = c(0,1), name = "theoretical\nprobability") +
   labs(y = "ego", x = "alter")+
   scale_x_discrete(position = 'top') +
   #scale_y_discrete(labels = rev(str_replace(order1, "V", ""))) +
   ThemeNoNet + 
-  theme(panel.grid = element_blank(), axis.text = element_text(size=rel(.8))) +
+  theme(panel.grid = element_blank(), axis.text = element_text(size=rel(.7)),
+        legend.position = "bottom", legend.title = element_text(size=rel(.7))) +
   coord_fixed() + 
   ggtitle("Theoretical Probabilities")
 p2 <- ggplot(data = empprobsDat,
@@ -1300,12 +1299,13 @@ p2 <- ggplot(data = empprobsDat,
              x = factor(alter, levels = order1),
              fill = empprob)) +
   geom_tile(color = 'black') +
-  scale_fill_gradient(low = 'white', high = 'black', name = "prob") +
+  scale_fill_gradient(low = 'white', high = 'black', name = "empirical\nprobability") +
   labs(y = "ego", x = "alter")+
   scale_x_discrete(position = 'top') +
   #scale_y_discrete(labels = rev(str_replace(order1, "V", ""))) +
   ThemeNoNet + 
-  theme(panel.grid = element_blank(), axis.text = element_text(size=rel(.8))) +
+  theme(panel.grid = element_blank(), axis.text = element_text(size=rel(.7)),
+        legend.position = 'bottom', legend.title = element_text(size=rel(.7))) +
   coord_fixed() + 
   ggtitle("Empirical Probabilities")
 gridExtra::grid.arrange(p1, p2, nrow = 1)
@@ -1450,7 +1450,7 @@ grid.arrange(p1, p2, nrow = 2)
 
 \section{Discussion}\label{sec:discussion}
 
-We have used novel visualization methods to explore the family of models known as stochastic actor-oriented models for dynamic social network data. By viewing the model in the data space, visualizing collections of models, and looking at the underlying algorithms, we have been able to gain knowledge and appreciation for these complicated and flexible models. When we looked at the model in the data space by viewing the expected network simulated from a model, we were able to easily see the lack of model fit. When visualizing collections of models, we quickly uncovered concerning relationships between parameters. When we explored the algorithms, we gained a better understanding of the model and its stochastic behavior. 
+We have used traditional network visualization methods to explore the family of models known as stochastic actor-oriented models for dynamic social network data in new ways. By viewing the model in the data space, visualizing collections of models, and looking at the underlying algorithms, we have been able to gain knowledge and appreciation for these complicated and flexible models. When we look at the model in the data space by viewing the expected network simulated from a model, we are able to easily see the lack of model fit. When visualizing collections of models, we uncover concerning relationships between parameters. When we explore the algorithms, we gain a better understanding of the model and its stochastic behavior. 
 % Visualizing the CTMC can provide researchers with more insight into the underlying features of the model. In addition, SAOMs can include a great deal of parameters in the model structure, each of which is attached to a network statistic. These statistics are often somewhat, if not highly, correlated, which causes high correlation between the corresponding parameters in a SAOM. By visualizing collections of SAOMs, we gain a better understanding of these correlations and can find ways to account for their effects in the model. Furthermore, the estimation of the parameters in a SAOM rely on convergence checks based on simulations from the fitted model. These simulations are hidden and unsaved by default for computational efficiency. With the help of both static and dynamic visualizations, we bring the hidden model fitting processes into the foreground, eventually leading to a better understanding and higher accessibility of stochastic actor-oriented models for social network analysts.
 We have only just begun to scratch the surface of these multi-layered models for social networks. The \texttt{RSiena} software is incredibly powerful, and can fit much more flexible stochastic actor-oriented models than we have examined here. If, for example, a researcher thinks the network structure or an actor covariate affects the rate of change of the network, there is a way to incorporate that belief into the rate function of the SAOM. In addition, more than one actor-level covariate can be included in the model, and many more than three parameters can be included in the objective function itself. As we have shown, the rate and objective function parameters are often highly correlated, so researchers can now use model-vis techniques to gain a better understanding of these correlations and hopefully find ways to account for their effects in the model. In addition, SAOMs can model behavior change of the actors in the network, a capability we did not explore here. 
 
