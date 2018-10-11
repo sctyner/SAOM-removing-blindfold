@@ -101,7 +101,7 @@ load("data/M3sims1000.RData")
 %Social networks, such as collaboration networks between academic researchers or friendship networks 
 % new intro 
 %As humans and researchers, it is our instint to try to learn as much as we can about the world around us. 
-As members of the human family, one of the hardest things we try to do is understand our relationships with one another, whether as friends, family, or colleagues. These relationships, or \emph{social networks}, have been studied for decades, in every format from self-help books to publications in academic journals. There are statistical models, such as exponential random graph models (ERGM) and latent space models (LSM), that strive to capture the underlying relationship-generating mechanism \citep{ergm, lsm}. These static models, however, are not optimal for modelling ``real-world" social networks because they do not account for changes in the network as time passes. Models for \textit{dynamic social networks} are more realistic because they contain multiple observations of the same network over time. %., and models for dynamic social networks hold a great deal of promise because of their potential to capture realistic mechanisms. %Our social networks evolve over time as new relationships are made, and being able to model these evolutionary mechanisms can uncover hidden truths about our relationships with each other. 
+As members of the human family, one of the hardest things we try to do is understand our relationships with one another, whether as friends, family, or colleagues. These relationships, or \emph{social networks}, have been studied for decades, in every format from self-help books to publications in academic journals. There are statistical models, such as exponential random graph models (ERGM) and latent space models (LSM), that strive to capture the underlying relationship-generating mechanism \citep{ergm, lsm}. These static models, however, are not optimal for modelling ``real-world" social networks because they do not account for changes in the network as time passes. Models for \textit{dynamic social networks} are more realistic because they provide mechanisms for analyzing multiple observations of the same network over time. %., and models for dynamic social networks hold a great deal of promise because of their potential to capture realistic mechanisms. %Our social networks evolve over time as new relationships are made, and being able to model these evolutionary mechanisms can uncover hidden truths about our relationships with each other. 
 
 \par One set of models for dynamic social networks are stochastic actor-oriented models (SAOMs), introduced in \citet{saompaper}. These models incorporate node-level covariate effects in addition to the traditional structural effects, such as in-degree or out-degree. 
 %These models are different from other dynamic network models because they allow us to add node level information into the model with the traditional network structure information. Adding node-level information into the model is a more intuitive approach to model changes in a social network because, for example 
@@ -392,7 +392,7 @@ alldat$X2 <- as.factor(alldat$X2)
 #write_csv(alldat, "smallfriends4Geomnet.csv")
 alldataviz <- ggplot(data = alldat,
        aes(from_id = X1, to_id = X2, color = as.ordered(drink), group = as.ordered(drink))) +
-  geom_net(fiteach = FALSE, directed=TRUE, layout.alg = 'fruchtermanreingold', size = 4, arrowsize = .25, arrowgap = .05, ecolour = 'grey40', labelon=T, labelcolour = 'white', fontsize = 2, vjust = .5, linewidth=0.5) +
+  geom_net(fiteach = FALSE, directed=TRUE, layout.alg = 'fruchtermanreingold', size = 4, arrowsize = .25, arrowgap = .05, ecolour = 'black', labelon=T, labelcolour = 'white', fontsize = 2, vjust = .5, linewidth=0.25) +
   scale_color_manual(values = cols[8:5], name = "Drinking\nBehavior", labels = c("never", "1-2 times per year", "once per month", "once per week")) +
   ThemeNet +
   facet_wrap(~Wave, labeller = "label_both") +
@@ -471,16 +471,16 @@ ggplot(data = jTT, aes(from_id = from, to_id = to)) +
            labelcolour='white',vjust = 0.5, hjust =0.5, arrowgap = .15,
            size=10, fontsize = 5, ecolour="black",
            linetype = c("solid", "solid","dotted", "solid")) +
-  expand_limits(x=c(-0.1,1.1), y=c(-0.1,1.1)) +
+  expand_limits(x=c(-0.2,1.2), y=c(-0.1,1.1)) +
   ThemeNet +
-  theme(legend.position = "none", 
-        plot.title = element_text(size = rel(1.1))) + 
-  labs(title = expression(paste(s[i3], "(x,z)", "=",Sigma[j != h], x[ij], x[ih], x[hj] %*% 
-                                I, "(", z[i], "=", z[h]!= z[j], ")")
-                          )
-       )
+  theme(legend.position = "none") + 
+  labs(title = expression(paste(s[i3], "(x,z)")))
+  # labs(title = expression(paste(s[i3], "(x,z)", "=",Sigma[j != h], x[ij], x[ih], x[hj] %*% 
+  #                               I, "(", z[i], "=", z[h]!= z[j], ")")
+  #                         )
+  #      )
 @
-\caption{\label{fig:jtt}Realization of a JTT, where $i$ is the ego, $j$ is the alter, and $h$ is the intermediary. The covariate is represented by the shape of the nodes.}
+\caption{\label{fig:jtt}Realization of a JTT, where $i$ is the ego, $j$ is the alter, and $h$ is the intermediary. The covariate is represented by the shape of the nodes. $s_{i3}(x,z) = \sum_{j \neq h} x_{ij}x_{ih}x_{hj} \mathbb{I}(z_i = z_h \neq z_j)$}
 \end{subfigure}\hfill
 \begin{subfigure}[t]{.45\textwidth}
 <<dab, echo=FALSE, fig.width=2, fig.height=2, message = FALSE, warning = FALSE, fig.align='center', out.width='.49\\textwidth'>>=
@@ -496,13 +496,13 @@ ggplot(data = dad, aes(from_id = from, to_id = to)) +
            labelcolour='white',vjust = 0.5, hjust =0.5, arrowgap = .15, size=10, fontsize = 5) +
   expand_limits(x=c(-0.1,1.1), y=c(-0.1,1.1)) +
   ThemeNet +
-  theme(legend.position = "none", 
-        plot.title = element_text(size = rel(1.1))) + 
-  labs(title = expression(paste(s[i4], "(x)", "=", "|{j:", x[ij],"=0, ", Sigma[h], x[ih], x[hj] >= 2, "}|" )
-                          )
-       )
+  theme(legend.position = "none") + 
+  labs(title = expression(paste(s[i4], "(x)")))
+  # labs(title = expression(paste(s[i4], "(x)", "=", "|{j:", x[ij],"=0, ", Sigma[h], x[ih], x[hj] >= 2, "}|" )
+  #                         )
+  #      )
 @
-\caption{\label{fig:dad}Realization of a N22 between actors $i$ and $j$. The dotted tie is encouraged if $\beta_4$ has a positive value.}
+\caption{\label{fig:dad}Realization of a N22 between actors $i$ and $j$. The dotted tie is encouraged if $\beta_4$ has a positive value. $s_{i4}(x) =  |\{j : x_{ij} = 0, \sum\limits_h x_{ih}x_{hj} \geq 2\}|$}
 \end{subfigure}
 \caption{\label{fig:structures} The additional network effects included in our models fit to the friends data. On the left, a JTT between $i$ and $j$, who have different covariate values, and on the right, a N22 between $i$ and $j$.}
 \end{figure}
@@ -537,7 +537,7 @@ ggplot() +
   #theme_net() +
   ThemeNet +
   scale_shape_manual(values = c(17,16), guide = guide_legend(nrow= 2)) +
-  scale_color_manual(values = c("black", "grey30","#ef3b2c"), guide = guide_legend(nrow=2)) +
+  scale_color_manual(values = c("black", "grey80","#ef3b2c"), guide = guide_legend(nrow=2)) +
   facet_wrap(~Clinton, nrow = 1, labeller = 'label_both')  +
   theme(legend.position = "bottom")
 @
@@ -678,7 +678,6 @@ grid.arrange(p2, p1, p3, nrow = 1)
 To view a SAOM in the data space, we simulate from the fitted model. No single network instance simulated from a SAOM will fully represent the model, so instead we look at an \textit{expectation} from the network model. We frequently rely on expected values in statistics, but network models, especially those as complex as SAOMs, lack an expected network measure. We could talk about expected values of parameters, but the parameters can be hard to interpret and cannot teach us much about the overall structure of the network. How then, can we arrive at an ``expected" network? We answer this question with visualization.
 %Expected values of parameters can be computed, but if they cannot directly tell us anything about our dependent variable, they lose value. 
 %There is no defined expected value of a network model, though expectations exist for most other statistical models. 
-
 %For network data, we view an ``average" network through a sort of summary network drawn using the traditional node-link diagram. 
 %In Figure~\ref{fig:summnetM1}, we show the \textit{expected network} of wave 2 from model M1, created with 1,000 simulations from the model. 
 To construct an expected network, we: 
@@ -686,7 +685,7 @@ To construct an expected network, we:
 \item simulate 1,000 wave 2 and wave 3 instances of our small friendship network from model M1 using parameters that have previously been estimated. Then, we 
 \item count the number of times each edge $i \rightarrow j$ appeared in one of the 1,000 network simulations. Then, we
 \item construct one weighted summary network for each time point, which has edge weights equal to the proportion of the simulated networks in which the edge appeared. Finally, we 
-\item creat the \textit{expected network} by including only the edges that appeared in more than 5\% of the simulations. 
+\item create the \textit{expected network} by including only the edges that appeared in more than 5\% of the simulations. 
 \end{enumerate}
 The resulting expected network is in the middle panel of Figure~\ref{fig:summnetM1}. Edges with higher weights are darker, thicker lines. On either side of the average network in Figure~\ref{fig:summnetM1}, we show the data for comparison: wave 1 on the left, and wave 2 on the right. We can see that the structure of the average network is much more similar to wave 1 than to wave 2. In both wave 1 and the expected network, the edges form two distinct clusters of nodes: $\{2,3,4,5,6,12,13,15\}$ and $\{7,8,9,10,11,14\}$. The expected network, however, is supposed to represent the second wave of data, on the right in Figure~\ref{fig:summnetM1}. The expected network does not resemble wave 2, which has one small node cluster and on large node cluster, with four unconnected nodes. Because the expected network does not resemble wave 2, we take this as evidence that the simple model, M1, does not capture the change in network structure from the first to the second wave of data. Visualizing the expected network in this way places the model M1 in the data space, and helps us assess model fit. % We can use the average network to help determine model goodness-of-fit. Because the the expected  network looks more like the first wave than the second wave, we can use the visualization in Figure~\ref{fig:summnetM1} as evidence of poor model fit.  
 
@@ -722,13 +721,13 @@ p1 <- ggplot(data = t1_1) +
            arrow = arrow(angle = 20, type = "open", length = unit(.2, "cm")), # ecolour = t1_1$color2,
            color = "#252525", hjust = .5, vjust = .5, labelcolour = 'white', fontsize = 4, arrowgap = .02, layout.alg = "fruchtermanreingold",
            singletons = T) +
-  scale_linetype_manual(values =c("dotted", "solid") ) + 
+  scale_linetype_manual(values =c("longdash", "dotted") ) + 
   labs(title = "Difference between Wave 1 &\nWave 2 expectation from M1") + ThemeNet +
   theme(plot.background = element_rect(color = 'black'), legend.position = "none")
 
 pforleg <- ggplot(data = mtcars) + 
   geom_line(aes(x = mpg, drat, group = as.factor(cyl), linetype = as.factor(cyl))) + 
-  scale_linetype_manual(values = c("solid", "longdash", "dotted"), name = "Tie is...", labels = c("in data, in\nexpectation", "in data,not in\nexpectation", "not in data, in\nexpectation")) + 
+  scale_linetype_manual(values = c("dotted", "solid", "longdash"), name = "Tie is...", labels = c("in data, in\nexpectation", "in data,not in\nexpectation", "not in data, in\nexpectation")) + 
   theme_grey() + 
   theme(legend.key = element_rect(color = "black", fill = "white"), 
         legend.key.height = unit(25, "pt"))
@@ -754,7 +753,7 @@ p2 <- ggplot(data = t1_2) +
            arrow = arrow(angle = 20, type = "open", length = unit(.2, "cm")), #ecolour = t1_2$color2,
            color = "#252525", hjust = .5, vjust = .5, labelcolour = 'white', fontsize = 4, arrowgap = .02, layout.alg = "fruchtermanreingold",
            singletons = T) +
-  scale_linetype_manual(values = c("dotted", "longdash", "solid")) + 
+  scale_linetype_manual(values = c("longdash", "solid", "dotted")) + 
   labs(title = "Difference between Wave 2 &\nWave 2 expectation from M1") + ThemeNet +
   theme(plot.background = element_rect(color = 'black'), legend.position = "none")
 legendsumm <- cowplot::get_legend(pforleg)
@@ -762,7 +761,7 @@ ggdraw() + draw_plot(p1, width = .4) +  draw_plot(p2, width = .4, x=.4) +
   draw_grob(legendsumm,x=.8, y=.25, width = .2, height = .4)
 @
 
-Another way to view a SAOM in the data space is with \textit{difference networks} between the expected network and the data, as shown in Figure~\ref{fig:summary2}. We created these networks by computing the difference between the adjacency matrices for the expected network and wave 1, and for wave 2 and the expected network. The lack of model fit becomes even more clear in Figure~\ref{fig:summary2}, with the dotted edges representing ties that only show up in the expected network, and the broken edges representing ties in the data that the model misses completely.  Again, the widths of the edges demonstrate the frequency of the ties in the simulations. On the left in Figure~\ref{fig:summary2}, we see the difference between the first wave of data and the expected network. We only see dotted and solid edges, meaning that the simulated networks consist primarily of edges in wave 1, plus some new edges that are not in the first wave of data. The additional edges are all reciprocating edges in the data, meaning that the model predicts more reciprocity in ties than there actually is. On the right in Figure~\ref{fig:summary2}, we see the difference between the second wave of data and the expected network. As the model is simulating the second wave of data, we would hope to see few differences between the expected network and wave 2. However, there are six broken edges, which are edges in the data that do not appear at all in the expected network, and there are a great many dotted edges that are in the expected network, but not in the data. Although there are some edges that appear in both the expected network and wave 2, the majority of edges in the expected network are not in wave 2, and there are several missing edges. We conclude that the model M1 is a poor fit to our example data, which we have seen very clearly by viewing the model in the data space. 
+Another way to view a SAOM in the data space is with \textit{difference networks} between the expected network and the data, as shown in Figure~\ref{fig:summary2}. We created these networks by computing the difference between the adjacency matrices for the expected network and wave 1, and for wave 2 and the expected network. The lack of model fit becomes even more clear in Figure~\ref{fig:summary2}, with the broken edges representing ties that only show up in the expected network, and the solid edges representing ties in the data that the model misses completely.  Dotted edges are in both the expectation and the data and represent where the model fit the data well. Again, the widths of the edges demonstrate the frequency of the ties in the simulations. On the left in Figure~\ref{fig:summary2}, we see the difference between the first wave of data and the expected network. We only see dotted and broken edges, meaning that the simulated networks consist primarily of edges in wave 1, plus some new edges that are not in the first wave of data. The added ties are all reciprocating edges in the data, meaning that the model predicts more reciprocity between actors than there actually is. On the right in Figure~\ref{fig:summary2}, we see the difference between the second wave of data and the expected network. Because the model is simulating the second wave of data, we would hope to see very few differences between the expected network and wave 2. However, there are six solid edges, which are edges in the data that do not appear at all in the expected network, and there are many broken edges that appear in the expected network but not in the data. Although there are some edges that appear in both the expected network and wave 2, the majority of edges in the expected network are not in wave 2, and there are several edges missing from the expectation. We conclude that the model M1 is a poor fit to our example data, which we have seen very clearly by viewing the model in the data space. 
 
 % No longer using this plot
 <<gof2, fig.cap="An example of viewing the distribution of a statistic of interest from a SAOM. Here, the Mahalanobis distance of the cumulative outdegree values computed on a simulated network to the mean value simulated is shown. The distance computed from the data is shown as a vertical line.", fig.height=3, out.width='.6\\textwidth', eval = FALSE>>=
@@ -873,7 +872,7 @@ $\beta_3$ & -- & \Sexpr{SFE$M2[5]} & -- & -- & \Sexpr{SSE$M2[6]} & -- \\
   \hline
 \end{tabular}
 }
-\caption{\label{tab:meanests} The means (std.\ dev.) of parameter values estimated from repeated fittings of $M1, M2, M3$ to the two example data sets.}
+\caption{\label{tab:meanests} The means (std.\ dev.)\ of parameter values estimated from repeated fittings of $M1, M2, M3$ to the two example data sets.}
 \end{table}
 
 \noindent \textbf{Fitting the same model to different data:} Finally, we view collections of models by fitting the same models to different data to understand how the model behaves in different contexts. As we did for the friendship data, we estimated the parameters for M1, M2, and M3, when fit to the senate data (see Figure \ref{fig:senateplot}) 100 times each. The means and standard deviations of the repeated parameter estimates for all six model-data combinations are given in Table~\ref{tab:meanests}, while corresponding density plots of the objective function parameters are given in Figure~\ref{fig:compareModels} in the Appendix. Looking at the estimates for both data sets, a few patterns emerge. First, we can see the same relationship between the outdegree parameter, $\beta_1$, and the reciprocity parameter, $\beta_2$ in both data sets and across all three models. The estimates of $\beta_1$ are all negative and range from about -5 and -3, while the estimates of $\beta_2$ are all positive and range from about four to five. %In addition, the outegree parameter, $\beta_1$, \textit{decreases} when $\beta_3$ is included, while the reciprocity parameter, $\beta_2$ increases. This inverse relationship implies that the girls prefer to form small, closely knit friend groups, as opposed to being popular and having many friends. Tight-knit friend groups are more encouraged by model M2 than by models M1 and M3.
@@ -1110,7 +1109,7 @@ We then perform a principal component analysis (PCA) on $\mathbf{A}^{cum}$, and 
 Using PCA on $\mathbf{A}^{cum}$ to order the rows and columns of the adjacency matrix visualization clearly shows the two distinct connected components in the first wave of the network, which are difficult to find in the visualization ordered by node ID. We continue to use the seriated matrix in another animation of the microstep process, which is available at \url{https://vimeo.com/240092677}. A few frames of the video are shown in Figure~\ref{fig:adjmatani}. In the animation, a square appears or disappears as that edge appears or disappears in the microstep process. %Through this animation, we can see edges appearing, and then later on disappearing. 
 This visualization also shows the microsteps where the nodes do not make a change. From start to finish, we see network evolve according to the model: sometimes ties are removed right after they are created, and sometimes several ties are removed or created in a row. The adjacency matrix animation shows the many ways the algorithm explores the data space. By viewing this animation, we can gain a better understanding of the dynamics of this model. 
 
-<<adjmatani, fig.cap='A selection of frames from the adjacency matrix visualization animation for one series of microsteps. The node labels are removed to declutter the figure. Starting at frame 0, there are two clearly connected components: one in the bottom left corner, and one in the top right corner. By the end, the component in the bottom left has spread out and become sparsely connected, while the top right component has shrunk, but remains closely connected.', warning = FALSE, message = FALSE, results='hide', fig.height=2.5>>=
+<<adjmatani, fig.cap='A selection of frames from the adjacency matrix visualization animation for one series of microsteps. The node labels are removed to declutter the figure. Starting at frame 0, there are two clearly connected components: one in the bottom left corner, and one in the top right corner. By the end, the component in the bottom left has spread out and become sparsely connected, while the top right component has shrunk, but remains closely connected.', warning = FALSE, message = FALSE, results='hide', fig.height=3, out.width="\\linewidth">>=
 adjmatall <- matrix(0, nrow = 16, ncol = 16)
 rownames(adjmatall) <- paste0("V", 1:16)
 colnames(adjmatall) <- paste0("V", 1:16)
@@ -1285,13 +1284,20 @@ p1 <- ggplot(data = probsDat,
              x = factor(alter, levels = order1),
              fill = prob)) +
   geom_tile(color = 'black') +
-  scale_fill_gradient(low = 'white', high = 'black', limits = c(0,1), name = "theoretical\nprobability") +
+  scale_fill_gradient(low = 'white', high = 'black', limits = c(0,1), name = "theoretical\nprobability", labels = c("0","",".5","","1")) +
   labs(y = "ego", x = "alter")+
   scale_x_discrete(position = 'top') +
   #scale_y_discrete(labels = rev(str_replace(order1, "V", ""))) +
   ThemeNoNet + 
-  theme(panel.grid = element_blank(), axis.text = element_text(size=rel(.7)),
-        legend.position = "bottom", legend.title = element_text(size=rel(.7))) +
+  theme(panel.grid = element_blank(), 
+          axis.text.x.top = element_text(size=rel(.7)),
+          axis.text.y.left = element_text(size=rel(.7)),
+          legend.position = "bottom", 
+          legend.title = element_text(size=rel(.7)), 
+          legend.text = element_text(size=rel(.7)), 
+          legend.key.height = unit(.5, "cm"), 
+          legend.margin=margin(0,0,0,0),
+          legend.box.margin=margin(-10,-10,-5,-10)) +
   coord_fixed() + 
   ggtitle("Theoretical Probabilities")
 p2 <- ggplot(data = empprobsDat,
@@ -1299,16 +1305,24 @@ p2 <- ggplot(data = empprobsDat,
              x = factor(alter, levels = order1),
              fill = empprob)) +
   geom_tile(color = 'black') +
-  scale_fill_gradient(low = 'white', high = 'black', name = "empirical\nprobability") +
+  scale_fill_gradient(low = 'white', high = 'black', name = "empirical\nprobability", labels = c(".02", ".04", ".06"), breaks = c(.02, .04, .06)) +
   labs(y = "ego", x = "alter")+
   scale_x_discrete(position = 'top') +
   #scale_y_discrete(labels = rev(str_replace(order1, "V", ""))) +
   ThemeNoNet + 
-  theme(panel.grid = element_blank(), axis.text = element_text(size=rel(.7)),
-        legend.position = 'bottom', legend.title = element_text(size=rel(.7))) +
+    theme(panel.grid = element_blank(), 
+          axis.text.x.top = element_text(size=rel(.7)),
+          axis.text.y.left = element_text(size=rel(.7)),
+          legend.position = "bottom", 
+          legend.title = element_text(size=rel(.7)), 
+          legend.text = element_text(size=rel(.7)), 
+          legend.key.height = unit(.5, "cm"), 
+          legend.margin=margin(0,0,0,0),
+          legend.box.margin=margin(-10,-10,-5,-10)) +
   coord_fixed() + 
   ggtitle("Empirical Probabilities")
-gridExtra::grid.arrange(p1, p2, nrow = 1)
+plot_grid(p1, p2)
+#gridExtra::grid.arrange(p1, p2, nrow = 1)
 @
 
 
@@ -1450,11 +1464,13 @@ grid.arrange(p1, p2, nrow = 2)
 
 \section{Discussion}\label{sec:discussion}
 
-We have used traditional network visualization methods to explore the family of models known as stochastic actor-oriented models for dynamic social network data in new ways. By viewing the model in the data space, visualizing collections of models, and looking at the underlying algorithms, we have been able to gain knowledge and appreciation for these complicated and flexible models. When we look at the model in the data space by viewing the expected network simulated from a model, we are able to easily see the lack of model fit. When visualizing collections of models, we uncover concerning relationships between parameters. When we explore the algorithms, we gain a better understanding of the model and its stochastic behavior. 
-% Visualizing the CTMC can provide researchers with more insight into the underlying features of the model. In addition, SAOMs can include a great deal of parameters in the model structure, each of which is attached to a network statistic. These statistics are often somewhat, if not highly, correlated, which causes high correlation between the corresponding parameters in a SAOM. By visualizing collections of SAOMs, we gain a better understanding of these correlations and can find ways to account for their effects in the model. Furthermore, the estimation of the parameters in a SAOM rely on convergence checks based on simulations from the fitted model. These simulations are hidden and unsaved by default for computational efficiency. With the help of both static and dynamic visualizations, we bring the hidden model fitting processes into the foreground, eventually leading to a better understanding and higher accessibility of stochastic actor-oriented models for social network analysts.
-We have only just begun to scratch the surface of these multi-layered models for social networks. The \texttt{RSiena} software is incredibly powerful, and can fit much more flexible stochastic actor-oriented models than we have examined here. If, for example, a researcher thinks the network structure or an actor covariate affects the rate of change of the network, there is a way to incorporate that belief into the rate function of the SAOM. In addition, more than one actor-level covariate can be included in the model, and many more than three parameters can be included in the objective function itself. As we have shown, the rate and objective function parameters are often highly correlated, so researchers can now use model-vis techniques to gain a better understanding of these correlations and hopefully find ways to account for their effects in the model. In addition, SAOMs can model behavior change of the actors in the network, a capability we did not explore here. 
+We have used traditional network visualization methods to explore the family of stochastic actor-oriented models for dynamic social network data in new ways. The guiding principles of model-vis: viewing the model in the data space, visualizing collections of models, and looking at the underlying algorithms, gave us knowledge and appreciation for these complicated and flexible models. When we look at the model in the data space by viewing the expected network simulated from a model, we are able to easily see the lack of model fit. When visualizing collections of models, we uncover concerning relationships between parameters. When we explore the algorithms, we gain a better understanding of the model and its stochastic behavior. Our three-pronged, model-vis attack has uncovered many properties of SAOMs. 
 
-The data sets we have used are relatively small by network data standards, with only 16 and 100 nodes. We are aware that some of the visualizations we have presented may not scale up to larger networks. 
+We have only just begun to scratch the surface of these multi-layered models for social networks. The \texttt{RSiena} software is incredibly powerful, and can fit much more flexible SAOMs than we have examined here. If, for example, a researcher thinks the network structure or an actor covariate affects the rate of change of the network, there is a way to incorporate that belief into the rate function of the SAOM. In addition, more than one actor-level covariate can be included in the model, and many more than three parameters can be included in the objective function itself. As we have shown, the rate and objective function parameters are often highly correlated, so researchers can now use model-vis techniques to gain a better understanding of these correlations and hopefully find ways to account for their effects in the model. In addition, SAOMs can model behavior change of the actors in the network, a capability we did not explore here. 
+
+Furthermore, the data sets we have used are relatively small by network data standards, with only 16 and 100 nodes. Thus, some of the visualizations we have presented may not scale up to larger networks. Future SAOM and other network model visualization research could include interactive and/or three-dimensional graphics. Interactivity is the state-of-the-art in data visualization, and network visualization is just starting to catch on \citep[see e.g.\ ][]{refinery}. \citet{modelvis} relied on interactive tools like GGobi \citep{STLBC03} for interactivity, and for networks, there is some interactive support with the package \texttt{plotly} \citep{plotly} built into \texttt{geomnet}. 
+
+We hope that the principles of model-vis continue to be used for learning more about the fit and behavior of complicated statistical models. Our model-vis application has uncovered many properties of SAOMs, and potential abounds for use in other areas of network study.  
 
 %The flexibility of \texttt{RSiena} allows the user to specify which parameters lead to tie creation, and which parameters lead to tie dissolution. We have used ``evaluation" parameters, which are agnostic, allowing the data to decide which parameters affect creation or dissolution via the sign \citep{RSienamanual}. Finally, SAOMs and \texttt{RSiena} are able to also model behavior change of the actors in the network, which again is a capability we did not explore here.
 
@@ -1611,4 +1627,4 @@ ggplot(data = sfmsall5) +
 Finally, we combine 1,000 simulations from model M1 into a visualization that displays the entire microstep process in Figure~\ref{fig:alledgests}. To make this visualization, we first assign each possible edge in the network an ID number so that we can keep track of it throughout all microsteps and all simlations. Then, we count up the number of times each edge appears in the network throughout the microstep process for each of the 1,000 simulations. We also count the number of times an edge occurs at each step number. Since the number of microsteps in the process varies, the number of times an edge occurs decreases as the step number increases. Next, we compute a proportion, which we call the occurrence percentage, which is the number of times the edge was in the network in step 1, step 2, etc. divided by 1,000. Finally, we visualize all this information together in Figure~\ref{fig:alledgests}. In this plot, we see that all possible edges appear at least once at some point in the microsteps of at least one simulated process. We also see, however, that the process struggles to focus in on the edges in the second wave of the data. Ideally, we would like to see more occurrences the edges in wave 2 that are not in wave 1. But, about half of the edges in wave two are in the bottom half of the figure, which means they do not appear as much as they would if the model was actually capturing the mechanisms of tie change in the network. More of the darkest areas of the figure should belong to ties in wave 2, but those are often the lightest. This solidifies what we found in Figure~\ref{fig:heatmap}: the model M1 and the SAOM fitting process do not explore the data space enough to adequately capture the network change mechanism.
 
 
-\noindent \textbf{Online supplemental material:} Much of the code used to create these plots has been packaged an posted online at https://github.com/sctyner/netvizinf and https://github.com/sctyner/geomnet (also on CRAN). Additional, non-packaged code can be found at https://github.com/sctyner/SAOM-removing-blindfold. 
+\noindent \textbf{Online supplemental material:} Much of the code used to create the visualizations in this paper has been packaged and made available online at \url{https://github.com/sctyner/netvizinf} and \url{https://github.com/sctyner/geomnet} (also on CRAN). Additional, non-packaged code can be found at \url{https://github.com/sctyner/SAOM-removing-blindfold}. 
