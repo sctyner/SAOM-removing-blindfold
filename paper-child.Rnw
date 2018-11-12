@@ -1,7 +1,7 @@
 \newcommand{\st}[1]{{\color{orange} #1}}
 \newcommand{\hh}[1]{{\color{magenta} #1}}
 
-<<setup, echo = FALSE, message = FALSE, warning = FALSE>>=
+<<setup, echo = FALSE, message = FALSE, warning = FALSE, purl=FALSE>>=
 options(replace.assign=TRUE,width=70, digits=3)
 require(knitr)
 opts_chunk$set(fig.path='figure/', cache.path='cache/', fig.align='center', fig.pos='h', out.width='.99\\textwidth', par=TRUE, cache=FALSE, concordance=TRUE, autodep=TRUE, message=F, warning=F, echo = FALSE, dev="cairo_pdf", fig.width = 6, fig.height = 6)#, root.dir = "~/Desktop/Dissertation/SAOM-removing-blindfold/")
@@ -87,7 +87,7 @@ ThemeNet <- theme_net() %+replace%
                   strip.background = element_rect(colour = "black", fill = "white"))
 @
 
-<<getdata , echo=FALSE>>=
+<<getdata, echo=FALSE>>=
 set.seed(823746)
 load("data/ansnullpaper.rda")
 ansnullchains <- get_chain_info(ansnull)
@@ -101,9 +101,13 @@ load("data/M3sims1000.RData")
 %Social networks, such as collaboration networks between academic researchers or friendship networks 
 % new intro 
 %As humans and researchers, it is our instint to try to learn as much as we can about the world around us. 
-As members of the human family, one of the hardest things we try to do is understand our relationships with one another, whether as friends, family, or colleagues. These relationships, or \emph{social networks}, have been studied for decades, in every format from self-help books to publications in academic journals. There are also statistical models, such as exponential random graph models (ERGM) and latent space models (LSM), that strive to capture the underlying relationship-generating mechanism \citep{ergm, lsm}. These static models, however, are not optimal for modeling ``real-world" social networks because they do not account for changes in the network as time passes. Models for \textit{dynamic social networks} are more realistic because they provide mechanisms for analyzing multiple observations of the same network over time. %., and models for dynamic social networks hold a great deal of promise because of their potential to capture realistic mechanisms. %Our social networks evolve over time as new relationships are made, and being able to model these evolutionary mechanisms can uncover hidden truths about our relationships with each other. 
+As members of the human family, one of the hardest things we try to do is understand our relationships with one another, whether as friends, family, or colleagues. These relationships, or \emph{social networks}, have been studied for decades, in every format from self-help books to publications in academic journals. There are also statistical models, such as exponential random graph models (ERGM) and latent space models (LSM), that strive to capture the underlying relationship-generating mechanism \citep{ergm, lsm}. These static models, however, are not optimal for modeling ``real-world" social networks because they do not account for changes in the network as time passes. \textit{Dynamic social networks}, which are observed at many points in time, are the alternative to static networks. 
 
-\par One set of models for dynamic social networks are stochastic actor-oriented models (SAOMs), introduced in \citet{saompaper}. These models incorporate node-level covariate effects in addition to the traditional structural effects, such as in-degree or out-degree, common in ERGMs.
+Models for dynamic social networks, however, are more complicated than those for static networks. These models must account for both the structure and the change in time.  But if we can capture the network change mechanisms in time, % are more realistic because they provide mechanisms for analyzing multiple observations of the same network over time. 
+
+%., and models for dynamic social networks hold a great deal of promise because of their potential to capture realistic mechanisms. %Our social networks evolve over time as new relationships are made, and being able to model these evolutionary mechanisms can uncover hidden truths about our relationships with each other. 
+
+\par One family of models for dynamic social networks are continuous time Markov chain (CTMC) models, introduced in \citet{ctmcorig}. These models condition on the past to model the present state of the network. %These models incorporate node-level covariate effects in addition to the traditional structural effects, such as in-degree or out-degree, common in ERGMs.
 %These models are different from other dynamic network models because they allow us to add node level information into the model with the traditional network structure information. Adding node-level information into the model is a more intuitive approach to model changes in a social network because, for example 
 With these models, we can examine assumptions made about social networks, i.e. that people with common interests are more likely to become friends. For example, we may assume that teenagers who drink heavily are more likely to be friends with other tennagers who drink heavily. The SAOM family allows us to incorporate this behavioral information on shared interests into the modeling process.
 
@@ -141,10 +145,8 @@ ggplot(data = toynetdat) +
   ThemeNet +
   theme(plot.title = element_text(size = 20)) +
   labs(title = "Node-Link Diagram")
-#ggsave("figure/toynetnld.pdf",plot = nld, width = 4, height = 4)
 
 ggplot(data = toynet$edges) +
-  #geom_tile(aes(x = from, y = -to), color = 'grey20', fill = 'black') +
   geom_tile(aes(x = to, y = -from), color = 'grey20', fill = 'black') +
   geom_segment(aes(x = x, xend = xend), y = -0.5, yend=-5.5, colour="grey30", data = data.frame(x = 0:5+.5, xend= 0:5+.5)) +
   geom_segment(aes(y=-y, yend=-yend), x = 0.5, xend=5.5, colour="grey30", data = data.frame(y = -0:5+.5, yend= -0:5+.5)) +
@@ -159,7 +161,6 @@ ggplot(data = toynet$edges) +
         axis.text.y  = element_text(size = 18)) +
   labs(title = "Adjacency Matrix Visualization", x = "\nto (alter)", y = "from (ego)\n")
 @
-%\hh{XXX Explain each of these visualizations and either comment on the differences in the visualizations (colors) or don't show them. }
 
 The lack of a native coordinate system has given rise two very different primary net-vis methods: the node-link diagram and the adjacency matrix visualization \citep{knuth2000, adjmatpro}. We demonstrate these with a simpe example. Consider the network with five nodes, $\{1,2,3,4,5\}$, connected by five directed edges:  $\{2 \to 4, 3 \to 4, 1 \to 5, 3 \to 5, 5 \to 4\}$ shown in Figure~\ref{fig:toyplots}.
 
@@ -236,36 +237,6 @@ p_{ij}(\boldsymbol{\beta}, x, \mathbf{Z}) = \dfrac{\exp\left\{f_i(\boldsymbol{\b
 \end{equation}%When $i = j$, the numerator represents the exponential of the value of the objective function when evaluated at the current network state. 
 %When the value of the objective function is high at the current state, the probability of not making a change is also high.
 We explore these probabilities further in Section~\ref{sec:algorithms}. The probabilities $p_{ij}$ combined with the rate parameters $\alpha_m$ fully characterize the underlying CTMC that models network change. For more details on CTMCs, see e.g. \citet{ctmc}. 
-% \subsubsection{Continuous Time Markov Chain (CTMC)}
-% \st{
-% In the continuous-time Markov chain literature, see for instance \citet{ctmc}, chains are characterized by their \textit{generator} or \textit{intensity} matrix $\mathbf{Q}$. This matrix describes the rate of change between two states of the CTMC process, and the rows of this matrix always add to zero. For directed networks with binary edge variables like the ones we will be working with, there are a very large number of possible states for a directed network with $n$ nodes. We denote the state space as $\mathcal{X}$, a set which contains $2^{n(n-1)}$ states: there are two possible states for an edge, $\{0,1\}$, and there are $n(n-1)$ edge relationships because the network is directed and we exclude self-ties.  The intensity matrix for a CTMC in a SAOM is then a square matrix of dimension $2^{n(n-1)} \times 2^{n(n-1)}$. Only one tie changes at a time in the CTMC, resulting in $n(n-1)$ reachable states from the current network state. Thus, the intensity matrix $\mathbf{Q}$ is very sparse, with only $n(n-1) + 1$ non-zero entries in each row. Note that $n(n-1)$ of these entries represent the possible states that are one edge different from a given state, while the additional non-zero entry is for the state to remain unchanged. All other entries in a row are structural zeroes because those network states cannot be reached from the current state in a single change.
-% 
-% The two pieces of a SAOM, the rate function/parameter and the objective function, each contribute to the entries of the intensity matrix to describe the rate of change between two network states. The entries of $\mathbf{Q}$ are defined as follows: let $b \neq c \in \{1, 2, \dots, 2^{n(n-1)} \}$ be indices of two different possible states of the network, $x^b, x^c \in \mathcal{X}$.  Then the $bc^{th}$ entry of $Q$ is:
-% \[ q_{bc} = \begin{cases}
-%      q_{ij}= \alpha_m p_{ij}(\boldsymbol{\beta}, x^b) & \text{if } x^c \in \{x^b(i \leadsto j) | \text{ any } i \neq j \in \{1, \dots, n\}\} \\
-%       0 & \text{if } \sum_i \sum_j |x_{ij}^c -x_{ij}^b | > 1 \\
-%       -\sum_{i\neq j} q_{ij} & \text{if } x^b = x^c
-%    \end{cases}
-% \]
-% 
-% Thus, the rate of change between any two states, $x^b$ and $x^c$, that differ by only one tie $x_{ij}$, is the product of the rate at which actor $i$ gets to change a tie and the probability that the tie that will change is the tie to node $j$. This matrix $\mathbf{Q}$ is the foundation for estimation of a SAOM. %Estimating the parameters in these models is difficult, but thanks to the SIENA software \citep{RSiena}, we have an accessible way to fit SAOMs to network observations.
-% 
-% %XXX HH can you help? I need a way better transition than that XXX
-% }
-
-%### A SAOM as a CTMC {#saomctmc}
-
-%In order to fit this model definition back into the original context of the CTMC described in Section \@ref(dynamicnets), it must be written in terms of its intensity matrix, $\mathbf{Q}$.  This matrix describes the rate of change between states of the process. For networks, there are a very large number of possible states, $2^{n(n-1)}$, so the intensity matrix is a square matrix of that dimension. But, thanks to the property of SAOMs that the states are allowed to change only one tie at a time, there are only $n$ possible states given the current state, $n-1$ of which are uniquely determined by the node $i$ that is given the opportunity to change. Thus, the intensity matrix $\mathbf{Q}$ is very sparse, with only $n(n-1) + 1$ non-zero entries in each row. Note that $n(n-1)$ of these represent the possible states that are one edge different from a given state, and the additional non-zero entry is for the state to remain the same. All other entries in a row are zero because those column states cannot be reached from the row state by just one change as dictated by the SAOM. The entries of $\mathbf{Q}$ are defined as follows: let $b \neq c \in \{1, 2, \dots, 2^{n(n-1)} \}$ be indices of two different possible states of the network, $x^b, x^c \in \mathcal{X}$.  Then the $bc^{th}$ entry of $Q$ is:
-% \[ q(x^b, x^c) = \begin{cases}
-%       q_{ij}(\alpha, \rho, \boldsymbol{\beta}, x^b) = \lambda_i(\alpha, \rho, x^b, m)p_{ij}(\boldsymbol{\beta}, x^b) & \text{if } x^c \in \{x^b(i \leadsto j) | \text{ any } i \neq j \in \mathcal{N}\} \\
-%       0 & \text{if } x^c \text{ differs from } x^b \text{ by more than 1 tie} \\
-%       -\sum_{i\neq j} q_{ij}(\alpha, \rho, \boldsymbol{\beta}, x^b)  & \text{if } x^b = x^c
-%    \end{cases}
-% \]
-%
-% Thus, the rate of change between any two states that differ by only one tie, $x_{ij}$, is the product of the rate at which actor $i$ gets to change a tie and the probability that the tie that will change is the tie to node $j$.^[Just to be clear, the change is from $x^b_{ij}$ to $x^c_{ij} = 1 - x^b_{ij}$.] Furthermore, the theory of continuous time Markov chains gives that the matrix of transition probabilities between observation times $t_{m-1}$ and $t_{m}$ is dependent only on the difference between timepoints, $t_m - t_{m-1}$. Following the same definition for transition probabilities in Section \@ref(dynamicnets), the matrix of transition probabilities is
-% $$e^{(t_m - t_{m-1})\mathbf{Q}},$$
-% where $\mathbf{Q}$ is the matrix defined above and $e^X$ for a real or complex square matrix $X$ is equal to $\sum_{k=0}^{\infty} \frac{1}{k!} X^k$.
 
 \subsubsection{Fitting Models to Data}
 
@@ -278,78 +249,12 @@ where $\theta = (\boldsymbol{\alpha}, \boldsymbol{\beta})$ is the vector of rate
 
 The rest of the paper is strucured as follows. In Section \ref{sec:exdatamods}, we introduce the example data and models we use for model-vis. Then, in Section~\ref{sec:minds}, we explore the first step in model-vis by placing the models in the data space. Section~\ref{sec:collectmodels} follows, in which we explore collections of models. Finally, in Section~\ref{sec:algorithms}, we visualize the underlying algorithms in the SAOM fitting process. We conclude with a discussion in Section~\ref{sec:discussion}.
 
-%\subsection{Model Goodness-of-Fit}\label{sec:modgof}
 
-%The \texttt{RSiena} software that fits the models to data also includes a goodnes-of-fit function for examining model fit, \texttt{sienaGOF()}. This function ``assess[es] the fit of the model with respect to auxiliary statistics of networks" \citep[p.~53]{RSienamanual}. Examples of auxiliary statistics include the out- or indegree distribution on the nodes, with the option for users to input their own statistics to examine. The goodness-of-fit is evaluated as follows:
-% \begin{enumerate}
-% \item The auxiliary statistics are computed on the observed data and $N$ simulated observations from the fitted model. Typically, $N=1000$.
-% \item The mean vector and covariance matrix of the statistics on the simulations from the model are computed.
-% \item The Mahalanobis distance from the observed statistics to the distribution of the simulated statistics is computed using the mean and covariance found in step 2.
-% \item The Mahalanobis distance from each of the $N$ simulations to the same distribution is computed, and the Mahalanobis distance of the observed data is compared to this distribution of distances.
-% \item An empirical $p$-value is found by computing the proportion of simulated distances found in step 4 that are as large or larger than the Mahalanobis distance from the data. A SAOM is thus considered a good fit if $p$ is large.
-% \end{enumerate}
-
-% <<sienagof, fig.cap="Goodness of fit measures for two network statistics computed on the first simulated wave of a SAOM: indegree and outdegree cumulative distributions. On the x-axis is the degree value, and on the y-axis is the number of times that degree value occurs in the network. \\st{The p-value shown on the x-axis is the proportion of observations simulated from the model that have observed statistic values as large or larger than the values observed in the data.}", cache = TRUE, message = FALSE, warning = FALSE, fig.height=5>>=
-% load("data/ansnullpaper.rda")
-% library(lattice)
-% gof1 <- sienaGOF(ansnull, OutdegreeDistribution, varName ="friendship", join = FALSE)
-% gof2 <- sienaGOF(ansnull, IndegreeDistribution, varName ="friendship", join = FALSE)
-%
-% sims1 <- data.frame(gof1$`Period 1`$Simulations)
-% dat1 <- gof1$`Period 1`$Observations
-% dat1 %>% data.frame() %>% gather(outdegree, val) %>%
-%   mutate(outdegree = parse_number(outdegree)-1) -> dat1
-% p1 <- sims1 %>%
-%   mutate(sim = row_number()) %>%
-%   gather(outdegree, val, X1:X9) %>%
-%   mutate(outdegree = parse_number(outdegree) - 1) %>%
-%   filter(outdegree <= 6) %>%
-%   ggplot(aes(x = outdegree, y = val)) +
-%   geom_boxplot(aes(group = outdegree), size = .5, outlier.shape = "x", outlier.size = 5) +
-%   geom_violin(aes(group = outdegree), bw = 2, fill = NA) +
-%   geom_point(data = dat1, color = 'red') +
-%   geom_line(data= dat1, color = 'red') +
-%   geom_text(data = dat1, aes(label = val), hjust = -.5) +
-%   labs(x = "Outdegree (p = 0.154)", y = "Statistic",
-%        title = "Goodness-of-Fit: Outdegree distribution period 1") +
-%   ThemeNoNet
-%
-% sims2 <- data.frame(gof2$`Period 1`$Simulations)
-% dat2 <- gof2$`Period 1`$Observations
-% dat2 %>% data.frame() %>% gather(indegree, val) %>%
-%   mutate(indegree = parse_number(indegree)-1) -> dat2
-% p2 <- sims2 %>%
-%   mutate(sim = row_number()) %>%
-%   gather(indegree, val, X1:X9) %>%
-%   mutate(indegree = parse_number(indegree) - 1) %>%
-%   filter(indegree <= 6) %>%
-%   ggplot(aes(x = indegree, y = val)) +
-%   geom_boxplot(aes(group = indegree), outlier.shape = "x", outlier.size = 5) +
-%   geom_violin(aes(group = indegree), bw = 2, fill = NA) +
-%   geom_point(data = dat2, color = 'red') +
-%   geom_line(data= dat2, color = 'red') +
-%   geom_text(data = dat2, aes(label = val), hjust = -.5) +
-%   labs(x = "Indegree (p = 0.063)", y = "Statistic",
-%        title = "Goodness-of-Fit: Indegree distribution period 1") +
-%   ThemeNoNet
-%
-%
-% gridExtra::grid.arrange(p1, p2)
-% # sum(gof1$`Period 1`$SimulatedTestStat >= gof1$`Period 1`$ObservedTestStat)/1000
-% # [1] 0.154
-% # > sum(gof2$`Period 1`$SimulatedTestStat >= gof2$`Period 1`$ObservedTestStat)/1000
-% # [1] 0.063
-%
-% @
-
-%The \texttt{plot.sienaGOF()} function allows us to visualize this fit. %In Figure~\ref{fig:sienagof}, we provide an example of what the goodness-of-fit plot output looks like for indegree and outdegree statistics for a small model.
-%This function draws a box plot and a violin plot at each value of the statistic of interest observed in the simulations: \st{on the $x$-axis, the out(in)degrees observed in the data ($0, 1, 2, 3, \dots$), and on the $y$-axis, the cumulative number of times that out(in)degree value appears in the simulations and the data.} In order to compare the distribution of the counts of nodes with the specified degree as calculated on the simulated networks to the counts observed in the true data, red points connected by red lines representing the observed values are superimposed on the boxplots. If the red points lie "well within" the simulated values, the model is a good fit to the data. \st{This plot is not shown because it is not intuitive for understanding network data. Boxplots separated by the many outdegree values observed do not communicate \textit{how} the nodes are connected, just that some have more connections than others. In order to understand the fit of the model, we should try to understand how well the model captures the\textit{overall} structure of the network, not just one or two summary measurements of that structure.} %The model examined in Figure~\ref{fig:sienagof} appears to do a better job of capturing the outdegree distribution than the indegree distribution of the data.
-%In Section~\ref{sec:minds}, we propose a new way of visualizing goodness-of-fit that uses the traditional node-link diagram to visualize the entire network instead of numerical summaries of the the network.
 
 \section{Example Data and Models}\label{sec:exdatamods}
 
 % removed the following plot
-<<adjmatviz, fig.align='center', fig.cap="A visualization of the adjacency matrices of the three waves of network observations in the ``Teenage Friends and Lifestyle Study'' data. The subset we will be using is outlined in red.", results='hide',fig.show='asis', fig.width=8, fig.height=3, eval = FALSE>>=
+<<adjmatviz, fig.align='center', fig.cap="A visualization of the adjacency matrices of the three waves of network observations in the ``Teenage Friends and Lifestyle Study'' data. The subset we will be using is outlined in red.", results='hide',fig.show='asis', fig.width=8, fig.height=3, eval = FALSE, purl=FALSE>>=
 source("code/00e_small_friends.R")
 view_rs2$wave <- factor(view_rs2$wave)
 levels(view_rs2$wave) <- c("Wave 1", "Wave 2", "Wave 3")
@@ -384,11 +289,8 @@ actual3 <- merge(data.frame(as.edgelist(as.network(fd2.w3))),
                  by.x = "X1", by.y = "id", all = T)
 actual3$Wave <- 3
 alldat <- rbind(actual1, actual2, actual3)
-#alldat$X1 <- paste0("V", alldat$X1)
 alldat$X1 <- as.factor(alldat$X1)
-#alldat$X2 <- ifelse(!is.na(alldat$X2), paste0("V", alldat$X2), NA)
 alldat$X2 <- as.factor(alldat$X2)
-#write_csv(alldat, "smallfriends4Geomnet.csv")
 alldataviz <- ggplot(data = alldat,
        aes(from_id = X1, to_id = X2, color = as.ordered(drink), group = as.ordered(drink))) +
   geom_net(fiteach = FALSE, directed=TRUE, layout.alg = 'fruchtermanreingold', size = 4, arrowsize = .25, arrowgap = .05, ecolour = 'black', labelon=T, labelcolour = 'white', fontsize = 2, vjust = .5, linewidth=0.25) +
@@ -474,10 +376,6 @@ ggplot(data = jTT, aes(from_id = from, to_id = to)) +
   ThemeNet +
   theme(legend.position = "none") + 
   labs(title = expression(paste(s[i3], "(x,z)")))
-  # labs(title = expression(paste(s[i3], "(x,z)", "=",Sigma[j != h], x[ij], x[ih], x[hj] %*% 
-  #                               I, "(", z[i], "=", z[h]!= z[j], ")")
-  #                         )
-  #      )
 @
 \caption{\label{fig:jtt}Realization of a JTT, where the covariate is represented by the shape of the nodes. The dotted tie is encouraged if $\beta_3$ is positive. $s_{i3}(x,z) = \sum_{j \neq h} x_{ij}x_{ih}x_{hj} \mathbb{I}(z_i = z_h \neq z_j)$}
 \end{subfigure}\hfill
@@ -497,9 +395,6 @@ ggplot(data = dad, aes(from_id = from, to_id = to)) +
   ThemeNet +
   theme(legend.position = "none") + 
   labs(title = expression(paste(s[i4], "(x)")))
-  # labs(title = expression(paste(s[i4], "(x)", "=", "|{j:", x[ij],"=0, ", Sigma[h], x[ih], x[hj] >= 2, "}|" )
-  #                         )
-  #      )
 @
 \caption{\label{fig:dad}Realization of a N22 between actors $i$ and $j$. The dotted tie is encouraged if $\beta_4$ has a positive value. $s_{i4}(x) =  |\{j : x_{ij} = 0, \sum\limits_h x_{ih}x_{hj} \geq 2\}|$}
 \end{subfigure}
@@ -533,7 +428,6 @@ ggplot() +
   geom_net(directed = T, labelon=F, arrowsize = .3, singletons= F, fiteach = T, arrowgap = .01, layout.alg = 'fruchtermanreingold', ecolour = "grey70",
            aes(from_id = source, to_id = target, color = party, linewidth = gsw, shape = sex,size = n_au/30)) +
   scale_size_continuous(name="# bills\nauthored" , guide = guide_legend(nrow= 2), breaks = c(0,1,2,3), labels = c(0,30, 60, 90), range = c(.5,3)) +
-  #theme_net() +
   ThemeNet +
   scale_shape_manual(values = c(17,16), guide = guide_legend(nrow= 2)) +
   scale_color_manual(values = c("black", "grey80","#ef3b2c"), guide = guide_legend(nrow=2)) +
@@ -563,33 +457,8 @@ M1parms <- (means %>% filter(Model == "M1"))$means
 M2parms <- (means %>% filter(Model == "M2"))$means
 M3parms <- (means %>% filter(Model == "M3"))$means
 set.seed(4231352)
-#M1sims1000 <- netvizinf::saom_simulate(dat = mydata,
-#                            struct = M1eff,
-#                       parms = as.numeric(M1parms),
-#                       N = 1000)
-#save(M1sims1000, file = "data/M1sims1000.RData")
-
-# M2sims1000 <- netvizinf::saom_simulate(dat = mydata,
-#                             struct = M2eff,
-#                        parms = as.numeric(M2parms),
-#                        N = 1000)
-# save(M2sims1000, file = "data/M2sims1000.RData")
-
-# M3sims1000 <- netvizinf::saom_simulate(dat = mydata,
-#                             struct = M3eff,
-#                        parms = as.numeric(M3parms),
-#                        N = 1000)
-# save(M3sims1000, file = "data/M3sims1000.RData")
-
-
-#M1simsdf <- netvizinf::sims_to_df(M1sims1000)
-# write_csv(M1simsdf, "data/M1simsdf.csv")
 M1simsdf <- read_csv("data/M1simsdf.csv")
-#M2simsdf <- netvizinf::sims_to_df(M2sims1000)
-#write_csv(M2simsdf, "data/M2simsdf.csv")
 M2simsdf <- read_csv("data/M2simsdf.csv")
-# M3simsdf <- netvizinf::sims_to_df(M3sims1000)
-# write_csv(M3simsdf, "data/M3simsdf.csv")
 M3simsdf <- read_csv("data/M3simsdf.csv")
 
 M1avgW2 <- M1simsdf %>% filter(!is.na(to) & wave == 1) %>%
@@ -693,13 +562,6 @@ The resulting expected network is in the middle panel of Figure~\ref{fig:summnet
 red <- "#fd8d3c"
 green <- "#41ab5d"
 
-#762a83
-#af8dc3
-#e7d4e8
-#d9f0d3
-#7fbf7b
-#1b7837
-
 am_t1 <- as.matrix(igraph::as_adj(igraph::graph_from_data_frame(arrange(t1, parse_number(from), parse_number(to)))))[-17,-17]
 
 diff1 <- am_t1 - fd2.w1
@@ -717,7 +579,7 @@ t1_1 <- arrange(t1_1, from, to)
 p1 <- ggplot(data = t1_1) +
   geom_net(aes(from_id = from, to_id = to, linewidth= linewidth, linetype = color2),
            directed = T, curvature = .2, labelon=T, size = 5,
-           arrow = arrow(angle = 20, type = "open", length = unit(.2, "cm")), # ecolour = t1_1$color2,
+           arrow = arrow(angle = 20, type = "open", length = unit(.2, "cm")), 
            color = "#252525", hjust = .5, vjust = .5, labelcolour = 'white', fontsize = 4, arrowgap = .02, layout.alg = "fruchtermanreingold",
            singletons = T) +
   scale_linetype_manual(values =c("longdash", "dotted") ) + 
@@ -749,7 +611,7 @@ t1_2 <- t1_2 %>% filter(!(from == 16 & is.na(to)))
 p2 <- ggplot(data = t1_2) +
   geom_net(aes(from_id = from, to_id = to, linewidth= linewidth, linetype = color2),
            directed = T, curvature = .2, labelon=T, size = 5,
-           arrow = arrow(angle = 20, type = "open", length = unit(.2, "cm")), #ecolour = t1_2$color2,
+           arrow = arrow(angle = 20, type = "open", length = unit(.2, "cm")), 
            color = "#252525", hjust = .5, vjust = .5, labelcolour = 'white', fontsize = 4, arrowgap = .02, layout.alg = "fruchtermanreingold",
            singletons = T) +
   scale_linetype_manual(values = c("longdash", "solid", "dotted")) + 
@@ -763,7 +625,7 @@ ggdraw() + draw_plot(p1, width = .4) +  draw_plot(p2, width = .4, x=.4) +
 Another way to view a SAOM in the data space is with \textit{difference networks} between the expected network and the data, as shown in Figure~\ref{fig:summary2}. We created these networks by computing the difference between the adjacency matrices for the expected network and wave 1, and for wave 2 and the expected network. The lack of model fit becomes even more clear in Figure~\ref{fig:summary2}, with the broken edges representing ties that only show up in the expected network, and the solid edges representing ties in the data that the model fails to capture.  Dotted edges are in both the expectation and the data and represent where the model ``got it right". Again, the widths of the edges demonstrate the frequency of the ties in the simulations. On the left in Figure~\ref{fig:summary2}, we see the difference between the first wave of data and the expected network. We only see dotted and broken edges, meaning that the simulated networks consist primarily of edges in wave 1, plus some new edges that are not in the first wave of data. The unobserved ties are all reciprocating edges in the data, so the model predicts more reciprocity between actors than there actually is. On the right in Figure~\ref{fig:summary2}, we see the difference between the second wave of data and the expected network. Because the model is simulating the second wave of data, we would hope to see very few differences between the expected network and wave 2. However, there are six solid edges, which are edges in the data that do not appear at all in the expected network, and there are many broken edges that appear in the expected network but not in the data. Although there are some edges that appear in both the expected network and wave 2, the majority of edges in the expected network are not in wave 2, and there are several edges in the data missing from the expectation. We conclude that the model M1 is a poor fit to our example data, which we have seen very clearly by viewing the model in the data space. 
 
 % No longer using this plot
-<<gof2, fig.cap="An example of viewing the distribution of a statistic of interest from a SAOM. Here, the Mahalanobis distance of the cumulative outdegree values computed on a simulated network to the mean value simulated is shown. The distance computed from the data is shown as a vertical line.", fig.height=3, out.width='.6\\textwidth', eval = FALSE>>=
+<<gof2, fig.cap="An example of viewing the distribution of a statistic of interest from a SAOM. Here, the Mahalanobis distance of the cumulative outdegree values computed on a simulated network to the mean value simulated is shown. The distance computed from the data is shown as a vertical line.", fig.height=3, out.width='.6\\textwidth', eval = FALSE, purl = FALSE>>=
 
 library(lattice)
 gof1 <- sienaGOF(ansnull, OutdegreeDistribution, varName ="friendship", join = FALSE)
@@ -776,18 +638,6 @@ ggplot(histdat) + geom_histogram(aes(x = x), binwidth = .1, fill = 'white', colo
 
 @
 
-%\st{If, as discussed in Section~\ref{sec:modgof},
-%Figure~\ref{fig:sienagof},
-%summary statistics such as outdegree and indegree distribution computed on the network are of interest, we can look at the computed distances between the data and the model simulations. distributions of these statistics computed on networks simulated from the model show the model in the edge data space. For an example, see Figure~\ref{fig:gof2}, where the distribution of the log of the Mahalanobis distance is shown for the outdegree distribution auxiliary statistics, and the log Mahalanobis distance for the observed data is shown as a vertical line. }
-
-
-% \begin{itemize}
-% \item WHat is the model? the network model (SAOM model is just one of many)
-% \item What is the data? Edge data, node data, observed time points, unobserved timepoints (CTMC)
-% \item Note: specifically dealing with dynamic networks observed at discrete time points.
-% \end{itemize}
-% What are some things that could go in here? need more data examples; not just the friends data.
-% Harry Potter data??? I want to find my own data, too.}
 
 \section{Collections of models}\label{sec:collectmodels}
 
@@ -805,7 +655,6 @@ Now that we have assessed model fit, we want to learn about model behavior in or
 
 <<distests, fig.cap="Distribution of fitted parameter values for our three SAOMs. The inclusion of $\\beta_3$ or $\\beta_4$ clearly has an effect on the distributions of the rate parameters, $\\alpha_1$ and $\\alpha_2$, and on the other objective function parameters $\\beta_1, \\beta_2$.", fig.height=3>>=
 
-simu2 <- read.csv("data/simulation-1000-M1-M2-M3.csv")
 levels(simu2$parameter) <- c("alpha[1]","alpha[2]","beta[1]","beta[2]","beta[3]","beta[4]")
 ggplot(data = simu2) +
   geom_density(aes(x = estimate, fill = Model), alpha = .5) +
@@ -821,7 +670,6 @@ ggplot(data = simu2) +
 %\subsection{Fitting the same model to different data}\label{sec:samemoddiffdat}
 
 <<tableofmeans>>=
-simu2 <- read.csv("data/simulation-1000-M1-M2-M3.csv")
 senM1est <- read.csv("data/congress/senateM1ests.csv")
 senM2est <- read.csv("data/congress/senateM2ests.csv")
 senM3est <- read.csv("data/congress/senateM3ests.csv")
@@ -887,7 +735,7 @@ In Figure~\ref{fig:distests}, we saw that the inclusion of $\beta_3$ for the fri
 
 
 % taken out.
-<<getdatam, eval = FALSE>>=
+<<getdatam, eval = FALSE, purl=FALSE>>=
 nulls <- read.csv("data/distribution_null_model.csv")
 alt <- read.csv("data/distribution_jumpTT_model.csv")
 alt2nd <- read.csv("data/distribution_dblpairs_model.csv")
@@ -900,7 +748,7 @@ alt_mod2_sv <- as.numeric(alt2nd[,-c(1,7,8)] %>% summarise_all(funs(mean)))
 @
 
 % taken out
-<<corplotsSenate, eval = FALSE>>=
+<<corplotsSenate, eval = FALSE, purl = FALSE>>=
 senM1est <- read.csv("data/congress/senateM1ests.csv")
 senM2est <- read.csv("data/congress/senateM2ests.csv")
 senM3est <- read.csv("data/congress/senateM3ests.csv")
@@ -943,11 +791,6 @@ The last model visualization principle, ``explore the process of model fitting,"
 %This simulation process follows the steps of the continuous-time Markov chain. Each tie change in the CTMC is referred to as one ``microstep".  The options for change are removing a current tie, adding a new tie, or making no change at all. 
 
 <<makinggif, fig.cap='A selection of images in the microstep animation. The selected edges and nodes are emphasized by changing the size and the color, then they fade in or out, while the nodes change color and shrink to blend in with the other nodes. Frames 15-28 show a an edge disappearing, while frames 71-84 show an edge appearing. A spring layout is used.', message = FALSE, warning = FALSE, fig.height=2.5>>=
-# Need old version of dplyr to get this to work:
-# if (!require("dplyr050",character.only = TRUE)) {
-#       devtools::install_github("sctyner/dplyr050")
-# }
-# library(dplyr050)
 friend.data.w1 <- as.matrix(read.table("data/s50_data/s50-network1.dat"))
 friend.data.w2 <- as.matrix(read.table("data/s50_data/s50-network2.dat"))
 friend.data.w3 <- as.matrix(read.table("data/s50_data/s50-network3.dat"))
@@ -957,16 +800,8 @@ fd2.w2 <- friend.data.w2[20:35,20:35]
 fd2.w3 <- friend.data.w3[20:35,20:35]
 friendshipData <- array(c(fd2.w1, fd2.w2,fd2.w3), dim = c(16, 16, 3))
 
-# running Siena
-#friendship <- sienaDependent(friendshipData)
-#alcohol <- varCovar(drink[20:35,])
-#mydata <- sienaDataCreate(friendship, alcohol)
-#myeffnull <- getEffects(mydata)
-#myalgorithm <- sienaAlgorithmCreate(projname = 's16_3')
-
 ansnullchains %>%
   dplyr::filter(period == 1) %>%  #only look at chains from wave 1 to wave 2
-  #dplyr::group_by(rep) %>%
   dplyr::select(rep, from = ego, to = alter) %>%
   dplyr::mutate(val = as.numeric(!from == to),
          from = paste0("V", parse_number(from)+1), # make the chains
@@ -1045,8 +880,6 @@ p1 <- ggplot(data = numordersf, aes(y = rev(from), x = to)) + geom_tile(color = 
   coord_fixed()
 
 # histogram of number of MS in 1000 reps
-# sfmsall %>% group_by(rep) %>% summarize(noMs = max(ms)) %>% ggplot() + geom_histogram(aes(x = noMs), binwidth = 5)
-
 sfmsall <- read_csv("data/smallfriendsmicrosteps.csv")
 
 sfmsall %>%
@@ -1058,7 +891,6 @@ sfmsall_summ$from <- as.factor(sfmsall_summ$from)
 levels(sfmsall_summ$from) <- paste0('V', 1:16)
 sfmsall_summ$to <- as.factor(sfmsall_summ$to)
 levels(sfmsall_summ$to) <- paste0('V', 1:16)
-#sfmsall_summ <- sfmsall_summ %>% ungroup() %>% mutate(from = as.factor(from), to = as.factor(to))
 sfmsall_summ %>%
   spread(to, count, fill = 0) %>%
   data.frame -> allmsrep1_adjmat
@@ -1070,7 +902,6 @@ rownames(allmsrep1_adjmat) <- paste0("V", 1:16)
 pca1 <- prcomp(allmsrep1_adjmat)
 order1 <- names(sort(pca1$rotation[,1], decreasing = T))
 order1 <- gsub("V", "",order1)
-# order2 <- names(sort(abs(pca1$rotation[,1]), decreasing = T))
 
 pcaordersf$from <- as.factor(pcaordersf$from)
 levels(pcaordersf$from) <- gsub("V", "", levels(pcaordersf$from))
@@ -1083,7 +914,6 @@ p2 <- ggplot(data = pcaordersf, aes(x = to, y = from)) +
   geom_tile(color = 'black', aes(fill = as.factor(value))) +
   scale_fill_manual(values = c('white', 'black'), name = "Tie is...", labels = c("not present","present")) +
   scale_x_discrete(position = "top") +
-  #scale_y_discrete(name = "from",labels = rev(str_replace(order1, "V", ""))) +
   ThemeNoNet +
   coord_fixed()
 p2a <- ggplot(data = pcaordersf, aes(x = to, y = from)) +
@@ -1096,7 +926,6 @@ p2a <- ggplot(data = pcaordersf, aes(x = to, y = from)) +
 legendp2 <- cowplot::get_legend(p2)
 ggdraw() + draw_plot(p1, width = .4) +  draw_plot(p2a, width = .4, x=.4) + 
   draw_grob(legendp2,x=.8, y=.25, width = .2, height = .4)
-# cowplot::plot_grid(p1,p2a,legendp2, ncol=3)
 @
 
 We continue to use animation to view the changing structure of the network via adjacency matrix visualizations. In the first adjacency matrix visualization in Figure~\ref{fig:adjmatorder}, we use the node ID to order the rows and columns. This arbitrary ordering does not easily convey the underlying structure of the network. We use \textit{matrix seriation} to reorder the rows and columns of the adjacency matrix visualization so that the structure of the network is apparent \citep{seriation}. %This lack of perceived structure would contribute to further confusion as the network chages, so we adjust the ordering so that the viewer can better perceive the structure of the network. This process is known as matrix seriation 
@@ -1178,12 +1007,11 @@ ggplot() +
         legend.position = "bottom") +
   coord_fixed() +
   facet_wrap(~frame, labeller = 'label_both', nrow = 2)
-#}
-#plots
+
 @
 
 % removed
-<<histogramalters, fig.width = 7, fig.height=9, fig.cap="Each panel shows the theoretical (as lines) and empirical (as points) probabilities of the chosen ego node changing its tie to each of the other nodes. The color of the line indicates whether the tie from the ego to the alter node is being added, removed, or if there is no change to the network in this step.", eval = FALSE>>=
+<<histogramalters, fig.width = 7, fig.height=9, fig.cap="Each panel shows the theoretical (as lines) and empirical (as points) probabilities of the chosen ego node changing its tie to each of the other nodes. The color of the line indicates whether the tie from the ego to the alter node is being added, removed, or if there is no change to the network in this step.", eval = FALSE, purl=FALSE>>=
 ansnullchains %>% group_by(period, rep) %>%
   mutate(ms = row_number()) %>%
   filter(ms == 1, period == 1) %>%
@@ -1224,34 +1052,6 @@ ggplot(data = changes3) +
   coord_flip() +
   facet_wrap(~ego, labeller = "label_both") +
   ThemeNoNet
-#
-# cumprobs %>% ggplot() + geom_histogram(aes(x = alter, weight = count), color = 'black', fill = 'white', binwidth = 1) + scale_x_continuous(labels = paste0("V",1:16), breaks = 0:15) + coord_flip() + facet_wrap(~ego, labeller = "label_both") + theme_gray()
-
-# cprobslist <- split(cumprobs, cumprobs$ego)
-# plots <- list()
-# for(i in 1:length(cprobslist)){
-#   cprobslist[[i]] %>%
-#   ggplot() +
-#   geom_histogram(aes(x = as.numeric(as.character(alter)),
-#                      y = alterProb), stat = 'identity', fill = 'white', color = 'black') +
-#   geom_line(aes(x = as.numeric(as.character(alter)),
-#                 y = csum)) +
-#   geom_point(aes(x = as.numeric(as.character(alter)),
-#                 y = csum)) +
-#   scale_x_continuous(limits = c(-.5, 15), breaks = 0:15, labels = 0:15) +
-#   geom_hline(yintercept = 1, color = 'red', linetype = 'dashed') +
-#   labs(x = "alter", y = (p[ij]), title = paste("Ego node:", names(cprobslist)[i])) + # ylab((p[ij])) +
-#   theme_gray() +
-#     theme(plot.title = element_text(size = 10),
-#           axis.title = element_text(size = 8),
-#           plot.margin = unit(rep(0,4),"pt")) -> p
-#   plots[[i]] <- p
-# }
-# grid.arrange(plots[[1]], plots[[2]], plots[[3]], plots[[4]],
-#              plots[[5]], plots[[6]], plots[[7]], plots[[8]],
-#              #plots[[9]], plots[[10]], plots[[11]], plots[[12]],
-#              #plots[[13]], plots[[14]], plots[[15]], plots[[16]],
-#              ncol = 2, padding = unit(0, 'line'))
 
 @
 
@@ -1276,8 +1076,6 @@ ansnullchains %>%
   mutate(ego = as.numeric(as.character(ego))+1,
          alter = as.numeric(as.character(alter))+1) ->empprobsDat
 
-# probsDat %>% group_by(ego, alter) %>% summarize(count = n()) %>% dim
-# 103, 3
 p1 <- ggplot(data = probsDat,
        aes(y = factor(ego, levels = rev(order1)),
              x = factor(alter, levels = order1),
@@ -1286,7 +1084,6 @@ p1 <- ggplot(data = probsDat,
   scale_fill_gradient(low = 'white', high = 'black', limits = c(0,1), name = "theoretical\nprobability", labels = c("0","",".5","","1")) +
   labs(y = "ego", x = "alter")+
   scale_x_discrete(position = 'top') +
-  #scale_y_discrete(labels = rev(str_replace(order1, "V", ""))) +
   ThemeNoNet + 
   theme(panel.grid = element_blank(), 
           axis.text.x.top = element_text(size=rel(.7)),
@@ -1307,7 +1104,6 @@ p2 <- ggplot(data = empprobsDat,
   scale_fill_gradient(low = 'white', high = 'black', name = "empirical\nprobability", labels = c(".02", ".04", ".06"), breaks = c(.02, .04, .06)) +
   labs(y = "ego", x = "alter")+
   scale_x_discrete(position = 'top') +
-  #scale_y_discrete(labels = rev(str_replace(order1, "V", ""))) +
   ThemeNoNet + 
     theme(panel.grid = element_blank(), 
           axis.text.x.top = element_text(size=rel(.7)),
@@ -1321,22 +1117,17 @@ p2 <- ggplot(data = empprobsDat,
   coord_fixed() + 
   ggtitle("Empirical Probabilities")
 plot_grid(p1, p2)
-#gridExtra::grid.arrange(p1, p2, nrow = 1)
 @
 
 
-We also illuminate the microstep process by visualizing the theoretical and observed transition probabilites for the first microstep in the process. These probabilities are defined in Equation~\ref{eq:pij}. We only do the first step of many because each microstep is dependent on the previous network state. %By ego node state, we mean the current set of incoming and outgoing ties to the ego node, $i$. Put more precisely, let the vector $X_i = (\{x_{ik}\}, \{x_{ki}\})_{k \neq i} \in \{0,1\}^{2(n-1)}$ represent the set of all tie variables involving node $i$ in the current network. For $p_{ij}$ to be comparable for any two network states $x$ and $x'$, the value of the vector $X_i$ must be the same in both states. It is possible to incorporate this information into our visualizations, but for now we look at only the first step, because we know without needing any complicated conditioning steps that the previous node state $X_i$ is identical in all cases. 
+We also illuminate the microstep process by visualizing the theoretical and observed transition probabilites for the first microstep in the process. These probabilities are defined in Equation~\ref{eq:pij}. We only do the first step of many because each microstep is dependent on the previous network state.  
 There are 1,000 transitions to examine: the first microstep taken in each one of the simulations. %Another way to view these transition probabilities is through the adjacency matrix visualization. 
 We use another seriated adjacency matrix visualization to show theoretical and empirical transition probabilities of the first microstep in Figure~\ref{fig:heatmap} for each tie that was the first change in a simulation. The figure is noticeably sparse: %showing the lack of coverage in the model.
 of the $16\cdot 16 = 256$ possible choices for the CTMC to make, only 103, or about 43\%, are made in the 1,000 simulated chains. This leaves %reinforces what we saw in Figure~\ref{fig:histogramalters}, where there are many paths not taken. This effect could only be exacerbated as more steps are taken in the CTMC, leading to 
 a large area of data space unexplored by the first step in the SAOM model fitting process. We present additional evidence for lack of coverage in Figure~\ref{fig:alledgests} the Appendix. The Figures~\ref{fig:heatmap} and \ref{fig:alledgests} show that the model M1 and the the corresponding fitting process do not explore the data space enough to adequately capture the network change mechanism, a finding we were only able to discern thanks to model visualization techniques. 
-%Put more precisely, let the vector $X_i = (x_{ij}|_{j \neq i}, x_{ji}|_{j \neq i}$ for $i \neq j \neq k \neq \ell \in \{1, \dots, n\}$, $p_{ij}$ is not necessarily the same \st{ARGH NOT SURE THIS IS TRUE } if the current state of the network achieved from the first microstep, denoted $X(1)$, is $X(1) = x(i \leadsto \ell)$ than is different in the case of $x_{ij}$ changing in the first step from the case of $x_{ij}$ not changing in the first step.
-%In Figure~\ref{fig:histogramalters}, we present each ego node and the resulting probabilities of tie changes. The probability shown by the bars is the theoretical probability, according to the objective function, of the ego node changing its tie to the alter node, while the probability shown by the points is the empirical probability of that change being made. The empirical probability is calculated by counting all instances of the ego node first, then computing the proportion of each different alter node change. In most cases, they are almost identical, which demonstrates that the algorithm is performing as expected. There are, however, many steps that are never taken. Some ego nodes, like 1, 4, and 16, really explore the space of all possible outgoing ties. On the other hand, nodes like 13 and 15 explore very few possible outgoing ties.  It is unclear why this would be happening; it may have something to do with the ties in wave 1, where 13 and 15 have multiple connections, while 1 and 16 have none, but there are counterexamples of well connected nodes, such as 12, that explore the space more. In addition, we can see that the ties changed most often are removing ties, not adding ties. This matches the overall pattern of the data: we see the most ties in the first wave of data, and the least ties in the third wave.
-
-
 
 % removed 
-<<allsteps, fig.cap="Two simulations (out of 1,000) of the microstep process from wave 1 to wave 2. The $x$ axis is the microstep number, with step 0 representing the first wave of data and the final step representing the second wave of data. We can see that many edges are underrepresented in this process: they are in the second wave, but never appear in the microsteps.", fig.height=2.5, eval = FALSE>>=
+<<allsteps, fig.cap="Two simulations (out of 1,000) of the microstep process from wave 1 to wave 2. The $x$ axis is the microstep number, with step 0 representing the first wave of data and the final step representing the second wave of data. We can see that many edges are underrepresented in this process: they are in the second wave, but never appear in the microsteps.", fig.height=2.5, eval = FALSE, purl=FALSE>>=
 smallfriends <- read_csv("data/smallfriends4Geomnet.csv")
 names(smallfriends)[1:2] <- c("from", "to")
 ansnullchains %>%
@@ -1404,8 +1195,6 @@ p2 <- ggplot(data = msall2_df2) +
   ThemeNoNet +
   theme(legend.position = 'none', axis.ticks.y = element_blank(),
         axis.text.y = element_blank(), axis.title = element_blank()) #+
-  #labs(x = "Microstep", y = "Edges (most frequent at top)")
-
 # rep 3
 # msall3 <- netvizinf::listMicrosteps(dat = wave1friends,
 #                       microsteps = filter(ansnullchainsw1w2, rep == 3))
@@ -1438,27 +1227,6 @@ p2 <- ggplot(data = msall2_df2) +
 grid.arrange(p1, p2, nrow = 2)
 @
 
-%We also wanted to better understand the entire microstep process from the first wave, all the way through to the second wave. The number of steps taken from wave 1 to wave 2 varies. In one set of 1,000 simulations from Model 1, the smallest number of steps taken was 58, and the longest was 248, with a mean of 106 and a median of 103. In the 1,000 simulations, the standard deviation of the number of microsteps was 22.8. In Figure~\ref{fig:allsteps}, we see two simulations of the process from wave 1 to wave 2, with wave 1 shown on the left, and wave 2 shown on the right. In each of the three plots, the $y$-axis contains the edges sorted by how often they appear in the networks along the way. We can see that some edges are there in the beginning, but disappear and never come back, while others appear a few steps in, only to dispappear again. There are also some edges that were observed in wave 2 that don't appear at all in the microstep process in a given simulation. \st{So, even though the CTMC makes about the right \textit{number} of changes as it was designed to do, the changes it is making are not necessarily in the right direction.}
-
- %In addition, there is not a distinct pattern or structure that we can see in this particular edge visualization. The edges that the model starts with appear more often in the first 50 or so microsteps than any other set of edges. This makes sense, because we condition on the first wave, but it would be better if the model explored the space of possible edges more than it currently does. It could be that the simple model M1 is not complicated enough for the friendship dynamics in the data, or it could be that the chains in the MCMCs ``get stuck" when exploring the parameter space, but we cannot know this .}
-
-% \st{The algorithms here are many!
-% \begin{enumerate}
-% %\item First, the microsteps / CTMC between each time point (gifs, other animations)
-% \item Phases of RSiena: phase 1 = initial parameter estimate
-% \item phase 2 = iterative update of parameters - trace plots
-% \item phase 3 = simulations for convergence diagnostics
-% \end{enumerate}
-%  }
-
-%\hh{The visualizations should address most elements of structure described before, i.e. follow along in the setup (for descriptive and teaching purposes), the fitting (understanding the model and interpreting the results) and then diagnostics (how well does the model fit the data - where are the most differences to the actual data/what are the sensitive parameters?) }
-
-% \hh{Some of the visualizations we talked about
-% \begin{enumerate}
-% \item visualization of the MCMC process:  movie of individual actors' step-by-step decisions; could be done with the ndtv package, as long as we can get individual steps out of RSiena
-% \item global picture: 1000 simulated networks + alpha blending should give a pretty good idea of the most important edges
-% %\item global structure + principal components (tensor pca)
-% \end{enumerate}}
 
 
 \section{Discussion}\label{sec:discussion}
@@ -1471,7 +1239,6 @@ Furthermore, the data sets we have used are relatively small by network data sta
 
 We hope that the principles of model-vis continue to be used for learning more about the fit and behavior of complicated statistical models. Our model-vis application has uncovered many properties of SAOMs, and potential abounds for application of model-vis in other areas of network analysis.  
 
-%The flexibility of \texttt{RSiena} allows the user to specify which parameters lead to tie creation, and which parameters lead to tie dissolution. We have used ``evaluation" parameters, which are agnostic, allowing the data to decide which parameters affect creation or dissolution via the sign \citep{RSienamanual}. Finally, SAOMs and \texttt{RSiena} are able to also model behavior change of the actors in the network, which again is a capability we did not explore here.
 
 \section*{Appendix: Additional model visualizations}
 
@@ -1493,7 +1260,6 @@ ggplot(aes(x = estimate, y = Waldpval, shape = inter1)) +
   coord_flip() +
   ThemeNoNet
 sen_effs <- read_csv("data/congress/senateModelSigEffects.csv")
-#sen_effs$Waldpval <- parse_number(sen_effs$Waldpval)
 sen_effs$inter1[is.na(sen_effs$inter1)] <- "none"
 ggplot(data = sen_effs %>% filter(Waldpval <=0.10), aes(x = estimate, y = Waldpval, shape= inter1)) +
   # geom_errorbarh(aes(xmin = estimate - se, xmax = estimate + se), color = 'black') +
@@ -1545,7 +1311,6 @@ The density plots in Figure~\ref{fig:compareModels} show the distribution of the
 
 <<corplots, fig.cap="A matrix of plots demonstrating the strong correlations between parameter estimate in our SAOMs. The strongest correlation within each model is between $\\beta_1$ and $\\beta_2$.", fig.width=8>>=
 
-simu2 <- read.csv("data/simulation-1000-M1-M2-M3.csv")
 simu_spread <- simu2 %>% spread(parameter, estimate)
 ggpairs(simu_spread, columns = 3:8, aes(colour=Model, alpha = .5)) + 
   theme(plot.title = element_text(size = 10,
