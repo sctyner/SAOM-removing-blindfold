@@ -16,7 +16,7 @@
 \usepackage[dvipsnames,svgnames,table]{xcolor}
 \usepackage{hyperref}
 \graphicspath{{figure/}}
-% \usepackage{endfloat} % Figures to the end of the document
+%\usepackage{endfloat} % Figures to the end of the document
 
 \DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
 %---------------------------------------------------
@@ -36,7 +36,7 @@
 \newtheorem{algorithm}[theorem]{Algorithm}
 %---------------------------------------------------
 
-%\pdfminorversion=4
+\pdfminorversion=4
 % NOTE: To produce blinded version, replace "0" with "1" below.
 \newcommand{\blind}{0}
 
@@ -46,7 +46,6 @@
 \addtolength{\textwidth}{1in}%
 \addtolength{\textheight}{1.3in}%
 \addtolength{\topmargin}{-.8in}%
-
 
 \begin{document}
 
@@ -60,7 +59,7 @@
 
 \if0\blind
 {
-  \title{\bf Visualizing Dynamic Social Network Models}
+  \title{\bf Visual Diagnostics of Dynamic Social Network Models}
   \author{Sam Tyner \hspace{.2cm}\\
     Department of Statistics and Statistical Laboratory, Iowa State University\\
     and \\
@@ -75,14 +74,14 @@
   \bigskip
   \bigskip
   \begin{center}
-    {\LARGE\bf Visualizing Dynamic Social Network Models}
+    {\LARGE\bf Visual Diagnostics of Dynamic Social Network Models}
 \end{center}
   \medskip
 } \fi
 
 \bigskip
 \begin{abstract}
-Stochastic actor-oriented models (SAOMs), first introduced by Snijders (1996), are statistical network models for dynamic social networks. Unlike other network models, SAOMs are analytically intractable and require extensive simulation procedures for model fitting. In this paper, we use model visualization techniques introduced in Wickham et al (2015) to better understand SAOMs and their behavior. We use a three-pronged visualization attack: (a) network visualizations to view the \emph{model}, (b) visualizations of collections of models to interpret parameters, and (c) visualizations of fitting algorithms to gain insights into the underlying mechanisms. With the help of static and dynamic visualizations, we bring the hidden SAOM fitting processes into the foreground, with the goal of a better understanding and higher accessibility of SAOMs by social network analysts.
+Statistical models for networks have been studied for decades, and they have gotten more complex as computing power has grown. Some network models, such as those for dynamic social networks networks, are analytically intractable and therefore require extensive simulation procedures for model fitting. In this paper, we use model visualization techniques introduced in Wickham et al (2015) to better understand some of these models and their behavior. We use a three-pronged visualization attack: (a) network visualizations to view the \emph{model}, (b) visualizations of collections of models to interpret parameters, and (c) visualizations of fitting algorithms to gain insights into the underlying mechanisms. With the help of static and dynamic visualizations, we bring the hidden algorithmic fitting processes into the foreground, with the goal of a better understanding and higher accessibility of statistical models for social network analysts.
 \end{abstract}
 
 \noindent%

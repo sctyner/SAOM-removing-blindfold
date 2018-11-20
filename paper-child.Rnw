@@ -171,8 +171,8 @@ In Figure~\ref{fig:toyplots}, we use the KK algorithm, and unless otherwise stat
 \begin{equation}\label{eq:adjmat}
   A_{ij} =
   \begin{cases}
-                                   1 &  \text{if an edge exists } i\to j, \quad i \neq j \\
-                                   0 & \text{otherwise}
+             1 &  \quad \text{if an edge exists } i\to j, \quad i \neq j \\
+             0 & \quad \text{otherwise}
   \end{cases}
 \end{equation}
 %In this paper, we only consider the presence or absence of an edge, but if the network has weighted edges, $A_{ij}$ is the weight of the edge from $i \to j$. 
@@ -242,9 +242,9 @@ We explore these probabilities further in Section~\ref{sec:algorithms}.
 
 The two pieces of the model hierarchy each contribute to the entries of the intensity matrix to describe the rate of change between two network states. The entries of $\mathbf{Q}$ are defined as follows: let $b \neq c \in \{1, 2, \dots, 2^{n(n-1)} \}$ be indices of two different possible states of the network, $x^b, x^c \in \mathcal{X}$.  Then the $bc^{th}$ entry of $Q$ is:
 \[ q_{bc} = \begin{cases}
-     q_{ij}= \alpha_m p_{ij}(\boldsymbol{\beta}, x^b) & \text{if } \sum_{i,j} |x_{ij}^c - x_{ij}^b| = 1\\
-      -\sum_{i\neq j} q_{ij} & \text{if } x^b = x^c
-      0 & \text{otherwise} \\
+     q_{ij} = \alpha_m p_{ij}(\boldsymbol{\beta}, x^b) & \text{ if } \sum_{i,j} |x_{ij}^c - x_{ij}^b| = 1 \\
+      -\sum_{i\neq j} q_{ij} & \text{ if } x^b = x^c \\
+      0 & \text{ otherwise} 
    \end{cases}
 \]
 The rate of change between any two states, $x^b$ and $x^c$, that differ by only one tie $x_{ij}$, is the product of the rate at which actor $i$ gets to change a tie and the probability that the tie that will change is the tie to node $j$. The intensity matrix $\mathbf{Q}$ fully defines the model for network change, and is the foundation required for parameter estimation. %Estimating the parameters in these models is difficult, but thanks to the SIENA software \citep{RSiena}, we have an accessible way to fit SAOMs to network observations.
