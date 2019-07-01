@@ -5,3 +5,4 @@
 *.Rproj
 *.out
 *.gif
+.httr-oauth

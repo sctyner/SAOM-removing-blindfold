@@ -637,11 +637,11 @@ Now that we have assessed model fit, we want to learn about model behavior in or
 
 %\subsection{Exploring the space of all possible models}\label{sec:allpossible}
 
-\noindent \textbf{Exploring the space of all possible models:} The \texttt{RSiena} manual contains over 80 effects to include in the objective function. To select objective function parameters for modeling our example data, we searched through all effects available to find \textit{significant} effects. The \texttt{RSiena} package includes the function \texttt{Wald.Rsiena} for Wald-type tests of parameter significance. We start by including the outdegree and reciprocity parameters in the model then add one effect to the objective function, fit the model to the example data, test the added effect for significance, and repeat for all possible model parameters. We performed this procedure, which we used to pick M2 and M3, for both the small friendship and the senate collaboration data. A visualization of the significant effects for the two example data sets are shown in Figure~\ref{fig:sigtesting} in the Appendix. Using this one-at-a-time testing method results in many possible significant parameters of different type and magnitude, demonstrating the flexibility of these models.  %We see in both the friendship data and the senate data results that most of the significant effects have absolute value less than ten. In addition, the $p$-values for the effects from the friendship data are more spread out than the $p$-values for the senate data, which are concentrated at about 0.02 or less. This may suggest that larger data sets tend to result generally in smaller $p$-values, just like a larger sample size results in smaller $p$-values in a $t$-test.
+\noindent \textbf{Exploring the space of all possible models:} The \texttt{RSiena} manual contains over 80 effects to include in the objective function. To select objective function parameters for modeling our example data, we searched through all effects available to find \textit{significant} effects. The \texttt{RSiena} package includes the function \texttt{Wald.Rsiena} for Wald-type tests of parameter significance. We start by including the outdegree and reciprocity parameters in the model then add one effect to the objective function, fit the model to the example data, test the added effect for significance, and repeat for all possible model parameters. We performed this procedure, which we used to pick M2 and M3, for both the small friendship and the senate collaboration data. A visualization of the significant effects for the two example data sets are available in the Supporing Information. Using this one-at-a-time testing method results in many possible significant parameters of different type and magnitude, demonstrating the flexibility of these models.  %We see in both the friendship data and the senate data results that most of the significant effects have absolute value less than ten. In addition, the $p$-values for the effects from the friendship data are more spread out than the $p$-values for the senate data, which are concentrated at about 0.02 or less. This may suggest that larger data sets tend to result generally in smaller $p$-values, just like a larger sample size results in smaller $p$-values in a $t$-test.
 
 %\subsection{Varying model settings}
 
-\noindent \textbf{Varying model settings:} The second method for viewing collections of models is varying model settings. We have done this already by choosing three different models M1, M2, M3 to fit to our example data sets. To explore the behavior of these three models, we simulate from them. Using the estimated parameter values in Table~\ref{tab:meanests}, we simulated 1,000 observations of waves 2 and 3 ofthe friendship data from each of the three models. From the simulations, we created an expected network for wave 2 from models M1, M2, and M3 using the same method described in Section~\ref{sec:minds}. These expected networks are shown in Figure~\ref{fig:averagenet} in the Appendix, and we see that all models are failing to capture the structure of the second wave, even though the individual parameters were all significant. %In Section~\ref{sec:samemodsamedat}, we fit these three models to the data 1,000 times, and examine the parameter densities. Here, . For simulation, we used the mean parameter values from the 1,000 fits of the corresponding model. 
+\noindent \textbf{Varying model settings:} The second method for viewing collections of models is varying model settings. We have done this already by choosing three different models M1, M2, M3 to fit to our example data sets. To explore the behavior of these three models, we simulate from them. Using the estimated parameter values in Table~\ref{tab:meanests}, we simulated 1,000 observations of waves 2 and 3 of the friendship data from each of the three models. From the simulations, we created an expected network for wave 2 from models M1, M2, and M3 using the same method described in Section~\ref{sec:minds}. These expected networks are presented in the Supporting Information, and we see that all models are failing to capture the structure of the second wave, even though the individual parameters were all significant. %In Section~\ref{sec:samemodsamedat}, we fit these three models to the data 1,000 times, and examine the parameter densities. Here, . For simulation, we used the mean parameter values from the 1,000 fits of the corresponding model. 
 
 %\subsection{Fitting the same model to the same data}\label{sec:samemodsamedat}
 
@@ -657,7 +657,7 @@ ggplot(data = simu2) +
   theme(legend.position = 'bottom')
 @
 
-\noindent \textbf{Fitting the same model to the same data:} The simulations required to fit the CTMC network models lead to inherent variability in the fitted values. To examine this variability, we fit models M1, M2, and M3 to the friendship network 1,000 times each. The distributions of the fitted model parameters are shown in Figure~\ref{fig:distests}. Clearly, the inclusion of the JTT parameter, $\beta_3$, results in very different estimates the of the other four parameters in all models, $\alpha_1$, $\alpha_2$, $\beta_1$, and $\beta_2$. On the other hand, the inclusion of the indirect tie parameter, $\beta_4$, does not lead to such drastically different estimates of other model parameters. When $\beta_3$ is included, its estimate is postitive, meaning that friendships between two girls with different drinking behaviors tend to form when there is third girl who is already friends with the other two. The inclusion of $\beta_3$ also leads to increases in the estimates of $\alpha_1, \alpha_2$. Thus, when modeling the transitive triplet behavior in this way, we may conclude that girls change friends more frequently. It is not clear, however, that the addition of a parameter to the objective function \textit{should} effect the estimates of the rate parameters. This strong and possibly problematic relationship between rate parameter estimates and objective function parameters is further shown in Figure~\ref{fig:corplots} in the Appendix. When visualizing the results of the same models fit many times to the same data, we can to see potential model behavior problems right away.   %In comparison with models M1 and M3, model M2 typically has higher estimates of the rate parameter, meaning that the inclusion of the covariate statistic in the model leads to higher estimates of the number of times, on average, a node gets to change its ties. 
+\noindent \textbf{Fitting the same model to the same data:} The simulations required to fit the CTMC network models lead to inherent variability in the fitted values. To examine this variability, we fit models M1, M2, and M3 to the friendship network 1,000 times each. The distributions of the fitted model parameters are shown in Figure~\ref{fig:distests}. Clearly, the inclusion of the JTT parameter, $\beta_3$, results in very different estimates the of the other four parameters in all models, $\alpha_1$, $\alpha_2$, $\beta_1$, and $\beta_2$. On the other hand, the inclusion of the indirect tie parameter, $\beta_4$, does not lead to such drastically different estimates of other model parameters. When $\beta_3$ is included, its estimate is postitive, meaning that friendships between two girls with different drinking behaviors tend to form when there is third girl who is already friends with the other two. The inclusion of $\beta_3$ also leads to increases in the estimates of $\alpha_1, \alpha_2$. Thus, when modeling the transitive triplet behavior in this way, we may conclude that girls change friends more frequently. It is not clear, however, that the addition of a parameter to the objective function \textit{should} effect the estimates of the rate parameters. This strong and possibly problematic relationship between rate parameter estimates and objective function parameters is further explored in the Supporting Information. When visualizing the results of the same models fit many times to the same data, we can to see potential model behavior problems right away.   %In comparison with models M1 and M3, model M2 typically has higher estimates of the rate parameter, meaning that the inclusion of the covariate statistic in the model leads to higher estimates of the number of times, on average, a node gets to change its ties. 
 
 %\subsection{Fitting the same model to different data}\label{sec:samemoddiffdat}
 
@@ -714,7 +714,7 @@ $\beta_3$ & -- & \Sexpr{SFE$M2[5]} & -- & -- & \Sexpr{SSE$M2[6]} & -- \\
 \caption{\label{tab:meanests} The means (std.\ dev.)\ of parameter values estimated from repeated fittings of $M1, M2, M3$ to the two example data sets.}
 \end{table}
 
-\noindent \textbf{Fitting the same model to different data:} Finally, we view collections of models by fitting the same models to different data to understand how the model behaves in different contexts. As we did for the friendship data, we estimated the parameters for M1, M2, and M3, when fit to the senate data (see Figure \ref{fig:senateplot}) 100 times each. The means and standard deviations of the repeated parameter estimates for all six model-data combinations are given in Table~\ref{tab:meanests}, while corresponding density plots of the objective function parameters are given in Figure~\ref{fig:compareModels} in the Appendix. Looking at the estimates for both data sets, a few patterns emerge. First, we can see the same relationship between the outdegree parameter, $\beta_1$ and the reciprocity parameter, $\beta_2$ in both data sets and across all three models. The estimates of $\beta_1$ are all negative and range from about -5 and -3, while the estimates of $\beta_2$ are all positive and range from about four to five. %In addition, the outegree parameter, $\beta_1$, \textit{decreases} when $\beta_3$ is included, while the reciprocity parameter, $\beta_2$ increases. This inverse relationship implies that the girls prefer to form small, closely knit friend groups, as opposed to being popular and having many friends. Tight-knit friend groups are more encouraged by model M2 than by models M1 and M3.
+\noindent \textbf{Fitting the same model to different data:} Finally, we view collections of models by fitting the same models to different data to understand how the model behaves in different contexts. As we did for the friendship data, we estimated the parameters for M1, M2, and M3, when fit to the senate data (see Figure \ref{fig:senateplot}) 100 times each. The means and standard deviations of the repeated parameter estimates for all six model-data combinations are given in Table~\ref{tab:meanests}, while corresponding density plots of the objective function parameters are provided in the Supporting Information. Looking at the estimates for both data sets, a few patterns emerge. First, we can see the same relationship between the outdegree parameter, $\beta_1$ and the reciprocity parameter, $\beta_2$ in both data sets and across all three models. The estimates of $\beta_1$ are all negative and range from about -5 and -3, while the estimates of $\beta_2$ are all positive and range from about four to five. %In addition, the outegree parameter, $\beta_1$, \textit{decreases} when $\beta_3$ is included, while the reciprocity parameter, $\beta_2$ increases. This inverse relationship implies that the girls prefer to form small, closely knit friend groups, as opposed to being popular and having many friends. Tight-knit friend groups are more encouraged by model M2 than by models M1 and M3.
 This suggests that in both data sets, nodes prefer outgoing ties that are reciprocated to those that are not. When we consider the context, this seems obvious: the students want to have close mutual friendships, and senators want mutual support for their bills. We are also concerned, however, with the extremely high correlation between the estimates of $\beta_1, \beta_2$. In all six model-data combinations, the absolute correlation between $\hat{\beta}_1, \hat{\beta}_2$ is greater than 0.93. %We explore the relationship between $\beta_1$ and $\beta_2$ further in Section~\ref{sec:samemodsamedat}.
 % We have seen how the same model forms behave in different context, with some  differences and some similarities. 
 After seeing the high correlation between parameter estimates in very different data contexts, we might question the guideline that both parameters need to be included in the objective function. 
@@ -1116,7 +1116,7 @@ We also illuminate the microstep process by visualizing the theoretical and obse
 There are 1,000 transitions to examine: the first microstep taken in each one of the simulations. %Another way to view these transition probabilities is through the adjacency matrix visualization. 
 We use another seriated adjacency matrix visualization to show theoretical and empirical transition probabilities of the first microstep in Figure~\ref{fig:heatmap} for each tie that was the first change in a simulation. The figure is noticeably sparse: %showing the lack of coverage in the model.
 of the $16\cdot 16 = 256$ possible choices for the CTMC to make, only 103, or about 43\%, are made in the 1,000 simulated chains. This leaves %reinforces what we saw in Figure~\ref{fig:histogramalters}, where there are many paths not taken. This effect could only be exacerbated as more steps are taken in the CTMC, leading to 
-a large area of data space unexplored by the first step in the model fitting process. We present additional evidence for lack of coverage in Figure~\ref{fig:alledgests} the Appendix. The Figures~\ref{fig:heatmap} and \ref{fig:alledgests} show that the model M1 and the the corresponding fitting process do not explore the data space enough to adequately capture the network change mechanism, a finding we were only able to discern thanks to model visualization techniques. 
+a large area of data space unexplored by the first step in the model fitting process. We present additional evidence for lack of coverage in the Supporting Information. The Figures~\ref{fig:heatmap} and \ref{fig:alledgests} show that the model M1 and the the corresponding fitting process do not explore the data space enough to adequately capture the network change mechanism, a finding we were only able to discern thanks to model visualization techniques. 
 
 % removed 
 <<allsteps, fig.cap="Two simulations (out of 1,000) of the microstep process from wave 1 to wave 2. The $x$ axis is the microstep number, with step 0 representing the first wave of data and the final step representing the second wave of data. We can see that many edges are underrepresented in this process: they are in the second wave, but never appear in the microsteps.", fig.height=2.5, eval = FALSE, purl=FALSE>>=
@@ -1232,155 +1232,4 @@ Furthermore, the data sets we have used are relatively small by network data sta
 We hope that the principles of model-vis continue to be used for learning more about the fit and behavior of complicated statistical models. Our model-vis application has uncovered many properties of CTMC models for dynamic social networks, and potential abounds for application of model-vis in other areas of network analysis.   
 
 
-\section*{Appendix: Additional model visualizations}
-
-\subsection*{Section 4}
-
-<<sigtesting, fig.show = 'hold', out.width='\\textwidth', fig.height=2, fig.cap="Significant effects for the two data sets, at a significance level of 0.10 or lower as calculated by the Wald-type test available in the SIENA software.", error=FALSE>>=
-smfr_effs <- read_csv("data/effects_significance_smallFriends.csv")
-smfr_effs$inter1[is.na(smfr_effs$inter1)] <- "none"
-library(ggrepel)
-set.seed(12345678)
-smfr_effs %>% filter(type == "eval" & Waldpval <=0.10) %>%
-ggplot(aes(x = estimate, y = Waldpval, shape = inter1)) +
-  #geom_errorbarh(aes(xmin = estimate - se, xmax = estimate + se), color = 'black') +
-  geom_vline(xintercept = 0) +
-  geom_point(size = 3, alpha = .75) +
-  #geom_text_repel(aes(label = shortName)) +
-  scale_shape(name = "Interaction\nVariable") +
-  ggtitle("Significant effects at level 0.10 for friendship data") +
-  coord_flip() +
-  ThemeNoNet
-sen_effs <- read_csv("data/congress/senateModelSigEffects.csv")
-sen_effs$inter1[is.na(sen_effs$inter1)] <- "none"
-ggplot(data = sen_effs %>% filter(Waldpval <=0.10), aes(x = estimate, y = Waldpval, shape= inter1)) +
-  # geom_errorbarh(aes(xmin = estimate - se, xmax = estimate + se), color = 'black') +
-  geom_vline(xintercept = 0) +
-  geom_point(size = 3) +
-  #geom_text_repel(aes(label = shortName)) +
-  scale_shape(name = "Interaction\nVariable") +
-  ggtitle("Significant effects at level 0.10 for senate data") +
-  coord_flip() +
-  ThemeNoNet
-@
-
-In Figure~\ref{fig:sigtesting}, we see for the friendship data and the senate data that most of the significant effects have absolute value less than ten. In addition, the $p$-values for the effects from the friendship data are more spread out than the $p$-values for the senate data, which are concentrated at about 0.02 or less. This suggests that larger data sets tend to result generally in smaller $p$-values, which is consistent with the construction of Wald-type tests.
-
-<<averagenet, results='hide', out.width='\\textwidth',fig.cap='The node-link diagrams from the three expected networks that we calculated are in the top row, and the true wave 1 and wave 2 data are shown in the bottom row above. There is some difference between the three models, but overall, these three models struggle to capture the structure in the true second wave of data.', fig.height=5>>=
-
-combinedavgs$linewidth[combinedavgs$cat %in% c("1st Wave", "2nd Wave")] <- .5
-combinedavgs$cat <- as.factor(combinedavgs$cat)
-combinedavgs$cat <- ordered(combinedavgs$cat, levels = c("Model1", "Model2", "Model3", "1st Wave", "2nd Wave"))
-
-ggplot(data = combinedavgs) +
-  geom_net(aes(from_id = from, to_id = to, linewidth= linewidth),
-           directed = T, curvature = .2, labelon=T, size = 3,
-           arrow = arrow(angle = 20, type = "open", length = unit(.2, "cm")), ecolour = "#969696", fiteach = T,
-           color = "#252525", hjust = .5, vjust = .5, labelcolour = 'white', fontsize = 2, arrowgap = .02,
-           singletons = T) +
-  ThemeNet + theme(panel.background = element_rect(color = 'black')) +
-  facet_wrap(~cat)
-@
-
-To create the expected network visualization shown in Figure~\ref{fig:averagenet}, we follow the same procedure as in Section~\ref{sec:minds}, counting occurrences of each realized edge in the simulations.  The resulting summary network has weighted edges representing the proportion of edge appearances in all 1,000 simulations of wave 2. As in Figure~\ref{fig:summnetM1}, edges only appear in the expected networks if they appear more than 5\% of the time in the simulations. In Figure~\ref{fig:averagenet}, we show the  expected network from the three models we fit and the first and second waves of data. Comparing the three averages to waves 1 and 2, we see that they have very similar structure to wave 1 but that model M2, which included the transitive triplet parameter, results in more strongly connected components. The lack of fit is clear: none of the three average networks show node 16 gaining ties as it does in wave two, nor do they show nodes 4 and 7 becoming isolated. In model M2, however, the ties to node 7 appear much weaker than in model M1 or model M3, and the nodes $\{10,11,14\}$ are also strongly connected as they are in wave 2 of data, suggesting that M2 may be the best model of the three.
-
-%Outdegree and reciprocity have the same inverse relationship for both data sets. For the friendship data, the inclusion of $\\beta_3$ has strong effect on the estimates of the other two parameters, but not for the senate data.
-<<compareModels, fig.cap="Density plots of objective function parameter estimates from repeatedly fitting models M1, M2, and M3 to the example data. ", fig.height = 3>>=
-simu2$data <- "friends"
-senateEsts$data <- "senate"
-allDataEsts <- rbind(senateEsts, simu2)
-allDataEsts$parameter <- as.factor(allDataEsts$parameter)
-allDataEsts$parameter <- ordered(allDataEsts$parameter, levels = c(paste0("alpha", 1:3),paste0("beta", 1:4)))
-ggplot(allDataEsts %>% filter(str_detect(parameter, "beta"))) +
-  geom_density(aes(x = estimate, fill = Model), alpha = .5) +
-  facet_grid(data~parameter, scales = "free", labeller = "label_both") +
-  scale_fill_brewer(palette = "Greys") + 
-  ThemeNoNet +
-  theme(legend.position = 'bottom')
-@
-
-The density plots in Figure~\ref{fig:compareModels} show the distribution of the parameter estimates for the objective function parameters in M1, M2, and M3 the two example data sets we used. The most notable difference is in the values of $\beta_1, \beta_2$. In the senate data, the inclusion of $\beta_3$ has no effect on the estimates of $\beta_1, \beta_2$, while the opposite is true for the friendship data. 
-
-<<corplots, fig.cap="A matrix of plots demonstrating the strong correlations between parameter estimates. The strongest correlation within each model is between $\\beta_1$ and $\\beta_2$.", fig.width=8>>=
-
-simu_spread <- simu2 %>% spread(parameter, estimate)
-ggpairs(simu_spread, columns = 4:9, aes(colour=Model, alpha = .5)) + 
-  theme(plot.title = element_text(size = 10,
-                                            face = 'plain', angle = 0, family = "Times New Roman"),
-                  axis.title.x = element_text(size = 10,
-                                            face = 'plain', angle = 0, family = "Times New Roman", inherit.blank = T),
-                  axis.title.y = element_text(size = 10,
-                                            face = 'plain', angle = 90, inherit.blank = T),
-                  axis.text.x= element_text(size = 10,
-                                            face = 'plain', angle = 90, inherit.blank = TRUE),
-                 # axis.text.x.bottom = element_text(size = 10,
-             #                               face = 'plain', angle = 90, inherit.blank = TRUE),
-                  axis.text.y = element_text(size = 10,
-                                            face = 'plain', angle = 0, family = "Times New Roman", inherit.blank = T),
-                #  axis.text.y.right = element_text(size = 12,
-               #                             face = 'plain', angle = 0, family = "Times New Roman", inherit.blank = T),
-                  strip.text.x = element_text(size = 12,
-                                            face = 'plain', angle = 0, family = "Times New Roman",
-                                            margin = margin(t = 3, r = 0, b = 3, l = 0, unit = "pt"), inherit.blank = T),
-                  strip.text.y =element_text(size = 12,
-                                            face = 'plain', family = "Times New Roman", angle = 90,margin = margin(t = 3, r = 3, b = 3, l = 3, unit = "pt"),inherit.blank = T),
-                  strip.background = element_rect(colour = "black", fill = "white")
-                    )
-@
-
-In Figure~\ref{fig:corplots}, we examine correlations between each of pair of parameters within each model and overall.\nocite{ggally} The strongest correlation within each model is between $\beta_1$ and $\beta_2$, with absolute correlation between them greater than 0.90 in all three models. The $\beta_1$ parameter is also highly correlated with the $\beta_3$ parameter within model M2, but it is not as highly correlated with the $\beta_4$ parameter in model M3. It might therefore be advisable to consider only models that either allow $\beta_1$ or $\beta_2$ but not both. Looking at the high correlation with $\alpha$, we might switch to a model without $\beta_1$.
-
-\subsection*{Section 5}
-
-<<alledgests, fig.height = 4, fig.cap="Visualizing all microsteps taken in 1,000 simulations from the model M1. The occurrence percent is split up into groups to correspond with its distribution: only about 10\\% of the possible edges appear more than 10\\% of the time in the 1,000 simulations, while about 60\\% appear less than 1\\% of the time. The first wave network is shown at microstep 0, and the second wave of the network is shown as the last microstep for comparison. We see that it is rare for a microstep process to last longer than 150 steps, and also that the edges that appear past the 150th step tend to be in either the first wave or the second wave.">>=
-# get a plot of all microsteps from w1 to w2 by edge
-alledges <- expand.grid(from = paste0("V", 1:16), to = paste0("V", 1:16))
-alledges$eid <- 1:nrow(alledges)
-
-sfmsall %>% left_join(alledges) -> sfmsall2
-
-sfmsall2 %>% group_by(rep) %>% mutate(isWave2 = (ms == max(ms))) -> sfmsall2
-
-sfmsall2 %>% group_by(from, to, eid) %>%
-  summarize(total =n()) %>%
-  arrange(desc(total)) %>%
-  ungroup %>%
-  mutate(plotorder = row_number()) -> sfmsallorder
-
-sfmsall2 %>% group_by(ms, eid) %>%
-  summarise(count = n()) %>%
-  mutate(alpha = count/1000) %>%
-  arrange(ms, eid) -> sfmsall3
-
-left_join(sfmsall3, sfmsallorder, by = "eid") -> sfmsall4
-
-#add true wave 2 to plot
-wave2 <- na.omit(actual2)
-wave2$from <- paste0("V", wave2$from)
-wave2$to <- paste0("V", wave2$to)
-wave2 <- left_join(wave2, alledges)
-wave2 <- left_join(wave2, sfmsallorder)
-
-sfmsall5 <- sfmsall4 %>% ungroup %>% add_row(ms = max(sfmsall4$ms) + 1,
-        eid = wave2$eid,
-        count = NA,
-        alpha = 1,
-        from = wave2$from,
-        to = wave2$to,
-        total = wave2$total,
-        plotorder = wave2$plotorder)
-sfmsall5$alphaFctr <- cut(sfmsall5$alpha, c(0,.01, .05, .10, .25, .5, .75, 1, 1.1))
-ggplot(data = sfmsall5) +
-  geom_tile(aes(x = ms, y = reorder(eid,-plotorder), fill = alphaFctr)) +
-  #scale_fill_gradient(low = 'grey90', high = '#0868ac', name = "occurrence %") +
-  scale_fill_brewer(palette = "Greys", name = "Occurrence %", labels = c("(0-1]%", "(1-5]%", "(5-10]%","(10-25]%", "(25-50]%", "(50-75]%", "(75-100]%")) +
-  labs(x = "Microstep No.", y = "Edges (ordered by total # occurrences)") +
-  ThemeNoNet +
-  theme(axis.ticks.y = element_blank(), axis.text.y = element_blank(), panel.grid = element_blank())
-@
-
-
-Finally, we combine 1,000 simulations from model M1 into a visualization that displays the entire microstep process in Figure~\ref{fig:alledgests}. To make this visualization, we first assign each possible edge in the network an ID number so that we can keep track of it throughout all microsteps and all simlations. Then, we count up the number of times each edge appears in the network throughout the microstep process for each of the 1,000 simulations. We also count the number of times an edge occurs at each step number. Since the number of microsteps in the process varies, the number of times an edge occurs decreases as the step number increases. Next, we compute a proportion, which we call the occurrence percentage, which is the number of times the edge was in the network in step 1, step 2, etc. divided by 1,000. Finally, we visualize all this information together in Figure~\ref{fig:alledgests}. In this plot, we see that all possible edges appear at least once at some point in the microsteps of at least one simulated process. We also see, however, that the process struggles to focus in on the edges in the second wave of the data. Ideally, we would like to see more occurrences the edges in wave 2 that are not in wave 1. But, about half of the edges in wave two are in the bottom half of the figure, which means they do not appear as much as they would if the model was actually capturing the mechanisms of tie change in the network. More of the darkest areas of the figure should belong to ties in wave 2, but those are often the lightest. This solidifies what we found in Figure~\ref{fig:heatmap}: the fitting process does not explore the data space enough to adequately capture the network change mechanism.
-
-
-\noindent \textbf{Online supplemental material:} Much of the code used to create the visualizations in this paper has been packaged and made available online at \url{https://github.com/sctyner/netvizinf} and \url{https://github.com/sctyner/geomnet} (also on CRAN). Additional, non-packaged code can be found at \url{http://bit.ly/ctmc-model-viz}. 
+\noindent \textbf{Online supplemental material:} In addition to the Supporting Information available online from the publisher, much of the code used to create the visualizations in this paper has been packaged and made available online at \url{https://github.com/sctyner/netvizinf} and \url{https://github.com/sctyner/geomnet} (also on CRAN). Additional, non-packaged code can be found at \url{http://bit.ly/ctmc-model-viz}. 

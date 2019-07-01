@@ -5,7 +5,7 @@
 \usepackage[font=small,skip=5pt]{caption}
 \usepackage{subcaption}
 \usepackage{animate}
-\usepackage{afterpage}
+%\usepackage{afterpage}
 \usepackage{amssymb}
 \usepackage{natbib}
 \usepackage{amsmath}
@@ -16,7 +16,7 @@
 \usepackage[dvipsnames,svgnames,table]{xcolor}
 \usepackage{hyperref}
 \graphicspath{{figure/}}
-\usepackage{endfloat} % Figures to the end of the document
+%\usepackage{endfloat} % Figures to the end of the document
 
 \DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
 %---------------------------------------------------
@@ -59,7 +59,7 @@
 
 \if0\blind
 {
-  \title{\bf Visual Diagnostics of Dynamic Social Network Models}
+  \title{\bf Supporting Information for Visual Diagnostics of Dynamic Social Network Models}
   \author{Sam Tyner \hspace{.2cm}\\
     Department of Statistics and Statistical Laboratory, Iowa State University\\
     and \\
@@ -74,27 +74,23 @@
   \bigskip
   \bigskip
   \begin{center}
-    {\LARGE\bf Visual Diagnostics of Dynamic Social Network Models}
+    {\LARGE\bf Supporting Information for Visual Diagnostics of Dynamic Social Network Models}
 \end{center}
   \medskip
 } \fi
 
 \bigskip
-\begin{abstract}
-Statistical models for networks have been studied for decades, and they have gotten more complex as computing power has grown. Some network models, such as those for dynamic social networks, are analytically intractable and therefore require extensive simulation procedures for model fitting. In this paper, we use model visualization techniques to better understand some of these models and their behavior. We use a three-pronged visualization attack: (a) network visualizations to view the model, (b) visualizations of collections of models to interpret parameters, and (c) visualizations of fitting algorithms to gain insights into the underlying mechanisms. With the help of static and dynamic visualizations, we bring the hidden algorithmic fitting processes into the foreground, with the goal of a better understanding and higher accessibility of statistical models for social network analysts.
-\end{abstract}
 
-\noindent%
-{\it Keywords:} social network analysis, dynamic networks, network mapping, animation, statistical graphics
+
 \vfill
 
 \newpage
 \spacingset{1.45} % DON'T change the spacing!
 
-\tableofcontents
+%\tableofcontents
 \newpage
 
-<<child-demo, child='paper-child.Rnw'>>=
+<<child-demo, child='supporting-info-child.Rnw'>>=
 @
 
 \bibliographystyle{asa}

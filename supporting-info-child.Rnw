@@ -1,0 +1,382 @@
+<<setup, echo = FALSE, message = FALSE, warning = FALSE, purl=FALSE>>=
+options(replace.assign=TRUE,width=70, digits=3)
+require(knitr)
+opts_chunk$set(fig.path='figure/', cache.path='cache/', fig.align='center', fig.pos='h', out.width='.99\\textwidth', par=TRUE, cache=FALSE, concordance=TRUE, autodep=TRUE, message=F, warning=F, echo = FALSE, dev="cairo_pdf", fig.width = 6, fig.height = 6)#, root.dir = "~/Desktop/Dissertation/SAOM-removing-blindfold/")
+@
+
+<<pkgs>>=
+# if (packageVersion("ggplot2") > "2.2.0"){
+#   remove.packages("ggplot2")
+#   install.packages("ggplot2")
+# }
+library(ggplot2)
+library(tidyverse)
+library(RSiena)
+library(network)
+library(sna)
+library(geomnet)
+library(GGally)
+# devtools::install_github("sctyner/netvizinf")
+library(netvizinf)
+library(RColorBrewer)
+library(gridExtra)
+library(cowplot)
+library(extrafont)
+loadfonts(quiet = T)
+
+ThemeNoNet <- theme_bw() %+replace%
+            theme(plot.title = element_text(size = 10,
+                                            face = 'plain',
+                                            angle = 0,
+                                            family="Times New Roman"),
+                  axis.title.x = element_text(size = 10,
+                                            face = 'plain',
+                                            angle = 0,
+                                            family="Times New Roman"),
+                  axis.title.y = element_text(size = 10,
+                                            face = 'plain',
+                                            angle = 90,
+                                            family="Times New Roman"),
+                  axis.text.x = element_text(size = 10,
+                                            face = 'plain',
+                                            angle = 0,
+                                            family="Times New Roman"),
+                  # axis.text.x.top = element_text(size = 10,
+                  #                           face = 'plain',
+                  #                           angle = 0,
+                  #                           family="Times New Roman"),
+                  # axis.text.x.bottom = element_text(size = 10,
+                  #                           face = 'plain',
+                  #                           angle = 0,
+                  #                           family="Times New Roman"),
+                  axis.text.y = element_text(size = 10,
+                                            face = 'plain',
+                                            angle = 0,
+                                            family="Times New Roman"),
+                  # axis.text.y.left = element_text(size = 10,
+                  #                           face = 'plain',
+                  #                           angle = 0,
+                  #                           family="Times New Roman"),
+                  # axis.text.y.right = element_text(size = 10,
+                  #                           face = 'plain',
+                  #                           angle = 0,
+                  #                           family="Times New Roman"),
+                  strip.text.x = element_text(size = 10,
+                                            face = 'plain',
+                                            angle = 0,
+                                            family="Times New Roman",
+                                            margin = margin(t = 3, r = 0, b = 3, l = 0, unit = "pt")),
+                  strip.text.y =element_text(size = 10,
+                                            face = 'plain',
+                                            angle = 90,
+                                            family="Times New Roman",
+                                            margin = margin(t = 3, r = 3, b = 3, l = 3, unit = "pt")),
+                  strip.background = element_rect(colour = "black", fill = "white")
+                    )
+ThemeNet <- theme_net() %+replace%
+            theme(plot.title = element_text(size = 10,
+                                            face = 'plain', angle = 0, family = "Times New Roman"),
+                  strip.text.x = element_text(size = 10,
+                                            face = 'plain', angle = 0, family = "Times New Roman",
+                                            margin = margin(t = 3, r = 0, b = 3, l = 0, unit = "pt")),
+                  strip.text.y =element_text(size = 10,
+                                            face = 'plain', angle = 0, family = "Times New Roman",margin = margin(t = 3, r = 0, b = 3, l = 0, unit = "pt")),
+                  strip.background = element_rect(colour = "black", fill = "white"))
+@
+
+<<getdata, echo=FALSE, results="hide">>=
+set.seed(823746)
+load("data/ansnullpaper.rda")
+sfmsall <- read_csv("data/smallfriendsmicrosteps.csv")
+ansnullchains <- get_chain_info(ansnull)
+load("data/M1sims1000.RData")
+load("data/M2sims1000.RData")
+load("data/M3sims1000.RData")
+
+# from chunk "alldataviz" in paper-child.Rnw
+cols <- RColorBrewer::brewer.pal(8, "Greys")
+
+source("code/00e_small_friends.R")
+view_rs2$wave <- factor(view_rs2$wave)
+levels(view_rs2$wave) <- c("Wave 1", "Wave 2", "Wave 3")
+actual1 <- merge(data.frame(as.edgelist(as.network(fd2.w1))),
+                 data.frame(id = 1:16, drink = drink2[,1]),
+                 by.x = "X1", by.y = "id", all = T)
+actual1$Wave <- 1
+actual2 <- merge(data.frame(as.edgelist(as.network(fd2.w2))),
+                 data.frame(id = 1:16,drink = drink2[,2]),
+                 by.x = "X1", by.y = "id", all = T)
+actual2$Wave <- 2
+actual3 <- merge(data.frame(as.edgelist(as.network(fd2.w3))),
+                 data.frame(id = 1:16,drink = drink2[,3]),
+                 by.x = "X1", by.y = "id", all = T)
+actual3$Wave <- 3
+alldat <- rbind(actual1, actual2, actual3)
+alldat$X1 <- as.factor(alldat$X1)
+alldat$X2 <- as.factor(alldat$X2)
+
+# from chunk "makinggif" in paper-child.Rnw
+friend.data.w1 <- as.matrix(read.table("data/s50_data/s50-network1.dat"))
+friend.data.w2 <- as.matrix(read.table("data/s50_data/s50-network2.dat"))
+friend.data.w3 <- as.matrix(read.table("data/s50_data/s50-network3.dat"))
+drink <- as.matrix(read.table("data/s50_data/s50-alcohol.dat"))
+fd2.w1 <- friend.data.w1[20:35,20:35]
+fd2.w2 <- friend.data.w2[20:35,20:35]
+fd2.w3 <- friend.data.w3[20:35,20:35]
+friendshipData <- array(c(fd2.w1, fd2.w2,fd2.w3), dim = c(16, 16, 3))
+
+ansnullchains %>%
+  dplyr::filter(period == 1) %>%  #only look at chains from wave 1 to wave 2
+  dplyr::select(rep, from = ego, to = alter) %>%
+  dplyr::mutate(val = as.numeric(!from == to),
+         from = paste0("V", parse_number(as.character(from))+1), # make the chains
+         to = paste0("V", parse_number(as.character(to))+1)) -> ansnullchainsw1w2
+colnames(fd2.w1) <- paste0("V", 1:16)
+rownames(fd2.w1) <- paste0("V", 1:16)
+wave1friends <- fortify(as.adjmat(fd2.w1))
+
+
+# from the paper-child.Rnw chunk number summnetM1
+friendshipData <- array(c(fd2.w1, fd2.w2, fd2.w3), dim = c(16, 16, 3))
+friendshipData <- array(c(fd2.w1, fd2.w2, fd2.w3), dim = c(16, 16, 3))
+drink1 <- drink[20:35,1]
+drink2 <- drink[20:35,2]
+drink3 <- drink[20:35,3]
+friendship <- sienaDependent(friendshipData)
+alcohol <- varCovar(cbind(drink1,drink2, drink3))
+mydata <- sienaDataCreate(friendship, alcohol)
+M1eff <- getEffects(mydata)
+M2eff <- includeEffects(M1eff, jumpXTransTrip, interaction1 = "alcohol")
+M3eff <- includeEffects(M1eff, nbrDist2twice)
+simu2 <- read.csv("data/simulation-1000-M1-M2-M3.csv")
+means <- simu2 %>% group_by(Model, parameter) %>% summarize(
+  means = mean(estimate)
+)
+M1parms <- (means %>% filter(Model == "M1"))$means
+M2parms <- (means %>% filter(Model == "M2"))$means
+M3parms <- (means %>% filter(Model == "M3"))$means
+set.seed(4231352)
+M1simsdf <- read_csv("data/M1simsdf.csv")
+M2simsdf <- read_csv("data/M2simsdf.csv")
+M3simsdf <- read_csv("data/M3simsdf.csv")
+
+M1avgW2 <- M1simsdf %>% filter(!is.na(to) & wave == 1) %>%
+  group_by(from, to) %>%
+  summarise(count = n()) %>%
+  mutate(weight = ifelse(from == to, 0, count))
+M2avgW2 <- M2simsdf %>% filter(!is.na(to) & wave == 1) %>%
+  group_by(from, to) %>%
+  summarise(count = n()) %>%
+  mutate(weight = ifelse(from == to, 0, count))
+M3avgW2 <- M3simsdf %>% filter(!is.na(to) & wave == 1) %>%
+  group_by(from, to) %>%
+  summarise(count = n()) %>%
+  mutate(weight = ifelse(from == to, 0, count))
+
+# make a df of wave 2, wave 1, and the three averages and facet.
+names(actual1)[1:2] <- c("from", "to")
+names(actual2)[1:2] <- c("from", "to")
+actual1$count <- 1
+actual1$weight <- 1
+actual2$count <- 1
+actual2$weight <- 1
+actual1 <- actual1 %>% dplyr::select(from,to, count, weight)
+actual2 <- actual2 %>% dplyr::select(from,to, count, weight)
+actual1$cat <- "1st Wave"
+actual2$cat <- "2nd Wave"
+
+avgW2M1 <- M1avgW2 %>% ungroup() %>%
+  filter(weight > 50) %>%
+  mutate(from = as.factor(from), to = as.factor(to),
+         cat = "Model1")
+add1 <- setdiff(as.character(1:16), unique(c(as.character(avgW2M1$from), as.character(avgW2M1$to))))
+avgW2M1 %>% add_row(from = add1, to = NA, count = NA, weight = NA, cat = "Model1") -> avgW2M1
+avgW2M2 <- M2avgW2 %>% ungroup() %>%
+  filter(weight > 50) %>%
+  mutate(from = as.factor(from), to = as.factor(to),
+         cat = "Model2")
+add2 <- setdiff(as.character(1:16), unique(c(as.character(avgW2M2$from), as.character(avgW2M2$to))))
+avgW2M2 %>% add_row(from = add2, to = NA, count = NA, weight = NA, cat = "Model2") -> avgW2M2
+avgW2M3 <- M3avgW2 %>% ungroup() %>%
+  filter(weight > 50) %>%
+  mutate(from = as.factor(from), to = as.factor(to),
+         cat = "Model3")
+add3 <- setdiff(as.character(1:16), unique(c(as.character(avgW2M3$from), as.character(avgW2M3$to))))
+avgW2M3 %>% add_row(from = add3, to = NA, count = NA, weight = NA, cat = "Model3") -> avgW2M3
+
+combinedavgs <- rbind(actual1, actual2, avgW2M1, avgW2M2, avgW2M3)
+combinedavgs %>% group_by(cat) %>%
+  mutate(linewidth = weight / max(weight,na.rm = T)) -> combinedavgs
+
+combinedavgs %>% filter(cat == "Model1") %>% mutate(logweight = log(weight)) -> t1
+colors <- tweenr::tween_color(data = c("#969696", "#d73027"), n = table(t1$cat) %>% as.numeric, ease = 'linear')
+t1 %>% arrange(logweight) -> t1
+t1$color <- NA
+t1$color <- colors[[1]]
+
+# from chunk tableofmeans in paper-child.Rnw
+senM1est <- read.csv("data/congress/senateM1ests.csv")
+senM2est <- read.csv("data/congress/senateM2ests.csv")
+senM3est <- read.csv("data/congress/senateM3ests.csv")
+senM1est$Model <- "M1"
+senM2est$Model <- "M2"
+senM3est$Model <- "M3"
+senM1est$Sim <- 1:nrow(senM1est)
+senM2est$Sim <- 1:nrow(senM2est)
+senM3est$Sim <- 1:nrow(senM3est)
+senM1est %>% gather(parameter, estimate, Rate:recip) %>% dplyr::select(Sim, Model, parameter, estimate) -> senM1est2
+senM2est %>% gather(parameter, estimate, Rate:jumpXTransTrip) %>% dplyr::select(Sim, Model, parameter, estimate) -> senM2est2
+senM3est %>% gather(parameter, estimate, Rate:nbrDist2twice) %>% dplyr::select(Sim, Model, parameter, estimate) -> senM3est2
+senateEsts <- rbind(senM1est2, senM2est2, senM3est2)
+senateEsts$parameter <- as.factor(senateEsts$parameter)
+levels(senateEsts$parameter) <- c("beta1", "beta3", "beta4", "alpha1", "alpha2", "alpha3", "beta2")
+@
+
+
+\section{Supporting Information for Section 4: Collections of models}
+
+<<sigtesting, fig.show = 'hold', out.width='\\textwidth', fig.height=2, fig.cap="Significant effects for the two data sets, at a significance level of 0.10 or lower as calculated by the Wald-type test available in the SIENA software.", error=FALSE>>=
+smfr_effs <- read_csv("data/effects_significance_smallFriends.csv")
+smfr_effs$inter1[is.na(smfr_effs$inter1)] <- "none"
+library(ggrepel)
+set.seed(12345678)
+smfr_effs %>% filter(type == "eval" & Waldpval <=0.10) %>%
+ggplot(aes(x = estimate, y = Waldpval, shape = inter1)) +
+  #geom_errorbarh(aes(xmin = estimate - se, xmax = estimate + se), color = 'black') +
+  geom_vline(xintercept = 0) +
+  geom_point(size = 3, alpha = .75) +
+  #geom_text_repel(aes(label = shortName)) +
+  scale_shape(name = "Interaction\nVariable") +
+  ggtitle("Significant effects at level 0.10 for friendship data") +
+  coord_flip() +
+  ThemeNoNet
+sen_effs <- read_csv("data/congress/senateModelSigEffects.csv")
+sen_effs$inter1[is.na(sen_effs$inter1)] <- "none"
+ggplot(data = sen_effs %>% filter(Waldpval <=0.10), aes(x = estimate, y = Waldpval, shape= inter1)) +
+  # geom_errorbarh(aes(xmin = estimate - se, xmax = estimate + se), color = 'black') +
+  geom_vline(xintercept = 0) +
+  geom_point(size = 3) +
+  #geom_text_repel(aes(label = shortName)) +
+  scale_shape(name = "Interaction\nVariable") +
+  ggtitle("Significant effects at level 0.10 for senate data") +
+  coord_flip() +
+  ThemeNoNet
+@
+
+In Figure~\ref{fig:sigtesting}, we see for the friendship data and the senate data that most of the significant effects have absolute value less than ten. In addition, the $p$-values for the effects from the friendship data are more spread out than the $p$-values for the senate data, which are concentrated at about 0.02 or less. This suggests that larger data sets tend to result generally in smaller $p$-values, which is consistent with the construction of Wald-type tests.
+
+<<averagenet, results='hide', out.width='\\textwidth',fig.cap='The node-link diagrams from the three expected networks that we calculated are in the top row, and the true wave 1 and wave 2 data are shown in the bottom row above. There is some difference between the three models, but overall, these three models struggle to capture the structure in the true second wave of data.', fig.height=5>>=
+
+combinedavgs$linewidth[combinedavgs$cat %in% c("1st Wave", "2nd Wave")] <- .5
+combinedavgs$cat <- as.factor(combinedavgs$cat)
+combinedavgs$cat <- ordered(combinedavgs$cat, levels = c("Model1", "Model2", "Model3", "1st Wave", "2nd Wave"))
+
+ggplot(data = combinedavgs) +
+  geom_net(aes(from_id = from, to_id = to, linewidth= linewidth),
+           directed = T, curvature = .2, labelon=T, size = 3,
+           arrow = arrow(angle = 20, type = "open", length = unit(.2, "cm")), ecolour = "#969696", fiteach = T,
+           color = "#252525", hjust = .5, vjust = .5, labelcolour = 'white', fontsize = 2, arrowgap = .02,
+           singletons = T) +
+  ThemeNet + theme(panel.background = element_rect(color = 'black')) +
+  facet_wrap(~cat)
+@
+
+To create the expected network visualization shown in Figure~\ref{fig:averagenet}, we follow the same procedure as in Section 3: Model in Data Space, counting occurrences of each realized edge in the simulations.  The resulting summary network has weighted edges representing the proportion of edge appearances in all 1,000 simulations of wave 2. As in Figure 6, Section 3, edges only appear in the expected networks if they appear more than 5\% of the time in the simulations. In Figure~\ref{fig:averagenet}, we show the  expected network from the three models we fit and the first and second waves of data. Comparing the three averages to waves 1 and 2, we see that they have very similar structure to wave 1 but that model M2, which included the transitive triplet parameter, results in more strongly connected components. The lack of fit is clear: none of the three average networks show node 16 gaining ties as it does in wave two, nor do they show nodes 4 and 7 becoming isolated. In model M2, however, the ties to node 7 appear much weaker than in model M1 or model M3, and the nodes $\{10,11,14\}$ are also strongly connected as they are in wave 2 of data, suggesting that M2 may be the best model of the three.
+
+%Outdegree and reciprocity have the same inverse relationship for both data sets. For the friendship data, the inclusion of $\\beta_3$ has strong effect on the estimates of the other two parameters, but not for the senate data.
+<<compareModels, fig.cap="Density plots of objective function parameter estimates from repeatedly fitting models M1, M2, and M3 to the example data. ", fig.height = 3>>=
+simu2$data <- "friends"
+senateEsts$data <- "senate"
+allDataEsts <- rbind(senateEsts, simu2)
+allDataEsts$parameter <- as.factor(allDataEsts$parameter)
+allDataEsts$parameter <- ordered(allDataEsts$parameter, levels = c(paste0("alpha", 1:3),paste0("beta", 1:4)))
+ggplot(allDataEsts %>% filter(str_detect(parameter, "beta"))) +
+  geom_density(aes(x = estimate, fill = Model), alpha = .5) +
+  facet_grid(data~parameter, scales = "free", labeller = "label_both") +
+  scale_fill_brewer(palette = "Greys") + 
+  ThemeNoNet +
+  theme(legend.position = 'bottom')
+@
+
+The density plots in Figure~\ref{fig:compareModels} show the distribution of the parameter estimates for the objective function parameters in M1, M2, and M3 the two example data sets we used. The most notable difference is in the values of $\beta_1, \beta_2$. In the senate data, the inclusion of $\beta_3$ has no effect on the estimates of $\beta_1, \beta_2$, while the opposite is true for the friendship data. 
+
+<<corplots, fig.cap="A matrix of plots demonstrating the strong correlations between parameter estimates. The strongest correlation within each model is between $\\beta_1$ and $\\beta_2$.", fig.width=8>>=
+
+simu_spread <- simu2 %>% spread(parameter, estimate)
+ggpairs(simu_spread, columns = 4:9, aes(colour=Model, alpha = .5)) + 
+  theme(plot.title = element_text(size = 10,
+                                            face = 'plain', angle = 0, family = "Times New Roman"),
+                  axis.title.x = element_text(size = 10,
+                                            face = 'plain', angle = 0, family = "Times New Roman", inherit.blank = T),
+                  axis.title.y = element_text(size = 10,
+                                            face = 'plain', angle = 90, inherit.blank = T),
+                  axis.text.x= element_text(size = 10,
+                                            face = 'plain', angle = 90, inherit.blank = TRUE),
+                 # axis.text.x.bottom = element_text(size = 10,
+             #                               face = 'plain', angle = 90, inherit.blank = TRUE),
+                  axis.text.y = element_text(size = 10,
+                                            face = 'plain', angle = 0, family = "Times New Roman", inherit.blank = T),
+                #  axis.text.y.right = element_text(size = 12,
+               #                             face = 'plain', angle = 0, family = "Times New Roman", inherit.blank = T),
+                  strip.text.x = element_text(size = 12,
+                                            face = 'plain', angle = 0, family = "Times New Roman",
+                                            margin = margin(t = 3, r = 0, b = 3, l = 0, unit = "pt"), inherit.blank = T),
+                  strip.text.y =element_text(size = 12,
+                                            face = 'plain', family = "Times New Roman", angle = 90,margin = margin(t = 3, r = 3, b = 3, l = 3, unit = "pt"),inherit.blank = T),
+                  strip.background = element_rect(colour = "black", fill = "white")
+                    )
+@
+
+In Figure~\ref{fig:corplots}, we examine correlations between each of pair of parameters within each model and overall.\nocite{ggally} The strongest correlation within each model is between $\beta_1$ and $\beta_2$, with absolute correlation between them greater than 0.90 in all three models. The $\beta_1$ parameter is also highly correlated with the $\beta_3$ parameter within model M2, but it is not as highly correlated with the $\beta_4$ parameter in model M3. It might therefore be advisable to consider only models that either allow $\beta_1$ or $\beta_2$ but not both. Looking at the high correlation with $\alpha$, we might switch to a model without $\beta_1$.
+
+\section{Supporting Information for Section 5: Explore algorithms, not just end result}
+
+<<alledgests, fig.height = 4, fig.cap="Visualizing all microsteps taken in 1,000 simulations from the model M1. The occurrence percent is split up into groups to correspond with its distribution: only about 10\\% of the possible edges appear more than 10\\% of the time in the 1,000 simulations, while about 60\\% appear less than 1\\% of the time. The first wave network is shown at microstep 0, and the second wave of the network is shown as the last microstep for comparison. We see that it is rare for a microstep process to last longer than 150 steps, and also that the edges that appear past the 150th step tend to be in either the first wave or the second wave.">>=
+# get a plot of all microsteps from w1 to w2 by edge
+alledges <- expand.grid(from = paste0("V", 1:16), to = paste0("V", 1:16))
+alledges$eid <- 1:nrow(alledges)
+
+sfmsall %>% left_join(alledges) -> sfmsall2
+
+sfmsall2 %>% group_by(rep) %>% mutate(isWave2 = (ms == max(ms))) -> sfmsall2
+
+sfmsall2 %>% group_by(from, to, eid) %>%
+  summarize(total =n()) %>%
+  arrange(desc(total)) %>%
+  ungroup %>%
+  mutate(plotorder = row_number()) -> sfmsallorder
+
+sfmsall2 %>% group_by(ms, eid) %>%
+  summarise(count = n()) %>%
+  mutate(alpha = count/1000) %>%
+  arrange(ms, eid) -> sfmsall3
+
+left_join(sfmsall3, sfmsallorder, by = "eid") -> sfmsall4
+
+#add true wave 2 to plot
+wave2 <- na.omit(actual2)
+wave2$from <- paste0("V", wave2$from)
+wave2$to <- paste0("V", wave2$to)
+wave2 <- left_join(wave2, alledges)
+wave2 <- left_join(wave2, sfmsallorder)
+
+sfmsall5 <- sfmsall4 %>% ungroup %>% add_row(ms = max(sfmsall4$ms) + 1,
+        eid = wave2$eid,
+        count = NA,
+        alpha = 1,
+        from = wave2$from,
+        to = wave2$to,
+        total = wave2$total,
+        plotorder = wave2$plotorder)
+sfmsall5$alphaFctr <- cut(sfmsall5$alpha, c(0,.01, .05, .10, .25, .5, .75, 1, 1.1))
+ggplot(data = sfmsall5) +
+  geom_tile(aes(x = ms, y = reorder(eid,-plotorder), fill = alphaFctr)) +
+  #scale_fill_gradient(low = 'grey90', high = '#0868ac', name = "occurrence %") +
+  scale_fill_brewer(palette = "Greys", name = "Occurrence %", labels = c("(0-1]%", "(1-5]%", "(5-10]%","(10-25]%", "(25-50]%", "(50-75]%", "(75-100]%")) +
+  labs(x = "Microstep No.", y = "Edges (ordered by total # occurrences)") +
+  ThemeNoNet +
+  theme(axis.ticks.y = element_blank(), axis.text.y = element_blank(), panel.grid = element_blank())
+@
+
+
+Finally, we combine 1,000 simulations from model M1 into a visualization that displays the entire microstep process in Figure~\ref{fig:alledgests}. To make this visualization, we first assign each possible edge in the network an ID number so that we can keep track of it throughout all microsteps and all simlations. Then, we count up the number of times each edge appears in the network throughout the microstep process for each of the 1,000 simulations. We also count the number of times an edge occurs at each step number. Since the number of microsteps in the process varies, the number of times an edge occurs decreases as the step number increases. Next, we compute a proportion, which we call the occurrence percentage, which is the number of times the edge was in the network in step 1, step 2, etc. divided by 1,000. Finally, we visualize all this information together in Figure~\ref{fig:alledgests}. In this plot, we see that all possible edges appear at least once at some point in the microsteps of at least one simulated process. We also see, however, that the process struggles to focus in on the edges in the second wave of the data. Ideally, we would like to see more occurrences the edges in wave 2 that are not in wave 1. But, about half of the edges in wave two are in the bottom half of the figure, which means they do not appear as much as they would if the model was actually capturing the mechanisms of tie change in the network. More of the darkest areas of the figure should belong to ties in wave 2, but those are often the lightest. This solidifies what we found in Figure 12, Section 5: the fitting process does not explore the data space enough to adequately capture the network change mechanism.
