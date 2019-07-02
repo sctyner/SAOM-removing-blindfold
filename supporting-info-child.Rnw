@@ -284,7 +284,7 @@ ggplot(data = combinedavgs) +
 To create the expected network visualization shown in Figure~\ref{fig:averagenet}, we follow the same procedure as in Section 3: Model in Data Space, counting occurrences of each realized edge in the simulations.  The resulting summary network has weighted edges representing the proportion of edge appearances in all 1,000 simulations of wave 2. As in Figure 6, Section 3, edges only appear in the expected networks if they appear more than 5\% of the time in the simulations. In Figure~\ref{fig:averagenet}, we show the  expected network from the three models we fit and the first and second waves of data. Comparing the three averages to waves 1 and 2, we see that they have very similar structure to wave 1 but that model M2, which included the transitive triplet parameter, results in more strongly connected components. The lack of fit is clear: none of the three average networks show node 16 gaining ties as it does in wave two, nor do they show nodes 4 and 7 becoming isolated. In model M2, however, the ties to node 7 appear much weaker than in model M1 or model M3, and the nodes $\{10,11,14\}$ are also strongly connected as they are in wave 2 of data, suggesting that M2 may be the best model of the three.
 
 %Outdegree and reciprocity have the same inverse relationship for both data sets. For the friendship data, the inclusion of $\\beta_3$ has strong effect on the estimates of the other two parameters, but not for the senate data.
-<<compareModels, fig.cap="Density plots of objective function parameter estimates from repeatedly fitting models M1, M2, and M3 to the example data. ", fig.height = 3>>=
+<<compareModels, fig.cap="Density plots of objective function parameter estimates from repeatedly fitting models M1, M2, and M3 to the example data. ", fig.height = 3, eval=FALSE>>=
 simu2$data <- "friends"
 senateEsts$data <- "senate"
 allDataEsts <- rbind(senateEsts, simu2)
@@ -298,7 +298,7 @@ ggplot(allDataEsts %>% filter(str_detect(parameter, "beta"))) +
   theme(legend.position = 'bottom')
 @
 
-The density plots in Figure~\ref{fig:compareModels} show the distribution of the parameter estimates for the objective function parameters in M1, M2, and M3 the two example data sets we used. The most notable difference is in the values of $\beta_1, \beta_2$. In the senate data, the inclusion of $\beta_3$ has no effect on the estimates of $\beta_1, \beta_2$, while the opposite is true for the friendship data. 
+% The density plots in Figure~\ref{fig:compareModels} show the distribution of the parameter estimates for the objective function parameters in M1, M2, and M3 the two example data sets we used. The most notable difference is in the values of $\beta_1, \beta_2$. In the senate data, the inclusion of $\beta_3$ has no effect on the estimates of $\beta_1, \beta_2$, while the opposite is true for the friendship data. 
 
 <<corplots, fig.cap="A matrix of plots demonstrating the strong correlations between parameter estimates. The strongest correlation within each model is between $\\beta_1$ and $\\beta_2$.", fig.width=8>>=
 

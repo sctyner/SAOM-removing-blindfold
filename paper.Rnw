@@ -12,6 +12,7 @@
 \usepackage{amsfonts}
 % \usepackage{color}
 \usepackage{multirow}
+\usepackage{booktabs}
 \usepackage{rotating}
 \usepackage[dvipsnames,svgnames,table]{xcolor}
 \usepackage{hyperref}
