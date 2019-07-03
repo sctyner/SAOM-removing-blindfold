@@ -101,16 +101,21 @@ load("data/M3sims1000.RData")
 %Social networks, such as collaboration networks between academic researchers or friendship networks 
 % new intro 
 %As humans and researchers, it is our instint to try to learn as much as we can about the world around us. 
-One of the hardest things scholars try to do is understand relationships between friends, family, or colleagues. These relationships, or \emph{social networks}, have been studied for decades, in every format from self-help books to publications in academic journals. There are also statistical models, such as exponential random graph models (ERGM) and latent space models (LSM), that strive to capture the underlying relationship-generating mechanism \citep{ergm, lsm}. These static models, however, are not optimal for modeling ``real-world" social networks because they do not account for changes in the network as time passes. \textit{Dynamic social networks}, which are observed at many points in time, are the alternative to static networks. The available models for dynamic social networks, however, are more complicated, as these models must account for both the network structure and the way it changes in time.  But if we can capture the change mechanisms over time, we can gain a better understanding of the underlying network dynamics that drive social connections.  % are more realistic because they provide mechanisms for analyzing multiple observations of the same network over time. 
+Scholars have been trying to understand relationships between people, or \emph{social networks}, for decades, especially in the social sciences. There are a host of quantitative methods available for analyzing social networks, including statistical models, such as exponential random graph models (ERGM) and latent space models (LSM), that strive to capture the underlying network-generating mechanism \citep{ergm, lsm}. The ERGM and LSM families are examples of static network models, which focus on a single ``snapshot" of a network and ``global network statistics" such as outdegree distribution \citep{goldenberg09}. Other static network model families include the Erd\"{o}s-R\'{e}nyi random graph model and the exchangeable graph model \citep{goldenberg09}. 
+% describe more about the ergms. cite goldenberg. answer the questions: how are they analyzed? What can they do? what can't they do? HOw are they applied? 
+These static models, however, are not optimal for modeling real networks because they do not account for changes in the network as time passes. In real networks, edges may be created or destroyed, and nodes can be born or die \citep{goldenberg09}. Dynamic models for networks, which model networks observed at many points in time, are the more realistic alternative to static network models. 
 
-%., and models for dynamic social networks hold a great deal of promise because of their potential to capture realistic mechanisms. %Our social networks evolve over time as new relationships are made, and being able to model these evolutionary mechanisms can uncover hidden truths about our relationships with each other. 
+Dynamic network models do not have as rich of a history as static network models, largely due to the historical lack of data and available analytical tools \citep{goldenberg09}. With the advent of social media and ever-increasing computational power, however, more and more researchers are turning toward dynamic network models.  Some of the classical models, such as the Erd\"{o}s-R\'{e}nyi model and the small-world model of \citet{watts} are pseudo-dynamic because they could be applied in a dynamic way but rarely are \citep{goldenberg09}.  
+% talk up dynamic social network models. they are much more realistic. they don't treat nodes as exchangeable, they allow the nodes to affect the ties. They account for both structural and covariate effects. They are very flexible. They are the ideal model because they are the only ones that have any chance of actually capturing the mechanisms. 
+Fully dynamic social network models, however, are more complicated: they incorporate both the network structure and its changes in time.  If we can capture this change mechanism in time, we can truly begin to model the underlying network dynamics that drive social connections. A comprehensive review of dynamic network models is presented in \citet{golenberg09}. 
 
-\par One family of models for dynamic social networks are continuous time Markov chain (CTMC) models, first introduced for networks in \citet{ctmcorig}. These models represent a hierarchical approach to network modeling: the changes happen at the smallest possible level, and subsequent choices are conditioned on the past. The transition probabilities between two adjacent states of a network depend on the current structure of the network, the characteristics of the nodes, or both \citep{saompaper}.   This means that node-level covariate effects, in addition to well-known ERGM effects such as reciprocity or transitivity, can be incorporated into the model.
-%These models are different from other dynamic network models because they allow us to add node level information into the model with the traditional network structure information. Adding node-level information into the model is a more intuitive approach to model changes in a social network because, for example 
-With these models, we can examine assumptions made about social networks, i.e. that people with common interests are more likely to become friends. For example, we may assume that teenagers who drink heavily are more likely to be friends with other teenagers who drink heavily. We can assess our assumptions on shared interests into the modeling process through a particular subfamily of CTMC models known as stochastic actor-oriented models (SAOMs) \citep{saompaper}.
+\par We are particularly interested one truly dynamic family of network models: continuous time Markov chain (CTMC) models, first introduced in \citet{ctmcorig}. We chose these models because they correspond to our intuition about how social networks are formed, and they are very flexible and widely applicable. In these models, network changes are modeled hierarchically at the node level: nodes are given opportunities to change via a rate function, then the node chooses which edge to change according to its utility function. %first step is the changes happen at the smallest possible level (one edge between two nodes), and subsequent changes condition on past changes. 
+In each step of the hierarchy, many possible effects can be implemented to capture the change mechanism. For example,  the rate function could be a simple waiting-time model, or it could depend on a node's indegree or outdegree: we may have reason to believe that the more "popular" nodes change their ties more frequently. In addition, we can incorporate node covariate information into the hierarchy, such as gender or education level of people in a social network. For instance, the genders of two people could effect whether and how quickly they establish a relationship, and people will likely form more relationships with those who share their education level. Thus, the transition probabilities between two states of a network depend on the network's structure, characteristics of the nodes, or both \citep{saompaper}.  For example, \citet{depression} use a CTMC model to learn about the tendency of depressed adolescents to form friendships and found that depressed students tended to avoid creating new friendships over time. The CTMC model family can also be expanded to model node behavior, as in \citet{chyzh2016}, who applies CTMC models to show that more indirect trade relationships in a country decrease its overall respect for human rights. % This means that node-level covariate effects, in addition to commonly used effects such as reciprocity or transitivity, can be incorporated into the model. 
+% Cite some of olga's work. what can you do with these models? cite other work with social networks. 
+Thus, with CTMC models we can examine assumptions made about social networks, i.e. that people with common qualities are more likely to become friends. %For example, we may assume that teenagers who drink heavily are more likely to be friends with other teenagers who drink heavily.  We can assess our assumptions on shared interests into the modeling process through a particular subfamily of CTMC models known as stochastic actor-oriented models (SAOMs) \citep{saompaper}.
 
-\par With the added flexibility of CTMC models comes increased estimation difficulty \citep{saomreview}. Likelihood functions quickly become very complex due to the inherent dependency structure in the data, and therefore computational methods, such as Markov chain Monte Carlo (MCMC), are used to fit models. %SAOMs are typically fit to dynamic social network data using a series of MCMC phases for finding method of moments (MoM) estimates of model parameters. 
-For CTMC parameter estimation, we use the software SIENA, and its \texttt{R} implementation \texttt{RSiena} by \citet{RSiena} \citep{rstats}. This software is a considerable contribution to the field of social network analysis, but the extensive parameter estimation process is largely hidden from the user. To better understand CTMCs and the fitting process in \texttt{RSiena}, we use model visualization, or model-vis \citep{modelvis}, to examine the underlying methods, hidden structures, and simulation results. Ultimately, we aim to help researchers better understand the structure, behavior, fit, and results of CTMC models for social network data. 
+\par With the flexibility of CTMC models comes increased estimation difficulty \citep{saomreview}. Likelihood functions quickly become very complex due to the inherent dependency structure in the data, and therefore computational methods, such as Markov chain Monte Carlo (MCMC), are used to fit models. Methods for maximum likelihood estimation (MLE) for these models were not introduced until \citet{saomsml2010}, and method of moments (Mom) estimation is still used \citep{RSiena}. %SAOMs are typically fit to dynamic social network data using a series of MCMC phases for finding method of moments (MoM) estimates of model parameters. 
+For CTMC parameter estimation, we use the software SIENA, and its \texttt{R} implementation \texttt{RSiena} \citep{rstats, RSiena}. This software is a considerable contribution to the field of social network analysis, allowing for estimation of structural effects, node covariate effects, as well as modeling both network and node changes. This extensive parameter estimation process is largely hidden from the user, and the primary outputs are parameter estimates. Direct simulation from a given model with fixed parameter values is also made easy with \texttt{RSiena}. %Comprehending these underlying algorithms for parameter estimation is difficult without an advanced statistics degree, so we use model visualization, or model-vis \citep{modelvis}, to examine the methods, hidden structures, simulation results, and model behavior. Ultimately, we aim to help researchers better understand the structure, behavior, fit, and results of CTMC models for social network data. 
 
 In the remainder of this section, we briefly introduce the structure of network data and two different network visualization (net-vis) techniques. Then, we carefully define the hierarchical model structure of a CTMC. Finally, we briefly ouline the CTMC fitting process in \texttt{RSiena} that we use throughout this paper \citep{SienaAlgs}. 
 
@@ -262,22 +267,12 @@ The rest of the paper is strucured as follows. In Section \ref{sec:exdatamods}, 
 
 \section{Example Data and Models}\label{sec:exdatamods}
 
-% removed the following plot
-<<adjmatviz, fig.align='center', fig.cap="A visualization of the adjacency matrices of the three waves of network observations in the ``Teenage Friends and Lifestyle Study'' data. The subset we will be using is outlined in red.", results='hide',fig.show='asis', fig.width=8, fig.height=3, eval = FALSE, purl=FALSE>>=
-source("code/00e_small_friends.R")
-view_rs2$wave <- factor(view_rs2$wave)
-levels(view_rs2$wave) <- c("Wave 1", "Wave 2", "Wave 3")
-ggplot(data= view_rs2, aes(x = y, y=-x)) +
-  geom_tile(aes(fill = as.factor(value))) +
-  scale_fill_manual("i likes j", labels=c("no", "yes"),
-                    values = c('white', 'black')) +
-  geom_rect(data= NULL, inherit.aes = FALSE, color = 'red',
-            aes(xmin = 19.5, xmax = 35.5, ymax = -19.5, ymin = -35.5, fill =NA)) +
-  facet_wrap(~wave) + theme_bw() +
-  labs(x = "node j (alter)", y = "node i (ego)") +
-  ThemeNoNet +
-  theme(aspect.ratio=1, axis.text = element_blank(), axis.ticks = element_blank(), panel.grid = element_blank())
-@
+
+% This is a canonical example in the social network modeling literature. That's why we chose it. 
+% It's easy to understand: everyone was once a teenager and knows how fragile those relationships are and how 
+% much and how quickly they can change. 
+% data has previously been used to quantify behavior & identify which ones will take risks. @pearson2003drifting
+
 
 <<alldataviz, fig.cap="The small friendship network data we model throughout this paper. The teenagers' drinking behavior changes and the network becomes less densely connected over time. These are the mechanisms we hope to model with our chosen CTMCs.", out.width='.99\\textwidth', fig.height=3, results='hide'>>=
 cols <- RColorBrewer::brewer.pal(8, "Greys")
@@ -420,7 +415,7 @@ ggplot(data = jTT, aes(from_id = from, to_id = to)) +
   labs(title = expression(paste(s[i3], "(x,z)")))
 @
 \caption{\label{fig:jtt}Realization of a JTT, where the covariate is represented by the shape of the nodes. The dotted tie is encouraged if $\beta_3$ is positive. $s_{i3}(x,z) = \sum_{j \neq h} x_{ij}x_{ih}x_{hj} \mathbb{I}(z_i = z_h \neq z_j)$}
-\end{subfigure}\hfill
+\end{subfigure}
 \begin{subfigure}[t]{.45\textwidth}
 <<dab, echo=FALSE, fig.width=2, fig.height=2, message = FALSE, warning = FALSE, fig.align='center', out.width='.49\\textwidth'>>=
 dade <- data.frame(from = c('i', 'i', 'h', 'k', 'i'), to = c('h', 'k', 'j', 'j','j'))
@@ -1113,8 +1108,9 @@ ggplot(data = changes3) +
   ThemeNoNet
 
 @
-
-<<heatmap, fig.align='center', fig.cap='Adjacency matrix visualizations showing the theoretical (left) and empirical (right) transition probabilities for the first microstep taken in 1,000 simulations. The ego node is on the y-axis, and the alter node is on the x-axis. There are many ties with empirical probability zero.', fig.height=2.5>>=
+\begin{figure}
+\begin{subfigure}[t]{\textwidth}
+<<heatmap, fig.align='center', fig.height=2.5>>=
 
 ansnullchains %>%
   filter(period == 1) %>%
@@ -1179,7 +1175,60 @@ p2 <- ggplot(data = empprobsDat,
   labs(x= "alter (j)", y = "ego (i)")
 plot_grid(p1, p2)
 @
+\caption{\label{fig:heatmap}Adjacency matrix visualizations showing the theoretical (left) and empirical (right) transition probabilities for the first microstep taken in 1,000 simulations. There are many ties with empirical probability zero.}
+\end{subfigure}
+\begin{subfigure}[t]{\textwidth}
+<<alledgests, fig.height = 3>>=
+# get a plot of all microsteps from w1 to w2 by edge
+alledges <- expand.grid(from = paste0("V", 1:16), to = paste0("V", 1:16))
+alledges$eid <- 1:nrow(alledges)
 
+sfmsall %>% left_join(alledges) -> sfmsall2
+
+sfmsall2 %>% group_by(rep) %>% mutate(isWave2 = (ms == max(ms))) -> sfmsall2
+
+sfmsall2 %>% group_by(from, to, eid) %>%
+  summarize(total =n()) %>%
+  arrange(desc(total)) %>%
+  ungroup %>%
+  mutate(plotorder = row_number()) -> sfmsallorder
+
+sfmsall2 %>% group_by(ms, eid) %>%
+  summarise(count = n()) %>%
+  mutate(alpha = count/1000) %>%
+  arrange(ms, eid) -> sfmsall3
+
+left_join(sfmsall3, sfmsallorder, by = "eid") -> sfmsall4
+
+#add true wave 2 to plot
+wave2 <- na.omit(actual2)
+wave2$from <- paste0("V", wave2$from)
+wave2$to <- paste0("V", wave2$to)
+wave2 <- left_join(wave2, alledges)
+wave2 <- left_join(wave2, sfmsallorder)
+
+sfmsall5 <- sfmsall4 %>% ungroup %>% add_row(ms = max(sfmsall4$ms) + 1,
+        eid = wave2$eid,
+        count = NA,
+        alpha = 1,
+        from = wave2$from,
+        to = wave2$to,
+        total = wave2$total,
+        plotorder = wave2$plotorder)
+sfmsall5$alphaFctr <- cut(sfmsall5$alpha, c(0,.01, .05, .10, .25, .5, .75, 1, 1.1))
+ggplot(data = sfmsall5) +
+  geom_tile(aes(x = ms, y = reorder(eid,-plotorder), fill = alphaFctr)) +
+  annotate(geom = "rect", xmin=.25, xmax = 1.75, ymin = -Inf, ymax = Inf, color = "red", fill = NA, size = .01, alpha = .15) + 
+  #scale_fill_gradient(low = 'grey90', high = '#0868ac', name = "occurrence %") +
+  scale_fill_brewer(palette = "Greys", name = "Occurrence %", labels = c("(0-1]%", "(1-5]%", "(5-10]%","(10-25]%", "(25-50]%", "(50-75]%", "(75-100]%")) +
+  labs(x = "Microstep No.", y = "Edges (ordered by total # occurrences)") +
+  ThemeNoNet +
+  theme(axis.ticks.y = element_blank(), axis.text.y = element_blank(), panel.grid = element_blank())
+@
+\caption{\label{fig:alledgests}Visualizing all microsteps taken in 1,000 simulations from the model M1. All $16\times(16-1)=240$ possible edges are represented on the y-axis, which is ordered by how often edges occur in the simulation process. The occurrence percent is split up into groups to correspond with its distribution: only about 10\% of the possible edges appear more than 10\% of the time in the 1,000 simulations, while about 60\% appear less than 1\% of the time. The network $x(t_1)$ is shown at microstep 0, and the network $x(t_2)$ is shown as the last microstep for comparison. We see that it is rare for a microstep process to last longer than 150 steps.}
+\end{subfigure}
+\caption{\label{fig:probabilities}Visualizing the underlying algorithms when fitting CTMC models. The emprical probability plot (on the right in Figure~\ref{fig:heatmap}) is also shown at microstep number 1 in Figure~\ref{fig:alledgests}.}
+\end{figure}
 
 We also illuminate the microstep process by visualizing the theoretical and observed transition probabilites for the first microstep in the process. These probabilities are defined in Equation~\ref{eq:pij}. We only do the first step of many because each microstep is dependent on the previous network state, and thus only the first steps can be compared across simulations.  
 There are 1,000 transitions to examine: the first microstep taken in each one of the simulations. %Another way to view these transition probabilities is through the adjacency matrix visualization. 

@@ -58,7 +58,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \if0\blind
-{
+{                                       % don't forget to change the title
   \title{\bf Supporting Information for Visual Diagnostics of Dynamic Social Network Models}
   \author{Sam Tyner \hspace{.2cm}\\
     Department of Statistics and Statistical Laboratory, Iowa State University\\
