@@ -235,7 +235,7 @@ levels(senateEsts$parameter) <- c("beta1", "beta3", "beta4", "alpha1", "alpha2",
 
 \section{Supporting Information for Section 4: Collections of models}
 
-<<sigtesting, fig.show = 'hold', out.width='\\textwidth', fig.height=2, fig.cap="Significant effects for the two data sets, at a significance level of 0.10 or lower as calculated by the Wald-type test available in the SIENA software.", error=FALSE>>=
+<<sigtesting, fig.show = 'hold', out.width='\\textwidth', fig.height=2, fig.cap="Significant effects for the two data sets, at a significance level of 0.10 or lower as calculated by the Wald-type test available in the SIENA software.", error=FALSE,eval = FALSE>>=
 smfr_effs <- read_csv("data/effects_significance_smallFriends.csv")
 smfr_effs$inter1[is.na(smfr_effs$inter1)] <- "none"
 library(ggrepel)
@@ -263,7 +263,7 @@ ggplot(data = sen_effs %>% filter(Waldpval <=0.10), aes(x = estimate, y = Waldpv
   ThemeNoNet
 @
 
-In Figure~\ref{fig:sigtesting}, we see for the friendship data and the senate data that most of the significant effects have absolute value less than ten. In addition, the $p$-values for the effects from the friendship data are more spread out than the $p$-values for the senate data, which are concentrated at about 0.02 or less. This suggests that larger data sets tend to result generally in smaller $p$-values, which is consistent with the construction of Wald-type tests.
+%In Figure~\ref{fig:sigtesting}, we see for the friendship data and the senate data that most of the significant effects have absolute value less than ten. In addition, the $p$-values for the effects from the friendship data are more spread out than the $p$-values for the senate data, which are concentrated at about 0.02 or less. This suggests that larger data sets tend to result generally in smaller $p$-values, which is consistent with the construction of Wald-type tests.
 
 <<averagenet, results='hide', out.width='\\textwidth',fig.cap='The node-link diagrams from the three expected networks that we calculated are in the top row, and the true wave 1 and wave 2 data are shown in the bottom row above. There is some difference between the three models, but overall, these three models struggle to capture the structure in the true second wave of data.', fig.height=5>>=
 
@@ -303,7 +303,7 @@ ggplot(allDataEsts %>% filter(str_detect(parameter, "beta"))) +
 <<corplots, fig.cap="A matrix of plots demonstrating the strong correlations between parameter estimates. The strongest correlation within each model is between $\\beta_1$ and $\\beta_2$.", fig.width=8>>=
 
 simu_spread <- simu2 %>% spread(parameter, estimate)
-ggpairs(simu_spread, columns = 4:9, aes(colour=Model, alpha = .5)) + 
+ggpairs(simu_spread, columns = 3:8, aes(colour=Model, alpha = .5)) + 
   theme(plot.title = element_text(size = 10,
                                             face = 'plain', angle = 0, family = "Times New Roman"),
                   axis.title.x = element_text(size = 10,
