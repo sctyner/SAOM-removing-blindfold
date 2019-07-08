@@ -265,24 +265,6 @@ ggplot(data = sen_effs %>% filter(Waldpval <=0.10), aes(x = estimate, y = Waldpv
 
 %In Figure~\ref{fig:sigtesting}, we see for the friendship data and the senate data that most of the significant effects have absolute value less than ten. In addition, the $p$-values for the effects from the friendship data are more spread out than the $p$-values for the senate data, which are concentrated at about 0.02 or less. This suggests that larger data sets tend to result generally in smaller $p$-values, which is consistent with the construction of Wald-type tests.
 
-<<averagenet, results='hide', out.width='\\textwidth',fig.cap='The node-link diagrams from the three expected networks that we calculated are in the top row, and the true wave 1 and wave 2 data are shown in the bottom row above. There is some difference between the three models, but overall, these three models struggle to capture the structure in the true second wave of data.', fig.height=5>>=
-
-combinedavgs$linewidth[combinedavgs$cat %in% c("1st Wave", "2nd Wave")] <- .5
-combinedavgs$cat <- as.factor(combinedavgs$cat)
-combinedavgs$cat <- ordered(combinedavgs$cat, levels = c("Model1", "Model2", "Model3", "1st Wave", "2nd Wave"))
-
-ggplot(data = combinedavgs) +
-  geom_net(aes(from_id = from, to_id = to, linewidth= linewidth),
-           directed = T, curvature = .2, labelon=T, size = 3,
-           arrow = arrow(angle = 20, type = "open", length = unit(.2, "cm")), ecolour = "#969696", fiteach = T,
-           color = "#252525", hjust = .5, vjust = .5, labelcolour = 'white', fontsize = 2, arrowgap = .02,
-           singletons = T) +
-  ThemeNet + theme(panel.background = element_rect(color = 'black')) +
-  facet_wrap(~cat)
-@
-
-To create the expected network visualization shown in Figure~\ref{fig:averagenet}, we follow the same procedure as in Section 3: Model in Data Space, counting occurrences of each realized edge in the simulations.  The resulting summary network has weighted edges representing the proportion of edge appearances in all 1,000 simulations of wave 2. As in Figure 6, Section 3, edges only appear in the expected networks if they appear more than 5\% of the time in the simulations. In Figure~\ref{fig:averagenet}, we show the  expected network from the three models we fit and the first and second waves of data. Comparing the three averages to waves 1 and 2, we see that they have very similar structure to wave 1 but that model M2, which included the transitive triplet parameter, results in more strongly connected components. The lack of fit is clear: none of the three average networks show node 16 gaining ties as it does in wave two, nor do they show nodes 4 and 7 becoming isolated. In model M2, however, the ties to node 7 appear much weaker than in model M1 or model M3, and the nodes $\{10,11,14\}$ are also strongly connected as they are in wave 2 of data, suggesting that M2 may be the best model of the three.
-
 %Outdegree and reciprocity have the same inverse relationship for both data sets. For the friendship data, the inclusion of $\\beta_3$ has strong effect on the estimates of the other two parameters, but not for the senate data.
 <<compareModels, fig.cap="Density plots of objective function parameter estimates from repeatedly fitting models M1, M2, and M3 to the example data. ", fig.height = 3, eval=FALSE>>=
 simu2$data <- "friends"
@@ -302,8 +284,67 @@ ggplot(allDataEsts %>% filter(str_detect(parameter, "beta"))) +
 
 <<corplots, fig.cap="A matrix of plots demonstrating the strong correlations between parameter estimates. The strongest correlation within each model is between $\\beta_1$ and $\\beta_2$.", fig.width=8>>=
 
+levels(simu2$parameter) <- c("alpha[1]","alpha[2]","beta[1]","beta[2]","beta[3]","beta[4]")
+ggplot(data = (simu2 %>% filter(parameter %in% c("beta[3]","beta[4]")))) +
+  geom_density(aes(x = estimate), alpha = .5) +
+  facet_wrap(~parameter, scales = 'free', labeller= label_parsed) +
+  ThemeNoNet +
+  xlab("estimate value") + 
+  theme(legend.position = 'bottom')
 simu_spread <- simu2 %>% spread(parameter, estimate)
-ggpairs(simu_spread, columns = 3:8, aes(colour=Model, alpha = .5)) + 
+
+simu_spreadM12 <- simu_spread %>% filter(Model == "M1" | Model == "M2") %>% select(-beta4)
+simu_spreadM13 <- simu_spread %>% filter(Model == "M1" | Model == "M3") %>% select(-beta3)
+
+theme_set(theme_classic())
+ggpairs(simu_spread, columns = 3:6, aes(colour=Model, fill=Model, alpha = .5)) 
+        lower = list(continuous = wrap(my_color)),
+        diag = list(continuous = wrap(my_fill))) + 
+  theme(plot.title = element_text(size = 10,
+                                            face = 'plain', angle = 0, family = "Times New Roman"),
+                  axis.title.x = element_text(size = 10,
+                                            face = 'plain', angle = 0, family = "Times New Roman", inherit.blank = T),
+                  axis.title.y = element_text(size = 10,
+                                            face = 'plain', angle = 90, inherit.blank = T),
+                  axis.text.x= element_text(size = 10,
+                                            face = 'plain', angle = 90, inherit.blank = TRUE),
+                 # axis.text.x.bottom = element_text(size = 10,
+             #                               face = 'plain', angle = 90, inherit.blank = TRUE),
+                  axis.text.y = element_text(size = 10,
+                                            face = 'plain', angle = 0, family = "Times New Roman", inherit.blank = T),
+                #  axis.text.y.right = element_text(size = 12,
+               #                             face = 'plain', angle = 0, family = "Times New Roman", inherit.blank = T),
+                  strip.text.x = element_text(size = 12,
+                                            face = 'plain', angle = 0, family = "Times New Roman",
+                                            margin = margin(t = 3, r = 0, b = 3, l = 0, unit = "pt"), inherit.blank = T),
+                  strip.text.y =element_text(size = 12,
+                                            face = 'plain', family = "Times New Roman", angle = 90,margin = margin(t = 3, r = 3, b = 3, l = 3, unit = "pt"),inherit.blank = T),
+                  strip.background = element_rect(colour = "black", fill = "white"), 
+        panel.background = element_rect(color = "black")
+                    )
+
+my_color <- function(data, mapping, ..., values = c("#bdbdbd", "#737373", "#252525")){
+  ggplot(data = data, mapping = mapping) + 
+    geom_point(...) + 
+    scale_color_manual(values = values) + 
+    scale_fill_manual(values = values)
+}
+
+my_fill <- function(data, mapping, ..., values = c("#bdbdbd", "#737373", "#252525")){
+  ggplot(data = data, mapping = mapping) + 
+    geom_density(...) + 
+    scale_fill_manual(values = values) + 
+    scale_color_manual(values = values)
+}
+
+my_text <- function(data, mapping, ..., values = c("#bdbdbd", "#737373", "#252525")){
+  ggplot(data = data, mapping = mapping) + 
+    geom_text(...) + 
+    scale_fill_manual(values = values) + 
+    scale_color_manual(values = values)
+}
+
+ggpairs(simu_spreadM13, columns = 3:7, aes(colour=Model, alpha = .5)) + 
   theme(plot.title = element_text(size = 10,
                                             face = 'plain', angle = 0, family = "Times New Roman"),
                   axis.title.x = element_text(size = 10,

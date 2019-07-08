@@ -192,7 +192,7 @@ Ultimately, there is no one ``correct" way to visualize network information, and
 
 \subsection{Defining CTMC Network Models} \label{sec:saoms}
 
-The continuous-time Markov chain (CTMC) model family is for analyzing dynamic networks, so we can use them to study the change of a network in time while also examining the structural and node covariate efects. To define CTMCs for our purposes, we follow the general hierarchical definition outlined in \citet{saomreview} and elsewhere (see e.g.\ \citet{snijders01} and \citet{snijdersetal2010}). This hierarchy reflects our intution about social networks: most social networks, even holding constant the set of actors over time, are ever-changing as relationships form or disappear. Actors in social networks also have properties that could change their role within the network, and existing ties may affect formation or dissolution of other ties. In this section, we define the data structure, the hierarchal model, and intensity matrix of the CTMC. 
+The continuous-time Markov chain (CTMC) model family is for analyzing dynamic networks, so we can use them to study the change of a network in time while also examining the structural and node covariate efects. To define CTMCs for our purposes, we follow the general hierarchical definition outlined in \citet{saomreview} and elsewhere (see e.g.\ \citet{snijders01} and \citet{snijdersetal2010}). CTMC models reflect our intution about social networks: most social networks, even holding constant the set of actors over time, are ever-changing as relationships form or dissolve. Actors in social networks also have properties that could change their role within the network, and existing ties may affect formation or dissolution of other ties. In this section, we define the data structure, the hierarchal model, and intensity matrix of the CTMC. 
 
 \subsubsection{Definitions, Terminology, and Notation}
 
@@ -200,7 +200,7 @@ A dynamic network consists of a fixed set of $n$ nodes that is changing over tim
 
 The CTMC process $X(T)$ is a series of single tie changes that happen according to the model's \textit{rate function}, the first piece of the hierarchy. One actor at a time is ``selected" to make a change, then in the second piece of the hierarchy, it randomly changes its ties according to probabilities derived from the \textit{objective function}.
 
-\noindent \textbf{Rate Function:} In general, the \emph{rate function}, $\rho(x, \mathbf{z}, \boldsymbol{\alpha})$, is a function of the network at its current state $x$, covariates of interest, $\mathbf{z}$, and some parameters, $\boldsymbol{\alpha}$. With this general formulation, each node can have a different rate of change. Throughout this paper, we assume a simple rate function, $\rho(x, \mathbf{z}, \boldsymbol{\alpha}) \equiv \alpha_m$ that is constant across all actors between time $t_m$ and $t_{m+1}$. With this simple rate function, we have $M-1$ rate parameters, one for each transition from $x(t_{m})$ to $x(t_{m+1})$ for $m = 1, \dots, M-1$. The rate parameter, $\alpha_m$ dictates how often an actor $i$ is selected to change one of its ties, $x_{ij}$, for $j \neq i \in \{1, \dots, n\}$ in the time period from $t_{m}$ to $t_{m+1}$ for $m = 1, \dots, M-1$. The CTMC model assumes that the actors $i$ are conditionally independent given their ties $x_{i1}, \dots, x_{in}$ at the current network state. Let $\tau(i|x,m)$ be the wait time until actor $i$ gets to the opportunity to change its ties. For any time point $T$, where $t_{m} \leq T < t_{m+1}$, the waiting time to actor $i$'s next change follows an exponential distribution,
+\noindent \textbf{Rate Function:} In general, the \emph{rate function}, $\rho(x, \mathbf{Z}, \boldsymbol{\alpha})$, is a function of the network at its current state $x$, covariates of interest, $\mathbf{Z}$, and some parameters, $\boldsymbol{\alpha}$. With this general formulation, each node can have a different rate of change. Throughout this paper, we assume a simple rate function, $\rho(x, \mathbf{Z}, \boldsymbol{\alpha}) \equiv \alpha_m$ that is constant across all actors between time $t_m$ and $t_{m+1}$. With this simple rate function, we have $M-1$ rate parameters, one for each transition from $x(t_{m})$ to $x(t_{m+1})$ for $m = 1, \dots, M-1$. The rate parameter, $\alpha_m$ dictates how often an actor $i$ is selected to change one of its ties, $x_{ij}$, for $j \neq i \in \{1, \dots, n\}$ in the time period from $t_{m}$ to $t_{m+1}$ for $m = 1, \dots, M-1$. The CTMC model assumes that the actors $i$ are conditionally independent given their ties $x_{i1}, \dots, x_{in}$ at the current network state. Let $\tau(i|x,m)$ be the wait time until actor $i$ gets to the opportunity to change its ties. For any time point $T$, where $t_{m} \leq T < t_{m+1}$, the waiting time to actor $i$'s next change follows an exponential distribution,
 \begin{equation} \label{eq:c1}
  \tau(i | x_{i1}(m), \dots, x_{in}(m)) \stackrel{\text{iid}}{\sim} Exp(\alpha_m)
 \end{equation}
@@ -477,7 +477,7 @@ $\beta_3$ & -- & \Sexpr{SFE$M2[5]} & --  \\
 \caption{\label{tab:meanests} The means (std.\ dev.)\ of parameter values estimated from 1,000 repeated fittings of M1, M2, and M3 to the example data.}
 \end{table}
 
-We encourage interested readers to consult the \texttt{RSiena} manual for a complete definition and description of these and all other possible effects available to use in CTMC models \citep{RSienamanual}. Our goal here is to assess the fit of these models to our data, not to find the best model for this data, which is why we have kept both the data and the models very small. A true analysis of these data would include all of the available data, including additional covariates related to smoking and other behaviors, and would use sociological research to select and test the most pertinent effects at each step in the model hierarchy. The exact model structure and effects we choose are not as important to us as is our ability to assess their impact on model fit. We keep the data and model simple in order to apply the more complicated model visualization tools that we discuss in Sections~\ref{sec:minds}-\ref{sec:algorithms}. 
+We encourage interested readers to consult the \texttt{RSiena} manual for a complete definition and description of these and all other possible effects available to use in CTMC models \citep{RSienamanual}. Our goal here is to assess the fit of these models to our data, not to find the best model for this data, which is why we have kept both the data and the models very small. A true analysis of these data would include all of the available data, including additional covariates related to smoking and other behaviors, and would use sociological research to select and test the most pertinent effects at each step in the model hierarchy. The exact model structure and effects we choose are not as important to us as our ability to assess their impact on model fit. We keep the data and model simple in order to apply the more complicated model visualization tools that we discuss in Sections~\ref{sec:minds}-\ref{sec:algorithms}. 
 
 % need a way better transition here. 
 
@@ -618,14 +618,24 @@ p3 <- ggplot(data = filter(combinedavgs, cat == "2nd Wave")) +
 #grid.arrange(p2, p1, p3, nrow = 1)
 @
 
-<<averagenet, results='hide', out.width='\\textwidth', fig.cap='In the bottom left, the network at the first time point ($x(t_1)$), which is conditioned on in the model. In the bottom right, the network at the second time point($x(t_2)$). In the top wor, the three expected networks for time point 2 ($\\bar{x}(t_2)$) according to model M1, M2, M3.', fig.height=5>>=
+<<averagenet, results='hide', out.width='\\textwidth', fig.cap='In the bottom left, the network at the first time point ($x(t_1)$), which is conditioned on in the model. In the bottom right, the network at the second time point($x(t_2)$). In the top row, the three expected networks for time point 2 ($\\bar{x}(t_2)$) according to model M1, M2, M3. Legend shows edge weights in the three expected networks.', fig.height=5>>=
 
 combinedavgs$linewidth[combinedavgs$cat %in% c("1st Wave", "2nd Wave")] <- .5
 combinedavgs$cat <- as.factor(combinedavgs$cat)
 combinedavgs$cat <- ordered(combinedavgs$cat, levels = c("Model1", "Model2", "Model3", "1st Wave", "2nd Wave"))
-levels(combinedavgs$cat) <- c("Model 1", "Model 2", "Model 3", "Time 1", "Time 2")
+levels(combinedavgs$cat) <- c("M1 expectation", "M2 expectation", "M3 expectation", "Time 1", "Time 2")
 
-ggplot(data = combinedavgs) +
+summary(combinedavgs$linewidth)
+
+combinedavgs %>% filter(!is.na(to)) %>% 
+  ggplot() +
+  geom_point(aes(x = from, y = to)) + 
+  geom_line(aes(x = from, y = to, size = linewidth), color = "#969696") +
+  scale_size_continuous(name = "Edge frequency", range = c(0,1)) + 
+  ThemeNet -> forlineleg  
+legendlines <- cowplot::get_legend(forlineleg)
+set.seed(35291)
+allp <- ggplot(data = combinedavgs) +
   geom_net(aes(from_id = from, to_id = to, linewidth= linewidth),
            directed = T, curvature = .2, labelon=T, size = 3,
            arrow = arrow(angle = 20, type = "open", length = unit(.2, "cm")), ecolour = "#969696", fiteach = T,
@@ -633,17 +643,22 @@ ggplot(data = combinedavgs) +
            singletons = T) +
   ThemeNet + theme(panel.background = element_rect(color = 'black')) +
   facet_wrap(~cat)
+
+ggdraw() + draw_plot(allp, width = 1) + 
+  draw_grob(legendlines,x=.7, y=.1, width = .2, height = .4)
 @
 
-To view our models in the data space, we first simulate from the fitted model. No single network instance simulated from a CTMC will fully represent the model, so instead we look at an \textit{expectation} from the network model. We frequently rely on expected values in statistics, but network models, especially those as complex as our CTMC models, lack an expected network measure. We could talk about expected values of parameters, but the parameters can be hard to interpret and do not illuminate the overall structure of the network. How then, can we arrive at an ``expected" network? To construct an expected network, we
+To view our models in the data space, we first simulate from the fitted model. No single network instance simulated from a CTMC will fully represent the model, so instead we look at an \textit{expectation} from the network model. We frequently rely on expected values in statistics, but network models, especially those as complex as our CTMC models, lack an expected network measure. We could talk about expected values of parameters, but the parameters can be hard to interpret and do not illuminate the overall structure of the network. How then, can we arrive at an expected network? We propose the following method:
 \begin{enumerate}
-\item condition on $x(t_1)$ and simulate 1,000 instances of $x(t_2)$ and $x(t_3)$ from the model of interest using previously estimated parameter values (see Table~\ref{tab:meanests}). Call these simulations $x^{(1)}(t_m), x^{(2)}(t_m),\dots x^{(1000)}(t_m)$ for $m=2,3$. Then, we 
-\item count the number of times each edge $i \rightarrow j$ appeared in one of the 1,000 network simulations. i.e.\ compute $x_{ij}^{(B)}(t_m) = \sum_{b=1}^{1000} x_{ij}^{(b)}(t_m)$ for $m=2,3$. Then, we
-\item construct one weighted summary network for time points 2 and 3. Each summary network has edge weights equal to the proportion of the simulated networks in which the edge appeared.i.e.\ $\bar{x}_{ij}(t_m) = x_{ij}^{(B)}(t_m) /1000$. Finally, we 
-\item create the \textit{expected network} by including only the edges that appeared in more than 5\% of the simulations. i.e.\ $\bar{x}_{ij}(t_m) := \bar{x}_{ij}(t_m) \cdot \mathbb{I}(\bar{x}_{ij}(t_m) > 0.05)$. We write the expected networks as $\bar{x}(t_2)$ and $\bar{x}(t_3)$.
+\item Condition on $x(t_1)$ and simulate 1,000 instances of $x(t_2)$ and $x(t_3)$ from the model of interest using previously estimated parameter values (see Table~\ref{tab:meanests}). Call these simulations $x^{(1)}(t_m), x^{(2)}(t_m),\dots x^{(1000)}(t_m)$ for $m=2,3$.  
+\item Count the number of times each edge $i \rightarrow j$ appeared in one of the 1,000 network simulations. i.e.\ compute $x_{ij}^{(B)}(t_m) = \sum_{b=1}^{1000} x_{ij}^{(b)}(t_m)$ for $m=2,3$.
+\item Construct one weighted summary network for time points 2 and 3. Each summary network has edge weights equal to the proportion of the simulated networks in which the edge appeared.i.e.\ $\bar{x}_{ij}(t_m) = x_{ij}^{(B)}(t_m) /1000$. 
+\item Create the \textit{expected network} by including only the edges that appeared in more than 5\% of the simulations. i.e.\ $\bar{x}_{ij}(t_m) := \bar{x}_{ij}(t_m) \cdot \mathbb{I}(\bar{x}_{ij}(t_m) > 0.05)$. We write the expected networks as $\bar{x}(t_2)$ and $\bar{x}(t_3)$.
 \end{enumerate}
 
-\noindent The expected network, $\bar{x}(t_2)$, is in the middle panel of Figure~\ref{fig:summnetM1}. Edges that appear with higher frequency are drawn with darker, thicker lines. On either side of the average network in Figure~\ref{fig:summnetM1}, we show the data for comparison: $x(t_1)$ on the left, and $x(t_2)$ on the right. Visualizing the expected network in this way places the model M1 in the data space, and helps us assess model fit. We can see that the overall structure of the average network is much more similar to $x(t_1)$  than to $x(t_2)$ . In both $x(t_1)$ and $\bar{x}(t_2)$, there are two clusters of nodes: $\{2,3,4,5,6,12,13,15\}$ and $\{7,8,9,10,11,14\}$. The expected network, however, does not resemble  $x(t_2)$, which it is supposed to represent $x(t_2)$. In $x(t_2)$, there is one small, strongly connected cluster and one larger, sparsely connected cluster, with four unconnected nodes. Because the expected network $\bar{x(t_1)}$ more closely resembles $x(t_1)$ than $x(t_2)$, we take this as evidence that the simple model, M1, is not a good fit to the data.  % We can use the average network to help determine model goodness-of-fit. Because the the expected  network looks more like the first wave than the second wave, we can use the visualization in Figure~\ref{fig:summnetM1} as evidence of poor model fit.  
+\noindent The above method can be generalized and applied to any network model, static or dynamic, from which we can simulate, for any number of simulations from the network. The expected networks from our three models of interest are shown in the top row of Figure~\ref{fig:averagenet}. Edges that appear with higher frequency are drawn with thicker lines. On the bottom row of Figure~\ref{fig:averagenet}, we show the data for comparison: $x(t_1)$ on the left, and $x(t_2)$ on the right. Visualizing the expected network in this way places models M1, M2, and M3, in the data space, and helps assess model fit.  For model M1 we can see that the overall structure of the average network is much more similar to $x(t_1)$  than to $x(t_2)$ . In both $x(t_1)$ and $\bar{x}(t_2)$, there are two clusters of nodes: $\{2,3,4,5,6,12,13,15\}$ and $\{7,8,9,10,11,14\}$. The expected network, however, does not resemble  $x(t_2)$, which it is supposed to represent. In $x(t_2)$, there is one small, strongly connected cluster and one larger, sparsely connected cluster, with four unconnected nodes. Because the expected network $\bar{x(t_1)}$ more closely resembles $x(t_1)$ than $x(t_2)$, we take this as evidence that the simple model, M1, is not a good fit to the data.
+Comparing the three expected networks to $x(t_1)$ and $x(t_2)$, we see that they all have nodes that are connected in the same groups as $x(t_1)$. Model M2, which included the transitive triplet parameter, results in more strongly connected components, as shown by the increased number of edges and the thicker lines between nodes. The lack of fit in all models is clear:  not one of the three model expectations show node 16 gaining ties as it does in $x(t_2)$, nor do they show nodes 4 and 7 becoming isolated. In model M2, however, the ties to node 7 appear much weaker than in model M1 or model M3, and the nodes $\{10,11,14\}$ are also more strongly connected, as they are in wave 2 of data. This suggests that, despite the fact that neither of the three models is a good fit, M2 may be the best fitting model of the three. In a complete data analysis, we can use this information to select more models for analysis that utilize transitivity and covariate effects, as opposed to structural and indirect effects.  
+% We can use the average network to help determine model goodness-of-fit. Because the the expected  network looks more like the first wave than the second wave, we can use the visualization in Figure~\ref{fig:summnetM1} as evidence of poor model fit.  
 
 <<summary2, fig.height=2.5, fig.cap="Differences between the expected network  $\\bar{x}(t_2)$ and $x(t_1)$  and  $x(t_2)$. Some edges appear in both the data and the expected network $\\bar{x}(t_2)$ (dotted lines), while others only appear in the data (solid lines) or only in the expectation (dashed lines). Width of non-data edges represent the proportion of appearances in the 1,000 simulations. The FR layout is used.">>=
 
@@ -666,9 +681,9 @@ diff1 %>% mutate(from =paste0("V", 1:16)) %>% gather(to, value, -from) %>%
 t1_1 <- arrange(t1_1, from, to)
 p1 <- ggplot(data = t1_1) +
   geom_net(aes(from_id = from, to_id = to, linewidth= linewidth, linetype = color2),
-           directed = T, curvature = .2, labelon=T, size = 5,
-           arrow = arrow(angle = 20, type = "open", length = unit(.2, "cm")), 
-           color = "#252525", hjust = .5, vjust = .5, labelcolour = 'white', fontsize = 4, arrowgap = .02, layout.alg = "fruchtermanreingold",
+           directed = T, curvature = .2, labelon=T, size = 3,
+           arrow = arrow(angle = 20, type = "open", length = unit(.15, "cm")), 
+           color = "#252525", hjust = .5, vjust = .5, labelcolour = 'white', fontsize = 2, arrowgap = .02, layout.alg = "fruchtermanreingold",
            singletons = T) +
   scale_linetype_manual(values =c("longdash", "dotted") ) + 
   labs(title = "Difference between Time 1 Data &\n Expectation from M1") + ThemeNet +
@@ -698,9 +713,9 @@ t1_2 <- arrange(t1_2, from, to)
 t1_2 <- t1_2 %>% filter(!(from == 16 & is.na(to)))
 p2 <- ggplot(data = t1_2) +
   geom_net(aes(from_id = from, to_id = to, linewidth= linewidth, linetype = color2),
-           directed = T, curvature = .2, labelon=T, size = 5,
-           arrow = arrow(angle = 20, type = "open", length = unit(.2, "cm")), 
-           color = "#252525", hjust = .5, vjust = .5, labelcolour = 'white', fontsize = 4, arrowgap = .02, layout.alg = "fruchtermanreingold",
+           directed = T, curvature = .2, labelon=T, size = 3,
+           arrow = arrow(angle = 20, type = "open", length = unit(.15, "cm")), 
+           color = "#252525", hjust = .5, vjust = .5, labelcolour = 'white', fontsize = 2, arrowgap = .02, layout.alg = "fruchtermanreingold",
            singletons = T) +
   scale_linetype_manual(values = c("longdash", "solid", "dotted")) + 
   labs(title = "Difference between Time 2 Data &\n Expectation from M1") + ThemeNet +
@@ -710,38 +725,68 @@ ggdraw() + draw_plot(p1, width = .4) +  draw_plot(p2, width = .4, x=.4) +
   draw_grob(legendsumm,x=.8, y=.25, width = .2, height = .4)
 @
 
-Another way to view our models in the data space is with \textit{difference networks} between the expected network and the data, as shown in Figure~\ref{fig:summary2}. We created these networks by computing the difference between $\bar{x}(t_2)$ and $x(t_1)$, $\mathbf{A}(\bar{x}(t_2)) - \mathbf{A}(x(t_1))$, and the difference between $\bar{x}(t_2)$ and $\bar{x}(t_2)$, $\mathbf{A}(x(t_2)) - \mathbf{A}(\bar{x}(t_2))$. The lack of model fit becomes more apparent in Figure~\ref{fig:summary2}, with the dashed edges representing ties that only show up in the expected network, and the solid edges representing ties in the data that the model fails to capture.  Dotted edges are in both the expectation and the data and represent where the model is correct.  On the left in Figure~\ref{fig:summary2}, we see the difference between $x(t_1)$ and the expected network. We see mostly dotted edges, meaning that the simulated networks consist primarily of edges in $x(t_1)$, plus some new edges represented by the dashed lines that are not in the data. The unobserved ties are all reciprocating ties in the data, so the model is predicting more reciprocity between actors than there actually is. On the right in Figure~\ref{fig:summary2}, we see the difference between $x(t_2)$ and the expected network. Because the model is simulating  $x(t_2)$, we would hope to see very few differences between the expected network and the data. However, there are six solid edges, which are in the data but do not appear at all in the expected network, and there are many dashed edges that appear in the expected network but are not in $x(t_2)$. Although there are some edges that appear in both the expected network and $x(t_2)$, the majority of edges in the expected network are not in the observed data, and there are several edges in the data missing from the expectation. We therefore conclude that the model M1 is a poor fit to our example data, which we have seen very clearly by viewing the model in the data space. 
+Another way to view our models in the data space is with \textit{difference networks} between the expected network and the data, as shown in Figure~\ref{fig:summary2}. We created these networks by computing the difference between $\bar{x}(t_2)$ and $x(t_1)$, $\mathbf{A}(\bar{x}(t_2)) - \mathbf{A}(x(t_1))$, and the difference between $\bar{x}(t_2)$ and $\bar{x}(t_2)$, $\mathbf{A}(x(t_2)) - \mathbf{A}(\bar{x}(t_2))$ for model M1. The lack of model fit is also apparent in Figure~\ref{fig:summary2}, where the dashed edges represent ties that only show up in the expected network, and the solid edges representing ties in the data that the model fails to capture.  Dotted edges are in both the expectation and the data and represent where the model is correct.  On the left in Figure~\ref{fig:summary2}, we see the difference between $x(t_1)$ and the expected network. We see mostly dotted edges, meaning that the simulated networks consist primarily of edges in $x(t_1)$, plus some new edges represented by the dashed lines that are not in the data. The unobserved ties are all reciprocating ties in the data, so the model is predicting more reciprocity between actors than there actually is. On the right in Figure~\ref{fig:summary2}, we see the difference between $x(t_2)$ and the expected network. Because the model is simulating  $x(t_2)$, we would hope to see very few differences between the expected network and the data. However, there are six solid edges, which are in the data but do not appear at all in the expected network, and there are many dashed edges that appear in the expected network but are not in $x(t_2)$. Although there are some edges that appear in both the expected network and $x(t_2)$, the majority of edges in the expected network are not in the observed data, and there are several edges in the data missing from the expectation. We therefore conclude that the model M1 is a poor fit to our example data, which we have seen very clearly by viewing the model in the data space. As with the expected network, we can apply the difference network computation other network models to determine how closely the model fits the data. 
 
 
 \section{Collections of models}\label{sec:collectmodels}
 
 Now that we have assessed model fit, we want to learn about model behavior in order to choose better fitting models in the future. To assess model behavior, we employ the second principle of model visualization: ``collections are more informative" \citep{modelvis}. We rely on three methods for constructing collections of CTMC models. First, we explore the space of all possible models to determine significant model parameters.  Second, we vary model settings to uncover relationships between parameters and their effects on the fitted model. Finally,  we fit the model many times to assess the behavior of the underlying simulations. We chose these three collections because they each explore something different about model behavior: the choice of and relationships between parameters in the objective function and the stochastic effects from simulation. %, and the resulting fitted values under different circumstances. %Using the tools in our visualization toolbox, we view these collections to learn about model behavior.%The first considers the many parameters to include in a SAOM, while the second results in different parameter estimates, so we can see how parameter estimates vary. The third collection shows how those many possible parameters affect the values of parameters in the fitted models. Finally, we explore how the same model behaves under two completely different circumstances. 
 
+<<getergmeffects, eval = FALSE>>=
+url <-"https://cran.r-project.org/web/packages/ergm/vignettes/ergm-term-crossRef.html"
+library(rvest)
+(read_html(url) %>% html_nodes("table"))[[2]] %>% html_table() %>% select(`Term name`) %>% distinct() %>% count()
+
+@
+
+
 \noindent \textbf{Exploring the space of all possible models:} The \texttt{RSiena} manual contains over 80 effects to include in the objective function \citep{RSienamanual}. To select objective function parameters for modeling our example data, we searched through all available parameters to find  significant effects. The \texttt{RSiena} package includes the function \texttt{Wald.Rsiena} for Wald-type tests of parameter significance \citep{RSiena}. We start by including the outdegree and reciprocity parameters in the model then add one effect to the objective function, fit the model to the example data, test the added effect for significance, and repeat for all possible model parameters. %We performed this procedure, which we used to pick M2 and M3, for both the small friendship and the senate collaboration data. A visualization of the significant effects for the two example data sets are available in the Supporing Information. 
-Using this one-at-a-time testing method results in many possible significant parameters of different type and magnitude, demonstrating the flexibility of these models. We chose models M2 and M3 in addition to model M1 to examine more closely because their added effects had the smallest $p$-values from the Wald-type tests.   %We see in both the friendship data and the senate data results that most of the significant effects have absolute value less than ten. In addition, the $p$-values for the effects from the friendship data are more spread out than the $p$-values for the senate data, which are concentrated at about 0.02 or less. This may suggest that larger data sets tend to result generally in smaller $p$-values, just like a larger sample size results in smaller $p$-values in a $t$-test.
+Using this one-at-a-time testing method results in many possible significant parameters of different type and magnitude, demonstrating the flexibility of these models. We chose models M2 and M3 in addition to model M1 to examine more closely because their added effects had the smallest $p$-values from the Wald-type tests. This particular type of model exploration is applicable to any network model with an \texttt{R} package or other software that allows the user to identify model parameters, such as the \texttt{ergm} package, which has well over 100 effects for fitting exponential-family models to networks \citep{ergm1, ergm2}. %We see in both the friendship data and the senate data results that most of the significant effects have absolute value less than ten. In addition, the $p$-values for the effects from the friendship data are more spread out than the $p$-values for the senate data, which are concentrated at about 0.02 or less. This may suggest that larger data sets tend to result generally in smaller $p$-values, just like a larger sample size results in smaller $p$-values in a $t$-test.
 
 %\subsection{Varying model settings}
 
-\noindent \textbf{Varying model settings:} The second method for obtaining collections of models is to vary model settings. We have done this already by choosing three different models M1, M2, M3 to fit to our example data sets. 
+\noindent \textbf{Varying model settings:} The second method for obtaining collections of models is to vary model settings. We have done this already by choosing three different models M1, M2, M3 to fit to our example data sets. CTMC models, however, are much more flexible than the three simple models we have chosen. Other models could have included different rate functions for each node, where for example the rate of change could depend on drinking behavior if we have reason to believe that girls who drink more change friends more frequently. We could also model the behavior changes, not just the network changes, if we believe that friends influence behavior, via peer pressure.  And as before, this method of gathering a collection of models can be used for any network model, such as the hierarchichal Bayesian network estimation model in the \texttt{R} package \texttt{sna}, which allows the user to vary prior and model parameters \citep{sna}.
 % took out this next bit just because it doesn't really add much and we can just put the appendix figure into the previous section. % add more later.
 
 %To explore the behavior of these three models, we simulate from them. Using the estimated parameter values in Table~\ref{tab:meanests}, we simulated 1,000 observations of $x(t_2)$ and $x(t_3)$ of the friendship data from each of the three models. From the simulations, we created an expected network for $x(t_2)$ from models M1, M2, and M3 using the same method described in Section~\ref{sec:minds}. These expected networks are presented in the Supporting Information, and we see that all models are failing to capture the structure of $x(t_2)$, even though the individual parameters were all significant according to the statistical tests. %In Section~\ref{sec:samemodsamedat}, we fit these three models to the data 1,000 times, and examine the parameter densities. Here, . For simulation, we used the mean parameter values from the 1,000 fits of the corresponding model. 
 
 %\subsection{Fitting the same model to the same data}\label{sec:samemodsamedat}
-
-<<distests, fig.cap="Distribution of fitted parameter values for our three models. The inclusion of $\\beta_3$ or $\\beta_4$ clearly has an effect on the distributions of the rate parameters, $\\alpha_1$ and $\\alpha_2$, and on the other objective function parameters $\\beta_1, \\beta_2$.", fig.height=3>>=
-
+\begin{figure}
+\begin{subfigure}[t]{.4\textwidth}
+<<distests, fig.height=7.5>>=
 levels(simu2$parameter) <- c("alpha[1]","alpha[2]","beta[1]","beta[2]","beta[3]","beta[4]")
-ggplot(data = simu2) +
-  geom_density(aes(x = estimate, fill = Model), alpha = .5) +
-  facet_wrap(~parameter, scales = 'free', labeller= label_parsed) +
+filter(simu2, parameter %in% c("beta[3]","beta[4]")) %>% 
+ggplot() +
+  geom_density(aes(x = estimate)) +
+  facet_wrap(~parameter, scales = 'free', labeller= label_parsed, nrow = 2) +
   ThemeNoNet +
   scale_fill_brewer(palette = "Greys") + 
   xlab("estimate value") + 
   theme(legend.position = 'bottom')
 @
+\caption{\label{fig:beta34} Distribution of fitted $\beta_3, \beta_4$ values.}
+\end{subfigure}
+\begin{subfigure}[t]{.6\textwidth}
+<<img, out.width = "\\linewidth">>=
+# correlation for other params. 
+simsM2 <- filter(simu2, Model == "M2") %>% spread(parameter, estimate)
+corm2 <- cor(simsM2[, 3:7])
+simsM3 <- filter(simu2, Model == "M3") %>% spread(parameter, estimate)
+corM3 <- cor(simsM3[, 3:7])
 
-\noindent \textbf{Fitting the model repeatedly:} The simulations required to fit the CTMC network models lead to inherent variability in the fitted values. To examine this variability, we fit models M1, M2, and M3 to the friendship network 1,000 times each. The resulting mean estimates are given in Table~\ref{tab:meanests}, and the distributions of all parameter estimates are shown in Figure~\ref{fig:distests}. Clearly, the inclusion of the JTT parameter, $\beta_3$, results in very different estimates the of the other four parameterss, $\alpha_1$, $\alpha_2$, $\beta_1$, and $\beta_2$. On the other hand, the inclusion of the indirect tie parameter, $\beta_4$, does not lead to such drastically different estimates of other model parameters. When $\beta_3$ is included, its estimate is postitive, meaning that friendships between two girls with different drinking behaviors tend to form when there is third girl who is already friends with the other two. The inclusion of $\beta_3$ also leads to increases in the estimates of $\alpha_1, \alpha_2$. Thus, when modeling the transitive triplet behavior in this way, the model concludes that girls change friends more frequently. It is not clear, however, that the addition of a parameter to the objective function should effect the estimates of the rate parameters. This strong and possibly problematic relationship between rate parameter estimates and objective function parameters is further explored in the Supporting Information. When visualizing the results of the same models fit many times to the same data, we can to see potential model behavior problems right away.  
+knitr::include_graphics("img/gray_corplot-1.png")
+@
+\caption{\label{fig:corplots} Relationships between parameters common to all three models. \nocite{ggally}}
+\end{subfigure}
+\caption{\label{fig:distests} Distribution of fitted parameter values for our three models. The inclusion of $\beta_3$ or $\beta_4$ clearly has an effect on the distributions of the rate parameters, $\alpha_1$ and $\alpha_2$, and on the other objective function parameters $\beta_1, \beta_2$.}
+\end{figure}
+
+\noindent \textbf{Fitting the model repeatedly:} The simulations required to fit the CTMC network models lead to inherent variability in the fitted values. To examine this variability, we fit models M1, M2, and M3 to the friendship network 1,000 times each. The resulting means and standard deviations of the estimates are given in Table~\ref{tab:meanests}, and the distributions of all parameter estimates are shown in Figure~\ref{fig:distests}. In Figure~\ref{fig:corplots}, we can see that the addition of $\beta_3$ to the model results in very different estimates the of the other four parameters, $\alpha_1$, $\alpha_2$, $\beta_1$, and $\beta_2$. In fact, the distributions of $\alpha_1$ and $\beta_1$ for M2 do not overlap at all with the distribution of the same parameters from model M1. On the other hand, the inclusion of the indirect tie parameter, $\beta_4$, does not lead to such drastically different estimates of other model parameters. When $\beta_3$ is included, its estimate is postitive, meaning that friendships between two girls with different drinking behaviors tend to form when there is third girl who is already friends with the other two. The inclusion of $\beta_3$ also leads to increases in the estimates of $\alpha_1, \alpha_2$. Thus, when modeling the transitive triplet behavior in this way, the model concludes that girls change friends more frequently. It is not clear, however, that the addition of a parameter to the objective function should effect the estimates of the rate parameters. %This strong and possibly problematic relationship between rate parameter estimates and objective function parameters is further explored in the Supporting Information. When visualizing the results of the same models fit many times to the same data, we can to see potential model behavior problems right away.   
+In Figure~\ref{fig:corplots}, we further examine the relationship between each of pair of parameters common to all three models. The strongest correlation within each model is between $\beta_1$ and $\beta_2$, with absolute correlation greater than 0.90 in all three models. The $\beta_1$ parameter is also highly correlated with the $\beta_3$ parameter within model M2 ($\rho = $\Sexpr{round(corm2[5, 3])}), but it is not as highly correlated with the $\beta_4$ parameter in model M3 ($\rho = $\Sexpr{round(corM3[5, 3])}). The inherent relationship between effects is a known problem in network analysis \citep{goldenberg09}. 
+% need a better reference here. 
+
+%It might therefore be advisable to consider only models that either allow $\beta_1$ or $\beta_2$ but not both. Looking at the high correlation with $\alpha$, we might switch to a model without $\beta_1$.
+
 % maybe talk about dependence of statistics, inherent correlation, etc. 
 
 
@@ -869,7 +914,7 @@ ggpairs(senM123est2, columns = 3:9, ggplot2::aes(colour=Model, alpha = .5))
 
 \section{Explore algorithms, not just end result}\label{sec:algorithms}
 
-The third and final model visualization principle, ``explore the process of model fitting," is crucial to understanding our models \citep{modelvis}. When fitting models in \texttt{RSiena}, several simulation processes are hidden from the user. We refer to one of these hidden pieces in the SIENA MoM algorithm as the \textit{microstep process}, which is a series of state changes in the CTMC as described in Section~\ref{sec:saoms}. At each microstep, an ego node is selected to change, and then randomly makes one change in its ties according to to the probabilities $p_{ij}$ defined in Equation~\ref{eq:pij}. This process continues until the network differs from the $x(t_m)$ by exactly $C_m$, as defined in Equation~\ref{eq:cdiff}. Between two network observations $x(t_m)$ and $x(t_{m+1})$, there can be dozens, hundreds, or even thousands of microsteps, depending on the size of the network and the value of $C_m$. We want to simulate and view these in-between steps in order to better understand the behavior of the  CTMC model. Hiding the microsteps is practical and efficient if the goal is to fit a model to data, obtain parameter estimates, and draw conclusions or make predictions. But in order to understand how the models are fit, we need to extract and explore the different steps of the process. We use these steps to visually explore the algorithms, so that we are visualizing the model fitting process, and not only the model fitting result.  
+The third and final model visualization principle, ``explore the process of model fitting," is crucial to understanding the CTMC models \citep{modelvis}. When fitting models in \texttt{RSiena}, several simulation processes are hidden from the user. We refer to one of these hidden pieces in the SIENA MoM algorithm as the \textit{microstep process}, which is a series of state changes in the CTMC as described in Section~\ref{sec:saoms}. At each microstep, an ego node is selected to change, and then randomly makes one change in its ties according to to the probabilities $p_{ij}$ defined in Equation~\ref{eq:pij}. This process continues until the network differs from the $x(t_m)$ by exactly $C_m$, as defined in Equation~\ref{eq:cdiff}. Between two network observations $x(t_m)$ and $x(t_{m+1})$, there can be dozens, hundreds, or even thousands of microsteps, depending on the size of the network and the value of $C_m$. We want to simulate and view these in-between steps in order to better understand the behavior of the  CTMC model. Hiding the microsteps is practical and efficient if the goal is to fit a model to data, obtain parameter estimates, and draw conclusions or make predictions. But in order to understand how the models are fit, we need to extract and explore the different steps of the process. We use these steps to visually explore the algorithms, so that we are visualizing the model fitting process, and not only the model fitting result.  
 
 %A series of microsteps is obtained by simulating from the model in its current state, $x(t_m)$ with current parameter values $\mathbf{\theta}_{0} = \{\alpha_{1_0}, \dots \alpha_{{(m-1)}_0}, \beta_{1_0}, \dots, \beta_{K_0}\}$, to the next state, $x(t_{m+1})$. One tie changes at a time until the simulated network has achieved the same number of differences, $C$, from $x(t_m)$ as $x(t_{m+1})$, where $C$ is definined in Equation~\ref{eq:cdiff}. 
 
@@ -1384,3 +1429,5 @@ We hope that the principles of model-vis continue to be used for learning more a
 \subsection*{Online supplemental material:} 
 
 In addition to the Supporting Information available online from the publisher, much of the code used to create the visualizations in this paper has been packaged and made available online at \url{https://github.com/sctyner/netvizinf} and \url{https://github.com/sctyner/geomnet} (also on CRAN). Additional, non-packaged code can be found at \url{http://bit.ly/ctmc-model-viz}. 
+
+\nocite{ggplot2}
