@@ -61,7 +61,7 @@
 \if0\blind
 { % new title ideas: Dynamic Social Network models and their Visualizations
   %                  Visualizations for Diagnosing Network Models  
-  \title{\bf Visual Diagnostics of Dynamic Social Network Models}
+  \title{\bf Visualizations for Diagnosing Network Models}
   \author{Sam Tyner \hspace{.2cm}\\
     Department of Statistics and Statistical Laboratory, Iowa State University\\
     and \\
@@ -76,7 +76,7 @@
   \bigskip
   \bigskip
   \begin{center}
-    {\LARGE\bf Visual Diagnostics of Dynamic Social Network Models}
+    {\LARGE\bf Visualizations for Diagnosing Network Models}
 \end{center}
   \medskip
 } \fi

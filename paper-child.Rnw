@@ -171,9 +171,9 @@ ggplot(data = toynet$edges) +
   labs(title = "Adjacency Matrix Visualization", x = "\nto (alter)", y = "from (ego)\n")
 @
 
-The lack of a native coordinate system has given rise two primary net-vis methods: the node-link diagram and the adjacency matrix visualization \citep{knuth2000, adjmatpro}. We demonstrate these with a simpe example. Consider the network with five nodes, $\{1,2,3,4,5\}$, connected by five directed edges:  $\{2 \to 4, 3 \to 4, 1 \to 5, 3 \to 5, 5 \to 4\}$ shown in Figure~\ref{fig:toyplots}.
+The lack of a native coordinate system has given rise two primary net-vis methods: the node-link diagram and the adjacency matrix visualization \citep{adjmatpro}. We demonstrate these with a simpe example. Consider the network with five nodes, $\{1,2,3,4,5\}$, connected by five directed edges:  $\{2 \to 4, 3 \to 4, 1 \to 5, 3 \to 5, 5 \to 4\}$ shown in Figure~\ref{fig:toyplots}.
 
-The first net-vis method, the node-link diagram, represents nodes with points in two dimensions and then represents edges by connecting the points with lines. These lines can also have arrows on them indicating the direction of the edge for directed networks, as shown in Figure~\ref{fig:toyplots}. Because there is often no natural placement of the nodes, they are placed in 2D at random, then adjusted with a layout algorithm. For a complete overview of available node-link layout algorithms, we direct the reader to \citet{drawingalgs}. Some commonly used algorithms, such as the Kamada-Kawai (KK) layout \citep{kamadakawai} and the Fruchterman-Reingold (FR) layout \citep{fruchterman-reingold}, are designed to mimic physical systems, drawing the graphs based on the ``forces" connecting them. %Other algorithms use multi-dimensional scaling or properties of the adjacency matrix (e.g. its eigenstructure), to place the nodes \citep{drawingalgs}. 
+The first net-vis method, the node-link diagram, represents nodes with points in two dimensions and then represents edges by connecting the points with lines. These lines can also have arrows on them indicating the direction of the edge for directed networks, as shown in Figure~\ref{fig:toyplots}. Because there is often no natural placement of the nodes, they are placed in 2D at random, then adjusted with a layout algorithm.  Some commonly used algorithms, such as the Kamada-Kawai (KK) layout \citep{kamadakawai} and the Fruchterman-Reingold (FR) layout \citep{fruchterman-reingold}, are designed to mimic physical systems, drawing the graphs based on the ``forces" connecting them. For a full discussion of available node-link layout algorithms, we direct the reader to \citet{drawingalgs}. %Other algorithms use multi-dimensional scaling or properties of the adjacency matrix (e.g. its eigenstructure), to place the nodes \citep{drawingalgs}. 
 In Figure~\ref{fig:toyplots}, we use the KK algorithm, and unless otherwise stated, all other node-link diagrams in this paper are laid out using the KK algorithm \citep{kamadakawai}. 
 
 \par The second method for net-vis uses the adjacency matrix of the network. The adjaceny matrix of a network, $\mathbf{A}(x)$ is defined as:
@@ -258,7 +258,7 @@ The two pieces of the model hierarchy each contribute to the intensity matrix to
 \]
 Thus, the rate of change between any two states, $x^b$ and $x^c$, that differ by only one tie $x_{ij}$, is the product of the rate at which actor $i$ gets to change a tie and the probability that the tie that will change is the tie to node $j$. The intensity matrix $\mathbf{Q}$ fully defines the CTMC model for network change. %, and is the foundation required for parameter estimation. %Estimating the parameters in these models is difficult, but thanks to the SIENA software \citep{RSiena}, we have an accessible way to fit SAOMs to network observations.
 
-\subsubsection{Fitting Models to Data}
+\subsubsection{Fitting Models to Data}\label{subsec:fitting}
 
 To fit a CTMC to dynamic network data, we apply the \texttt{RSiena} software, which uses simulation methods to estimate parameter values using either MoM or maximum likelihood (ML) estimation \citep{RSiena}. We chose to use MoM estimation, so we describe that process here, while more information on ML estimation can be found in \citet{SienaAlgs}. %because the theory behind it was established in \citet{saompaper}, while the maximum likelihood estimation methods were not fully established until \citet{saomsml2010}, though \texttt{RSiena} contains capabilities to use maximum likelihood estimation. We also use the score function method for estimating the derivatives of the expected values, as opposed to the finite differences method, both of which are outlined in detail in .
 The underlying SIENA software uses a Robbins-Monro algorithm (see \citet{robbinsmonro}) to estimate the solution of the moment equation
@@ -360,7 +360,7 @@ ggplot(data = seobama) +
 \begin{equation}\label{eq:m1}
 M1: \quad f_i(x) = \beta_1s_{i1}(x) + \beta_2s_{i2}(x),
 \end{equation}
-where $s_{i1}(x)$ is the density network statistic and $s_{i2}(x)$ is the reciprocity network statistic for actor $i$ at the current network state $x$ (see Figure~\ref{fig:structures}). The second and third models, M2 and M3, contain one additional parameter each in the objective function. We chose the additional parameters because they were significant ($p$-value $<$ 0.05) according to a Wald-type test (\texttt{Wald.RSiena()}) provided in the \texttt{RSiena} software \citep{RSienaTest}. The model M2 contains an actor-level covariate parameter, and the model M3 contains an additional strutural effect in the objective function.
+where $s_{i1}(x)$ is the density network statistic and $s_{i2}(x)$ is the reciprocity network statistic for actor $i$ at the current network state $x$ (see Figure~\ref{fig:structures}). The second and third models, M2 and M3, contain one additional parameter each in the objective function. We chose the additional parameters because they were significant ($p$-value $<$ 0.05) according to a Wald-type test (\texttt{Wald.RSiena()}) provided in the \texttt{RSiena} software \citep{RSiena}. The model M2 contains an actor-level covariate parameter, and the model M3 contains an additional strutural effect in the objective function.
 \begin{align}\label{eq:m2m3}
 M2: \quad f_i(x,z) & = \beta_1s_{i1}(x) + \beta_2s_{i2}(x) + \beta_3s_{i3}(x, z) \\
 M3: \quad f_i(x) & = \beta_1s_{i1}(x) + \beta_2s_{i2}(x) + \beta_4s_{i4}(x),
@@ -745,7 +745,7 @@ Using this one-at-a-time testing method results in many possible significant par
 
 %\subsection{Varying model settings}
 
-\noindent \textbf{Varying model settings:} The second method for obtaining collections of models is to vary model settings. We have done this already by choosing three different models M1, M2, M3 to fit to our example data sets. CTMC models, however, are much more flexible than the three simple models we have chosen. Other models could have included different rate functions for each node, where for example the rate of change could depend on drinking behavior if we have reason to believe that girls who drink more change friends more frequently. We could also model the behavior changes, not just the network changes, if we believe that friends influence behavior, via peer pressure.  And as before, this method of gathering a collection of models can be used for any network model, such as the hierarchichal Bayesian network estimation model in the \texttt{R} package \texttt{sna}, which allows the user to vary prior and model parameters \citep{sna}.
+\noindent \textbf{Varying model settings:} The second method for obtaining collections of models is to vary model settings. We have done this already by choosing three different models M1, M2, M3 to fit to our example data sets. CTMC models, however, are much more flexible than the three simple models we have chosen. Other models could have included different rate functions for each node, where for example the rate of change could depend on drinking behavior if we have reason to believe that girls who drink more change friends more frequently. We could also model the behavior changes, not just the network changes, if we believe that friends influence behavior via peer pressure.  And as before, this method of gathering a collection of models can be used for any network model, such as the hierarchichal Bayesian network estimation model in the \texttt{R} package \texttt{sna}, which allows the user to vary hyperparameters in the prior and model parameters \citep{sna}.
 % took out this next bit just because it doesn't really add much and we can just put the appendix figure into the previous section. % add more later.
 
 %To explore the behavior of these three models, we simulate from them. Using the estimated parameter values in Table~\ref{tab:meanests}, we simulated 1,000 observations of $x(t_2)$ and $x(t_3)$ of the friendship data from each of the three models. From the simulations, we created an expected network for $x(t_2)$ from models M1, M2, and M3 using the same method described in Section~\ref{sec:minds}. These expected networks are presented in the Supporting Information, and we see that all models are failing to capture the structure of $x(t_2)$, even though the individual parameters were all significant according to the statistical tests. %In Section~\ref{sec:samemodsamedat}, we fit these three models to the data 1,000 times, and examine the parameter densities. Here, . For simulation, we used the mean parameter values from the 1,000 fits of the corresponding model. 
@@ -762,27 +762,34 @@ ggplot() +
   ThemeNoNet +
   scale_fill_brewer(palette = "Greys") + 
   xlab("estimate value") + 
-  theme(legend.position = 'bottom')
+  theme(legend.position = 'bottom', strip.text.x = element_text(size = 20), 
+        axis.text.x = element_text(size = 20), axis.title.x = element_text(size = 20),
+        axis.text.y = element_text(size = 20), axis.title.y = element_text(size = 20))
 @
 \caption{\label{fig:beta34} Distribution of fitted $\beta_3, \beta_4$ values.}
-\end{subfigure}
+\end{subfigure}\hfill
 \begin{subfigure}[t]{.6\textwidth}
-<<img, out.width = "\\linewidth">>=
+<<img, out.width = "\\linewidth", fig.height=7.5>>=
 # correlation for other params. 
 simsM2 <- filter(simu2, Model == "M2") %>% spread(parameter, estimate)
 corm2 <- cor(simsM2[, 3:7])
 simsM3 <- filter(simu2, Model == "M3") %>% spread(parameter, estimate)
 corM3 <- cor(simsM3[, 3:7])
 
-knitr::include_graphics("img/gray_corplot-1.png")
+#knitr::include_graphics("img/gray_corplot-1.png")
+knitr::include_graphics("img/plot-matrix.png")
+
 @
-\caption{\label{fig:corplots} Relationships between parameters common to all three models. \nocite{ggally}}
+\caption{\label{fig:corplots} Relationships between parameters common to all models. Densities and scatterplots are colored by model. \nocite{ggally}}
 \end{subfigure}
 \caption{\label{fig:distests} Distribution of fitted parameter values for our three models. The inclusion of $\beta_3$ or $\beta_4$ clearly has an effect on the distributions of the rate parameters, $\alpha_1$ and $\alpha_2$, and on the other objective function parameters $\beta_1, \beta_2$.}
 \end{figure}
 
-\noindent \textbf{Fitting the model repeatedly:} The simulations required to fit the CTMC network models lead to inherent variability in the fitted values. To examine this variability, we fit models M1, M2, and M3 to the friendship network 1,000 times each. The resulting means and standard deviations of the estimates are given in Table~\ref{tab:meanests}, and the distributions of all parameter estimates are shown in Figure~\ref{fig:distests}. In Figure~\ref{fig:corplots}, we can see that the addition of $\beta_3$ to the model results in very different estimates the of the other four parameters, $\alpha_1$, $\alpha_2$, $\beta_1$, and $\beta_2$. In fact, the distributions of $\alpha_1$ and $\beta_1$ for M2 do not overlap at all with the distribution of the same parameters from model M1. On the other hand, the inclusion of the indirect tie parameter, $\beta_4$, does not lead to such drastically different estimates of other model parameters. When $\beta_3$ is included, its estimate is postitive, meaning that friendships between two girls with different drinking behaviors tend to form when there is third girl who is already friends with the other two. The inclusion of $\beta_3$ also leads to increases in the estimates of $\alpha_1, \alpha_2$. Thus, when modeling the transitive triplet behavior in this way, the model concludes that girls change friends more frequently. It is not clear, however, that the addition of a parameter to the objective function should effect the estimates of the rate parameters. %This strong and possibly problematic relationship between rate parameter estimates and objective function parameters is further explored in the Supporting Information. When visualizing the results of the same models fit many times to the same data, we can to see potential model behavior problems right away.   
-In Figure~\ref{fig:corplots}, we further examine the relationship between each of pair of parameters common to all three models. The strongest correlation within each model is between $\beta_1$ and $\beta_2$, with absolute correlation greater than 0.90 in all three models. The $\beta_1$ parameter is also highly correlated with the $\beta_3$ parameter within model M2 ($\rho = $\Sexpr{round(corm2[5, 3])}), but it is not as highly correlated with the $\beta_4$ parameter in model M3 ($\rho = $\Sexpr{round(corM3[5, 3])}). The inherent relationship between effects is a known problem in network analysis \citep{goldenberg09}. 
+\noindent \textbf{Fitting the model repeatedly:} The simulations required to fit the CTMC network models lead to inherent variability in the fitted values. To examine this variability, we fit models M1, M2, and M3 to the friendship network 1,000 times each. The resulting means and standard deviations of the estimates are given in Table~\ref{tab:meanests}, and the distributions of all parameter estimates are shown in Figure~\ref{fig:distests}. In Figure~\ref{fig:corplots}, we can see that the addition of $\beta_3$ to the model results in very different estimates the of the other four parameters, $\alpha_1$, $\alpha_2$, $\beta_1$, and $\beta_2$. In fact, the distributions of $\alpha_1$ and $\beta_1$ for M2 do not overlap at all with the distribution of the same parameters from model M1. When $\beta_3$ is included, its estimate is postitive, meaning that friendships between two girls with different drinking behaviors tend to form when there is third girl who is already friends with the other two. The inclusion of $\beta_3$ also leads to increases in the estimates of $\alpha_1, \alpha_2$. Thus, when modeling the transitive triplet behavior in this way, the model concludes that girls change friends more frequently. It is not clear, however, that the addition of a parameter to the objective function should effect the estimates of the rate parameters. 
+
+On the other hand, the inclusion of the indirect tie parameter, $\beta_4$, does not lead to such drastically different estimates of other model parameters.  The mean estimate of $\beta_4$ is large and negative, which suggests that indirect ties are strongly discouraged from forming. This is fairly intuitive given the context: teenage girls likely want to have direct friendships in tightly knit groups, so indirect relationships are not common.
+%This strong and possibly problematic relationship between rate parameter estimates and objective function parameters is further explored in the Supporting Information. When visualizing the results of the same models fit many times to the same data, we can to see potential model behavior problems right away.   
+Finally, in Figure~\ref{fig:corplots}, we demonstrate the relationship between each of pair of parameters common to all three models. The strongest correlation within each model is between $\beta_1$ and $\beta_2$, with absolute correlation greater than 0.90 in all three models. The $\beta_1$ parameter is also highly correlated with the $\beta_3$ parameter within model M2 ($\rho = $ \Sexpr{round(corm2[5, 3],3)}), but it is not as highly correlated with the $\beta_4$ parameter in model M3 ($\rho = $ \Sexpr{round(corM3[5, 3], 3)}). The inherent relationship between effects is a known problem in network analysis \citep{goldenberg09}. 
 % need a better reference here. 
 
 %It might therefore be advisable to consider only models that either allow $\beta_1$ or $\beta_2$ but not both. Looking at the high correlation with $\alpha$, we might switch to a model without $\beta_1$.
@@ -914,7 +921,7 @@ ggpairs(senM123est2, columns = 3:9, ggplot2::aes(colour=Model, alpha = .5))
 
 \section{Explore algorithms, not just end result}\label{sec:algorithms}
 
-The third and final model visualization principle, ``explore the process of model fitting," is crucial to understanding the CTMC models \citep{modelvis}. When fitting models in \texttt{RSiena}, several simulation processes are hidden from the user. We refer to one of these hidden pieces in the SIENA MoM algorithm as the \textit{microstep process}, which is a series of state changes in the CTMC as described in Section~\ref{sec:saoms}. At each microstep, an ego node is selected to change, and then randomly makes one change in its ties according to to the probabilities $p_{ij}$ defined in Equation~\ref{eq:pij}. This process continues until the network differs from the $x(t_m)$ by exactly $C_m$, as defined in Equation~\ref{eq:cdiff}. Between two network observations $x(t_m)$ and $x(t_{m+1})$, there can be dozens, hundreds, or even thousands of microsteps, depending on the size of the network and the value of $C_m$. We want to simulate and view these in-between steps in order to better understand the behavior of the  CTMC model. Hiding the microsteps is practical and efficient if the goal is to fit a model to data, obtain parameter estimates, and draw conclusions or make predictions. But in order to understand how the models are fit, we need to extract and explore the different steps of the process. We use these steps to visually explore the algorithms, so that we are visualizing the model fitting process, and not only the model fitting result.  
+The third and final model visualization principle, ``explore the process of model fitting," is crucial to understanding the CTMC models \citep{modelvis}. When fitting models in \texttt{RSiena}, several simulation processes are hidden from the user. We refer to one of these hidden pieces in the SIENA MoM algorithm as the \textit{microstep process}, which is a series of state changes in the CTMC as described in Section~\ref{sec:saoms}. At each microstep, an ego node is selected to change, and then randomly makes one change in its ties according to to the probabilities $p_{ij}$ defined in Equation~\ref{eq:pij}. The microstep process is a key piece of the model fitting procedure and is used in the third phase mentioned in Section~\ref{subsec:fitting} \citep{SienaAlgs}. During modeling, the process proceeds until the network differs from the $x(t_m)$ by exactly $C_m$, as defined in Equation~\ref{eq:cdiff}. Between two network observations $x(t_m)$ and $x(t_{m+1})$, there can be dozens, hundreds, or even thousands of microsteps, depending on the size of the network and the value of $C_m$. We want to simulate and view these in-between steps in order to better understand the behavior of the CTMC model. The default in the software is discard the microsteps, which is practical and efficient if the goal is to fit a model to data, obtain parameter estimates, and draw conclusions or make predictions. But in order to understand how the models are fit, we need to extract and explore the different steps of the process, which is possible in \texttt{RSiena} with some small changes to the default settings. We use these steps to visually explore the algorithms, so that we are visualizing the model fitting process, and not only the model fitting result.  
 
 %A series of microsteps is obtained by simulating from the model in its current state, $x(t_m)$ with current parameter values $\mathbf{\theta}_{0} = \{\alpha_{1_0}, \dots \alpha_{{(m-1)}_0}, \beta_{1_0}, \dots, \beta_{K_0}\}$, to the next state, $x(t_{m+1})$. One tie changes at a time until the simulated network has achieved the same number of differences, $C$, from $x(t_m)$ as $x(t_{m+1})$, where $C$ is definined in Equation~\ref{eq:cdiff}. 
 
@@ -981,7 +988,9 @@ to_ani +
 @
 
 
-To visualize the underlying algorithm, we animate the microsteps that form the CTMC from $x(t_1)$ to $x(t_2)$ for the example data. The microstep animation, some frames of which are shown in Figure~\ref{fig:makinggif}, represent one possible path from $x(t_1)$ to $x(t_2)$ according to the model M1. We show each change in the network as follows: we first increase the size and change the color of the ego node to focus attention to its ties. Then, the changing tie either fades in or fades out. If there are no changes at a particular microstep, the microstep does not appear. Some frames of the animations are shown in Figure~\ref{fig:makinggif}, and the full movie, created with \texttt{tweenr} and \texttt{gganimate} can be viewed at \url{https://vimeo.com/240089108} \citep{tweenr, gganimate}. Movies similar to this animation were used to visualize the changes of dynamic networks in \citet{dynnetviz}. Frames 15-28 of Figure~\ref{fig:makinggif} show tie that is destroyed, while frames 71-84 show a tie that is created. For both changes, the ego node is emphasized with color and size. When a tie is removed, it is first emphasized with the same color and size as the node. As the animation proceeds, the tie shrinks and disappears as the ego node shrinks and changes color to match the others. If a tie is being added, it appears red from nothing, grows large for emphasis, then changes color and size to match the rest of the edges. In this network animation, we show the modeled steps of the unobserved CTMC process between two observed networks. We see each part of the hierarchical model: first, the selection of the ego node via the rate function, then the result of the actor maximizing its objective function by either deleting or adding a node. Finally, the layout of the network transitions as edges are removed or added, demonstrating how the overall network structure changes with each of the individual tie changes. Combining the tie changes in this animation makes the CTMC process the focus, demonstrating the underlying change mechanism of the dynamic network according to the model. % need more about what we learned. 
+To visualize the underlying process, we animate the microsteps that form the CTMC from $x(t_1)$ to $x(t_2)$ for the example data.  The microstep animation, some frames of which are shown in Figure~\ref{fig:makinggif}, represents one possible path from $x(t_1)$ to $x(t_2)$ according to the model M1. We show each change in the network as follows: we first increase the size and change the color of the ego node to focus attention to its ties. Then, the changing tie either fades in or fades out. If there are no changes at a particular microstep, the microstep does not appear. Some frames of the animations are shown in Figure~\ref{fig:makinggif}, and the full movie, created with \texttt{tweenr} and \texttt{gganimate} can be viewed at \url{https://vimeo.com/240089108} \citep{tweenr, gganimate}. Movies similar to this animation were used to visualize the changes of dynamic networks in \citet{dynnetviz}. Frames 15-28 of Figure~\ref{fig:makinggif} show a tie that is destroyed, while frames 71-84 show a tie that is created. For both changes, the ego node is emphasized with color and size. When a tie is removed, it is first emphasized with the same color and size as the node. As the animation proceeds, the tie shrinks and disappears as the ego node shrinks and changes color to match the others. If a tie is being added, it appears red from nothing, grows large for emphasis, then changes color and size to match the rest of the edges. In this network animation, we show the modeled steps of the unobserved CTMC process between two observed networks. We see each part of the hierarchical model: first, the selection of the ego node via the rate function, then the result of the actor maximizing its objective function by either deleting or adding a node. Finally, the layout of the network transitions as edges are removed or added, demonstrating how the overall network structure changes with each of the individual tie changes. Combining the tie changes in this animation makes the CTMC process the focus, demonstrating the underlying change mechanism of the dynamic network according to the model. 
+
+With this animation, we can see how the model behaves. Some tie changes appear to alter the overall network structure, as shown by the change in the layout of the nodes, while others seem to be inevitable, such as an added reciprocal tie between two nodes in a large connected group that do not change the layout. Other edges are created in one step and destroyed the next.  When watching the animation, we are watching the model in action, which helps us better understand its behavior. This same animation method can be applied to any network model which changes one tie at a time. For example, the Erd\"{o}s-R\'{e}nyi random graph model is a series of tie additions, and we could animate the creation of a network from this model. Unlike CTMCs, however, Erd\"{o}s-R\'{e}nyi random graph models only create ties \citep{goldenberg09}. Regardless of the network model under consideration, animating the node-link diagram to view how the network changes gives insight into the model behavior and the process of model fitting. % need more about what we learned. 
 
 <<adjmatorder, message = FALSE, warning = FALSE, fig.cap="On the left, the first observation of the friendship network represented in adjacency matrix form, ordered by node ID. On the right, the same adjacency matrix is presented after seriation", fig.width=8, fig.height=3, fig.align='center'>>=
 # first present the original wave 1 adj mat, then present the adj mat after being ordered by the 1st pc of the big adjmat A.
@@ -1065,10 +1074,11 @@ To seriate the matrix, we first construct a cumulative adjaceny matrix, $\mathbf
 \end{equation}
 We then perform a principal component analysis (PCA) on $\mathbf{A}^{cum}$, and use the values of the first principal component to order the vertices on the $x$ and $y$ axes for the adjacency matrix net-vis. The resulting visualization for the first network observation is shown on the right in Figure~\ref{fig:adjmatorder}. %we present the first wave of data ordered by the arbitrary node ID order alongside the seriated adjacency matrix ordered by the first principal component loading on the cumulative adjacency matrix, $\mathbf{A}^{cum}$. 
 Using matrix seriation on the %PCA on $\mathbf{A}^{cum}$ to order the rows and columns of the 
-adjacency matrix visualization clearly shows the two distinct connected components in the first network, which are difficult to find in the visualization ordered by node ID. We continue to use the seriated matrix in another animation of the microstep process, which is available at \url{https://vimeo.com/240092677}. Some frames of this video are shown in Figure~\ref{fig:adjmatani}. In the animation, a square appears or disappears as that edge appears or disappears in the microstep process. %Through this animation, we can see edges appearing, and then later on disappearing. 
-This vanimation, unlike the node-link visualization, shows the microsteps where the chosen node does not make a change. From start to finish, we see the network evolve: sometimes ties are removed right after they are created, and sometimes several ties are removed or created in a row. The adjacency matrix animation shows the algorithm exploring the data space. In contrast to the previous animation, all possible edges are represented in the adjacency matrix visualization. By viewing this animation, we gain a better understanding of the underlying dynamics of this model. % need more oomph 
+adjacency matrix visualization clearly shows the two distinct connected components in the first network, which are difficult to find in the visualization ordered by node ID. We continue to use the seriated matrix in another animation of the microstep process, which is available at \url{https://vimeo.com/240092677}. Some frames of the video are shown in Figure~\ref{fig:adjmatani}. In the animation, a square appears or disappears when the edge it represents appears or disappears in the microstep process. %Through this animation, we can see edges appearing, and then later on disappearing. 
+This animation, unlike the previous one, shows the microsteps where the chosen node does not make a change. Starting at frame 0 (the first network observation $x(t_1)$), there are two clearly connected components: one in the bottom left, and one in the top right. With each frame, we see the network evolve: sometimes ties are removed right after they are created, and sometimes several ties are removed or created in a row. By the end, the bottom left component has become more sparsely connected, while the top right component has shrunk, but remains closely connected. In contrast to the node-link animation, the adjacency matrix animation shows how the algorithm explore the space of all possible networks, because possible edges are represented in each frame of the adjacency matrix animation.  It is also easier to see the connected components of the graph in this animation because we have clearly grouped them with matrix seriation. As with the node-link animation, the adjacency matrix animation could also be used for other dynamic network models. Because the adjacency matrix emphasizes edges, this animation method is best for large directed networks whose structure is easier to see in an adjacency matrix visualization than in a node-link visualization \citep{adjmatviz}. Both animation methods demonstrate model behavior that would have not been seen with traditional visualizations or computations.
+% need more oomph 
 
-<<adjmatani, fig.cap='A selection of frames from the adjacency matrix visualization animation for one series of microsteps. The node labels are removed to declutter the figure. Starting at frame 0 (the data), there are two clearly connected components: one in the bottom left, and one in the top right. By the end, the bottom left component has become more sparse, while the top right component has shrunk, but remains closely connected.', warning = FALSE, message = FALSE, results='hide', fig.height=3, out.width="\\linewidth">>=
+<<adjmatani, fig.cap='A selection of frames from the adjacency matrix visualization animation for one series of microsteps. The node labels are removed to declutter the figure. Complete video available at \\url{https://vimeo.com/240092677}.', warning = FALSE, message = FALSE, results='hide', fig.height=3, out.width="\\linewidth">>=
 adjmatall <- matrix(0, nrow = 16, ncol = 16)
 rownames(adjmatall) <- paste0("V", 1:16)
 colnames(adjmatall) <- paste0("V", 1:16)
@@ -1185,133 +1195,133 @@ ggplot(data = changes3) +
   ThemeNoNet
 
 @
-\begin{figure}
-\begin{subfigure}[t]{\textwidth}
-<<heatmap, fig.align='center', fig.height=2.5>>=
-
-ansnullchains %>%
-  filter(period == 1) %>%
-  group_by(rep) %>%
-  mutate(msno = row_number()) %>%
-  filter(msno == 1) %>%
-  mutate(ego = as.numeric(as.character(ego))+1,
-         alter = as.numeric(as.character(alter))+1,
-         prob = exp(logAlterProb)) -> probsDat
-
-ansnullchains %>%
-  filter(period == 1) %>%
-  group_by(rep) %>%
-  mutate(msno = row_number()) %>%
-  filter(msno == 1) %>%
-  ungroup() %>% group_by(ego, alter) %>% 
-  tally() %>% ungroup() %>% mutate(empprob = n/1000) %>% 
-  mutate(ego = as.numeric(as.character(ego))+1,
-         alter = as.numeric(as.character(alter))+1) ->empprobsDat
-
-p1 <- ggplot(data = probsDat,
-       aes(y = factor(ego, levels = rev(order1)),
-             x = factor(alter, levels = order1),
-             fill = prob)) +
-  geom_tile(color = 'black') +
-  scale_fill_gradient(low = 'white', high = 'black', limits = c(0,1), name = "theoretical\nprobability", labels = c("0","",".5","","1")) +
-  labs(y = "ego", x = "alter")+
-  scale_x_discrete(position = 'top') +
-  ThemeNoNet + 
-  theme(panel.grid = element_blank(), 
-          axis.text.x.top = element_text(size=rel(.7)),
-          axis.text.y.left = element_text(size=rel(.7)),
-          legend.position = "bottom", 
-          legend.title = element_text(size=rel(.7)), 
-          legend.text = element_text(size=rel(.7)), 
-          legend.key.height = unit(.5, "cm"), 
-          legend.margin=margin(0,0,0,0),
-          legend.box.margin=margin(-10,-10,-5,-10)) +
-  coord_fixed() + 
-  ggtitle("Theoretical Probabilities") + 
-  labs(x= "alter (j)", y = "ego (i)")
-p2 <- ggplot(data = empprobsDat,
-       aes(y = factor(ego, levels = rev(order1)),
-             x = factor(alter, levels = order1),
-             fill = empprob)) +
-  geom_tile(color = 'black') +
-  scale_fill_gradient(low = 'white', high = 'black', name = "empirical\nprobability", labels = c(".02", ".04", ".06"), breaks = c(.02, .04, .06)) +
-  labs(y = "ego", x = "alter")+
-  scale_x_discrete(position = 'top') +
-  ThemeNoNet + 
-    theme(panel.grid = element_blank(), 
-          axis.text.x.top = element_text(size=rel(.7)),
-          axis.text.y.left = element_text(size=rel(.7)),
-          legend.position = "bottom", 
-          legend.title = element_text(size=rel(.7)), 
-          legend.text = element_text(size=rel(.7)), 
-          legend.key.height = unit(.5, "cm"), 
-          legend.margin=margin(0,0,0,0),
-          legend.box.margin=margin(-10,-10,-5,-10)) +
-  coord_fixed() + 
-  ggtitle("Empirical Probabilities") + 
-  labs(x= "alter (j)", y = "ego (i)")
-plot_grid(p1, p2)
-@
-\caption{\label{fig:heatmap}Adjacency matrix visualizations showing the theoretical (left) and empirical (right) transition probabilities for the first microstep taken in 1,000 simulations. There are many ties with empirical probability zero.}
-\end{subfigure}
-\begin{subfigure}[t]{\textwidth}
-<<alledgests, fig.height = 3>>=
-# get a plot of all microsteps from w1 to w2 by edge
-alledges <- expand.grid(from = paste0("V", 1:16), to = paste0("V", 1:16))
-alledges$eid <- 1:nrow(alledges)
-
-sfmsall %>% left_join(alledges) -> sfmsall2
-
-sfmsall2 %>% group_by(rep) %>% mutate(isWave2 = (ms == max(ms))) -> sfmsall2
-
-sfmsall2 %>% group_by(from, to, eid) %>%
-  summarize(total =n()) %>%
-  arrange(desc(total)) %>%
-  ungroup %>%
-  mutate(plotorder = row_number()) -> sfmsallorder
-
-sfmsall2 %>% group_by(ms, eid) %>%
-  summarise(count = n()) %>%
-  mutate(alpha = count/1000) %>%
-  arrange(ms, eid) -> sfmsall3
-
-left_join(sfmsall3, sfmsallorder, by = "eid") -> sfmsall4
-
-#add true wave 2 to plot
-wave2 <- na.omit(actual2)
-wave2$from <- paste0("V", wave2$from)
-wave2$to <- paste0("V", wave2$to)
-wave2 <- left_join(wave2, alledges)
-wave2 <- left_join(wave2, sfmsallorder)
-
-sfmsall5 <- sfmsall4 %>% ungroup %>% add_row(ms = max(sfmsall4$ms) + 1,
-        eid = wave2$eid,
-        count = NA,
-        alpha = 1,
-        from = wave2$from,
-        to = wave2$to,
-        total = wave2$total,
-        plotorder = wave2$plotorder)
-sfmsall5$alphaFctr <- cut(sfmsall5$alpha, c(0,.01, .05, .10, .25, .5, .75, 1, 1.1))
-ggplot(data = sfmsall5) +
-  geom_tile(aes(x = ms, y = reorder(eid,-plotorder), fill = alphaFctr)) +
-  annotate(geom = "rect", xmin=.25, xmax = 1.75, ymin = -Inf, ymax = Inf, color = "red", fill = NA, size = .01, alpha = .15) + 
-  #scale_fill_gradient(low = 'grey90', high = '#0868ac', name = "occurrence %") +
-  scale_fill_brewer(palette = "Greys", name = "Occurrence %", labels = c("(0-1]%", "(1-5]%", "(5-10]%","(10-25]%", "(25-50]%", "(50-75]%", "(75-100]%")) +
-  labs(x = "Microstep No.", y = "Edges (ordered by total # occurrences)") +
-  ThemeNoNet +
-  theme(axis.ticks.y = element_blank(), axis.text.y = element_blank(), panel.grid = element_blank())
-@
-\caption{\label{fig:alledgests}Visualizing all microsteps taken in 1,000 simulations from the model M1. All $16\times(16-1)=240$ possible edges are represented on the y-axis, which is ordered by how often edges occur in the simulation process. The occurrence percent is split up into groups to correspond with its distribution: only about 10\% of the possible edges appear more than 10\% of the time in the 1,000 simulations, while about 60\% appear less than 1\% of the time. The network $x(t_1)$ is shown at microstep 0, and the network $x(t_2)$ is shown as the last microstep for comparison. We see that it is rare for a microstep process to last longer than 150 steps.}
-\end{subfigure}
-\caption{\label{fig:probabilities}Visualizing the underlying algorithms when fitting CTMC models. The emprical probability plot (on the right in Figure~\ref{fig:heatmap}) is also shown at microstep number 1 in Figure~\ref{fig:alledgests}.}
-\end{figure}
-
-We also illuminate the microstep process by visualizing the theoretical and observed transition probabilites for the first microstep in the process. These probabilities are defined in Equation~\ref{eq:pij}. We only do the first step of many because each microstep is dependent on the previous network state, and thus only the first steps can be compared across simulations.  
-There are 1,000 transitions to examine: the first microstep taken in each one of the simulations. %Another way to view these transition probabilities is through the adjacency matrix visualization. 
-We use another seriated adjacency matrix visualization to show theoretical and empirical transition probabilities of the first microstep in Figure~\ref{fig:heatmap} for each tie that was the first change in a simulation. The figure is noticeably sparse: %showing the lack of coverage in the model.
-of the $16\cdot 16 = 256$ possible choices for the CTMC to make, only 103, or about 43\%, are made in the 1,000 simulated chains. This leaves %reinforces what we saw in Figure~\ref{fig:histogramalters}, where there are many paths not taken. This effect could only be exacerbated as more steps are taken in the CTMC, leading to 
-a large area of data space unexplored by the first step in the model fitting process. We present additional evidence for lack of coverage in the Supporting Information. The Figures~\ref{fig:heatmap} and \ref{fig:alledgests} show that the model M1 and the the corresponding fitting process do not explore the data space enough to adequately capture the network change mechanism, a finding we were only able to discern thanks to model visualization techniques. 
+% \begin{figure}
+% \begin{subfigure}[t]{\textwidth}
+% <<heatmap, fig.align='center', fig.height=2.5>>=
+% 
+% ansnullchains %>%
+%   filter(period == 1) %>%
+%   group_by(rep) %>%
+%   mutate(msno = row_number()) %>%
+%   filter(msno == 1) %>%
+%   mutate(ego = as.numeric(as.character(ego))+1,
+%          alter = as.numeric(as.character(alter))+1,
+%          prob = exp(logAlterProb)) -> probsDat
+% 
+% ansnullchains %>%
+%   filter(period == 1) %>%
+%   group_by(rep) %>%
+%   mutate(msno = row_number()) %>%
+%   filter(msno == 1) %>%
+%   ungroup() %>% group_by(ego, alter) %>% 
+%   tally() %>% ungroup() %>% mutate(empprob = n/1000) %>% 
+%   mutate(ego = as.numeric(as.character(ego))+1,
+%          alter = as.numeric(as.character(alter))+1) ->empprobsDat
+% 
+% p1 <- ggplot(data = probsDat,
+%        aes(y = factor(ego, levels = rev(order1)),
+%              x = factor(alter, levels = order1),
+%              fill = prob)) +
+%   geom_tile(color = 'black') +
+%   scale_fill_gradient(low = 'white', high = 'black', limits = c(0,1), name = "theoretical\nprobability", labels = c("0","",".5","","1")) +
+%   labs(y = "ego", x = "alter")+
+%   scale_x_discrete(position = 'top') +
+%   ThemeNoNet + 
+%   theme(panel.grid = element_blank(), 
+%           axis.text.x.top = element_text(size=rel(.7)),
+%           axis.text.y.left = element_text(size=rel(.7)),
+%           legend.position = "bottom", 
+%           legend.title = element_text(size=rel(.7)), 
+%           legend.text = element_text(size=rel(.7)), 
+%           legend.key.height = unit(.5, "cm"), 
+%           legend.margin=margin(0,0,0,0),
+%           legend.box.margin=margin(-10,-10,-5,-10)) +
+%   coord_fixed() + 
+%   ggtitle("Theoretical Probabilities") + 
+%   labs(x= "alter (j)", y = "ego (i)")
+% p2 <- ggplot(data = empprobsDat,
+%        aes(y = factor(ego, levels = rev(order1)),
+%              x = factor(alter, levels = order1),
+%              fill = empprob)) +
+%   geom_tile(color = 'black') +
+%   scale_fill_gradient(low = 'white', high = 'black', name = "empirical\nprobability", labels = c(".02", ".04", ".06"), breaks = c(.02, .04, .06)) +
+%   labs(y = "ego", x = "alter")+
+%   scale_x_discrete(position = 'top') +
+%   ThemeNoNet + 
+%     theme(panel.grid = element_blank(), 
+%           axis.text.x.top = element_text(size=rel(.7)),
+%           axis.text.y.left = element_text(size=rel(.7)),
+%           legend.position = "bottom", 
+%           legend.title = element_text(size=rel(.7)), 
+%           legend.text = element_text(size=rel(.7)), 
+%           legend.key.height = unit(.5, "cm"), 
+%           legend.margin=margin(0,0,0,0),
+%           legend.box.margin=margin(-10,-10,-5,-10)) +
+%   coord_fixed() + 
+%   ggtitle("Empirical Probabilities") + 
+%   labs(x= "alter (j)", y = "ego (i)")
+% plot_grid(p1, p2)
+% @
+% \caption{\label{fig:heatmap}Adjacency matrix visualizations showing the theoretical (left) and empirical (right) transition probabilities for the first microstep taken in 1,000 simulations. There are many ties with empirical probability zero.}
+% \end{subfigure}
+% \begin{subfigure}[t]{\textwidth}
+% <<alledgests, fig.height = 3>>=
+% # get a plot of all microsteps from w1 to w2 by edge
+% alledges <- expand.grid(from = paste0("V", 1:16), to = paste0("V", 1:16))
+% alledges$eid <- 1:nrow(alledges)
+% 
+% sfmsall %>% left_join(alledges) -> sfmsall2
+% 
+% sfmsall2 %>% group_by(rep) %>% mutate(isWave2 = (ms == max(ms))) -> sfmsall2
+% 
+% sfmsall2 %>% group_by(from, to, eid) %>%
+%   summarize(total =n()) %>%
+%   arrange(desc(total)) %>%
+%   ungroup %>%
+%   mutate(plotorder = row_number()) -> sfmsallorder
+% 
+% sfmsall2 %>% group_by(ms, eid) %>%
+%   summarise(count = n()) %>%
+%   mutate(alpha = count/1000) %>%
+%   arrange(ms, eid) -> sfmsall3
+% 
+% left_join(sfmsall3, sfmsallorder, by = "eid") -> sfmsall4
+% 
+% #add true wave 2 to plot
+% wave2 <- na.omit(actual2)
+% wave2$from <- paste0("V", wave2$from)
+% wave2$to <- paste0("V", wave2$to)
+% wave2 <- left_join(wave2, alledges)
+% wave2 <- left_join(wave2, sfmsallorder)
+% 
+% sfmsall5 <- sfmsall4 %>% ungroup %>% add_row(ms = max(sfmsall4$ms) + 1,
+%         eid = wave2$eid,
+%         count = NA,
+%         alpha = 1,
+%         from = wave2$from,
+%         to = wave2$to,
+%         total = wave2$total,
+%         plotorder = wave2$plotorder)
+% sfmsall5$alphaFctr <- cut(sfmsall5$alpha, c(0,.01, .05, .10, .25, .5, .75, 1, 1.1))
+% ggplot(data = sfmsall5) +
+%   geom_tile(aes(x = ms, y = reorder(eid,-plotorder), fill = alphaFctr)) +
+%   annotate(geom = "rect", xmin=.25, xmax = 1.75, ymin = -Inf, ymax = Inf, color = "red", fill = NA, size = .01, alpha = .15) + 
+%   #scale_fill_gradient(low = 'grey90', high = '#0868ac', name = "occurrence %") +
+%   scale_fill_brewer(palette = "Greys", name = "Occurrence %", labels = c("(0-1]%", "(1-5]%", "(5-10]%","(10-25]%", "(25-50]%", "(50-75]%", "(75-100]%")) +
+%   labs(x = "Microstep No.", y = "Edges (ordered by total # occurrences)") +
+%   ThemeNoNet +
+%   theme(axis.ticks.y = element_blank(), axis.text.y = element_blank(), panel.grid = element_blank())
+% @
+% \caption{\label{fig:alledgests}Visualizing all microsteps taken in 1,000 simulations from the model M1. All $16\times(16-1)=240$ possible edges are represented on the y-axis, which is in descending order according to how often edges occur in the simulation process. The occurrence percent is split up into groups to correspond with its distribution: only about 10\% of the possible edges appear more than 10\% of the time in the 1,000 simulations, while about 60\% appear less than 1\% of the time. The network $x(t_1)$ is shown at microstep 0, and the network $x(t_2)$ is shown as the last microstep for comparison. We see that it is rare for a microstep process to last longer than 150 steps.}
+% \end{subfigure}
+% \caption{\label{fig:probabilities}Visualizing the underlying algorithms when fitting CTMC models. The emprical probability plot (on the right in Figure~\ref{fig:heatmap}) is also shown at microstep number 1 in Figure~\ref{fig:alledgests}.}
+% \end{figure}
+% 
+% Finally, we illuminate the microstep process by visualizing the theoretical and observed transition probabilites for the first microstep in the process. These probabilities are defined in Equation~\ref{eq:pij}. We examine the first step because each microstep is dependent on its predecessor, and thus only the first steps can be compared across simulations.  
+% There are 1,000 transitions to examine: the first microstep taken in each one of the simulations. %Another way to view these transition probabilities is through the adjacency matrix visualization. 
+% We use another seriated adjacency matrix visualization to show theoretical and empirical transition probabilities of the first microstep in Figure~\ref{fig:heatmap} for each tie that was the first change in a simulation. The figure is noticeably sparse: %showing the lack of coverage in the model.
+% of the $16\cdot 16 = 256$ possible choices for the CTMC to make, only 103, or about 43\%, are made in the 1,000 simulated chains. This leaves %reinforces what we saw in Figure~\ref{fig:histogramalters}, where there are many paths not taken. This effect could only be exacerbated as more steps are taken in the CTMC, leading to 
+% a large area of data space unexplored by the first step in the model fitting process. The Figures~\ref{fig:heatmap} and \ref{fig:alledgests} show that the model M1 and the the corresponding fitting process do not explore the data space enough to adequately capture the network change mechanism, a finding we were only able to discern thanks to model visualization techniques.  
 
 % removed 
 <<allsteps, fig.cap="Two simulations (out of 1,000) of the microstep process from $x(t_1)$ to $x(t_2)$. The $x$ axis is the microstep number, with step 0 representing the first wave of data and the final step representing the second wave of data. We can see that many edges are underrepresented in this process: they are in the second wave, but never appear in the microsteps.", fig.height=2.5, eval = FALSE, purl=FALSE>>=
@@ -1418,16 +1428,16 @@ grid.arrange(p1, p2, nrow = 2)
 
 \section{Discussion}\label{sec:discussion}
 
-We have used several visualizations, some old and some new, to explore social network models new ways. The guiding principles of model-vis: viewing the model in the data space, visualizing collections of models, and looking at the underlying algorithms, gave us knowledge and appreciation for these complicated and flexible models. When we look at the model in the data space by viewing the expected network simulated from a model, we are able to easily see the lack of model fit. When visualizing collections of models, we uncover concerning relationships between parameters. When we explore the algorithms, we gain a better understanding of the model and its stochastic behavior. Our three-pronged model-vis attack has uncovered many properties of these models. 
+We have used several visualization methods, some old and some new, to diagnose and understand network models in new ways. Though we have applied these methods to CTMC models for dynamic social networks, all of our visualizations can be applied to other dynamic network models and most can also be applied to any static network model. We gained insight into and appreciation for complicated and flexible network models by following the guiding principles of model visualization: viewing the model in the data space, visualizing collections of models, and looking at the underlying algorithms \citep{modelvis}. When we look at the model in the data space by viewing the expected network simulated from a model, we are able to easily see the lack of model fit. Computing and visualizing the difference network between the data and the expected network also helps assess model fit by showing us where the model is completely missing the data.  When exploring collections of models, we learn more about the large number of parameters possible in network models, and we can also uncover relationships between these parameters. Finally, when we explore the algorithms fitting the models, we have a better understanding of the model and its stochastic behavior. All in all, this three-pronged model-vis attack has uncovered many properties of CTMC models for social networks and shows great potential for application to other network models. 
 
 We have only just begun to scratch the surface of these multi-layered models for social networks. The \texttt{RSiena} software is incredibly powerful, and we can fit much more flexible hierarchical models than we have examined here. If, for example, we think the network structure or an actor covariate affects the rate of change of the network, we can incorporate that belief into the rate function. In addition, more than one actor-level covariate can be included in the model, and many more than three parameters can be included in the objective function. As we have shown, the rate and objective function parameters are often highly correlated, so researchers can now use model-vis techniques to gain a better understanding of these correlations and hopefully find ways to account for their effects in the model. In addition, some extensions of the CTMC model can aslo model behavior change of the actors in the network, which we have just treated as covariates. The CTMC family of models for dynamic networks has immense potential for additional model visualization applications.
 
-Furthermore, the data we have used are quite small by network data standards, with only 16 nodes. Thus, some of the visualizations we have presented may not scale up to larger networks. Future network model-vis research could also include interactive and/or three-dimensional graphics, which we did not explore here. Interactivity is the state-of-the-art in data visualization, and network visualization is just starting to catch on \citep[see e.g.\ ][]{refinery}. \citet{modelvis} also relied on interactive tools like GGobi \citep{STLBC03} for interactivity, and for networks, there is some interactive support with the package \texttt{plotly} \citep{plotly} built into \texttt{geomnet}. 
+Furthermore, the data we have used are quite small by network data standards, with only 16 nodes. Thus, some of the visualizations we have presented, such as the small node-link diagram animation, may not scale up to larger networks. Future network model-vis research could also include interactive and/or three-dimensional graphics, which we did not explore here. Interactivity is the state-of-the-art in data visualization, and network visualization is just starting to catch on \citep[see e.g.\ ][]{refinery}. \citet{modelvis} also relied on interactive tools like GGobi \citep{STLBC03} for interactivity, and for networks, there is some interactive support with the package \texttt{plotly}  built into \texttt{geomnet} \citep{plotly, geomnet}. 
 
-We hope that the principles of model-vis continue to be used for learning more about the fit and behavior of complicated statistical models. Our model-vis application has uncovered many properties of CTMC models for dynamic social networks, and potential abounds for application of model-vis in other areas of network analysis.   
+We hope that the principles of model-vis continue to be used for learning more about the fit and behavior of statistical models for network data. Our model-vis application has uncovered many properties of CTMC models for dynamic social networks, and potential abounds for application of model-vis in other areas of network analysis.   
 
-\subsection*{Online supplemental material:} 
+{\centering \subsection*{Online supplemental material:}}
 
-In addition to the Supporting Information available online from the publisher, much of the code used to create the visualizations in this paper has been packaged and made available online at \url{https://github.com/sctyner/netvizinf} and \url{https://github.com/sctyner/geomnet} (also on CRAN). Additional, non-packaged code can be found at \url{http://bit.ly/ctmc-model-viz}. 
+Much of the code used to create the visualizations in this paper has been packaged and made available online at \url{https://github.com/sctyner/netvizinf} and \url{https://github.com/sctyner/geomnet} (also on CRAN). Additional, non-packaged code can be found at \url{http://bit.ly/ctmc-model-viz}. 
 
 \nocite{ggplot2}
