@@ -22,7 +22,7 @@
 \DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
 %---------------------------------------------------
 %                 Editing Commands
-%\newcommand{\hh}[1]{{\color{magenta} #1}}
+\newcommand{\hh}[1]{{\color{magenta} #1}}
 %\newcommand{\st}[1]{{\color{orange} #1}}
 
 %---------------------------------------------------
