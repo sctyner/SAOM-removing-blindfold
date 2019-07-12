@@ -1,5 +1,5 @@
-\newcommand{\st}[1]{{\color{orange} #1}}
-\newcommand{\hh}[1]{{\color{magenta} #1}}
+%\newcommand{\st}[1]{{\color{orange} #1}}
+%\newcommand{\hh}[1]{{\color{magenta} #1}}
 
 <<setup, echo = FALSE, message = FALSE, warning = FALSE, purl=FALSE>>=
 options(replace.assign=TRUE,width=70, digits=3)
@@ -96,26 +96,21 @@ load("data/M2sims1000.RData")
 load("data/M3sims1000.RData")
 @
 
-\hh{Sam, it might be better to chop section 1 into two - 1. introduction and 2. Background (or Network Models and Visualization). 12 pages of intro is too much. Make sure to move the last sentence of 2. Background to the end of 1. Introduction. That allows people familiar with network models to skim over section 2 and go directly to the meat of the paper.}
-\section{Introduction \& Background}
-% peices of old intro
-%Social networks, such as collaboration networks between academic researchers or friendship networks 
-% new intro 
-%As humans and researchers, it is our instint to try to learn as much as we can about the world around us. 
+%\hh{Sam, it might be better to chop section 1 into two - 1. introduction and 2. Background (or Network Models and Visualization). 12 pages of intro is too much. Make sure to move the last sentence of 2. Background to the end of 1. Introduction. That allows people familiar with network models to skim over section 2 and go directly to the meat of the paper.}
+\section{Introduction}
 Scholars have been trying to understand relationships between people, or \emph{social networks}, for decades, especially in the social sciences. There are a host of quantitative methods available for analyzing social networks, including statistical models, such as exponential random graph models (ERGM) and latent space models (LSM), that strive to capture the underlying network-generating mechanism \citep{ergm, lsm}. The ERGM and LSM families are examples of static network models, which focus on a single ``snapshot" of a network and ``global network statistics" such as outdegree distribution \citep{goldenberg09}. Other static network model families include the Erd\"{o}s-R\'{e}nyi random graph model and the exchangeable graph model \citep{goldenberg09}. 
-% describe more about the ergms. cite goldenberg. answer the questions: how are they analyzed? What can they do? what can't they do? HOw are they applied? 
 These static models, however, are not optimal for modeling real networks because they do not account for changes in the network as time passes. In real networks, edges may be created or destroyed, and nodes can be born or die \citep{goldenberg09}. Dynamic models for networks, which model networks observed at many points in time, are the more realistic alternative to static network models. 
 
 Dynamic network models do not have as rich of a history as static network models, largely due to the historical lack of data and available analytical tools \citep{goldenberg09}. With the advent of social media and ever-increasing computational power, however, more and more researchers are turning their attention toward dynamic network models.  Some of the classical models, such as the Erd\"{o}s-R\'{e}nyi model and the small-world model of \citet{watts} are pseudo-dynamic because they could be applied in a dynamic way but rarely are \citep{goldenberg09}.  
-% talk up dynamic social network models. they are much more realistic. they don't treat nodes as exchangeable, they allow the nodes to affect the ties. They account for both structural and covariate effects. They are very flexible. They are the ideal model because they are the only ones that have any chance of actually capturing the mechanisms. 
 Fully dynamic social network models, however, are more complicated: they incorporate both the network structure and its changes in time.  If we can capture this change mechanism in time, we can truly begin to model the underlying network dynamics that drive social connections. A comprehensive review of dynamic network models is presented in \citet{goldenberg09}. 
 
-\par We are particularly interested in one truly dynamic family of network models: continuous time Markov chain (CTMC) models, first introduced in \citet{ctmcorig}. We chose these models because they correspond to our intuition about how social networks are formed, and they are very flexible and widely applicable. In these models, network changes are modeled hierarchically at the node level: nodes are given opportunities to change via a rate function, then the node chooses which edge to change according to its utility function. %first step is the changes happen at the smallest possible level (one edge between two nodes), and subsequent changes condition on past changes. 
-In each step of the hierarchy, many possible effects can be implemented to capture the change mechanism. For example,  the rate function could be a simple waiting-time model, or it could depend on a node's indegree or outdegree: we may have reason to believe that the more popular nodes change their ties more frequently. In addition, we can incorporate node covariate information into the hierarchy, such as gender or education level of people in a social network. For instance, the genders of two people could affect whether and how quickly they establish a relationship. People also will likely form more relationships with those who share their education level. Thus, the transition probabilities between two states of a network depend on the network's structure, the characteristics of its nodes, or both \citep{saompaper}.  For example, \citet{depression} use a CTMC model to learn about the tendency of depressed adolescents to form friendships and found that depressed students tended to avoid creating new friendships over time. The CTMC model family can also be expanded to model node behavior, as in \citet{chyzh2016}, who apply CTMC models to show that more indirect trade relationships in a country decrease its overall respect for human rights. % This means that node-level covariate effects, in addition to commonly used effects such as reciprocity or transitivity, can be incorporated into the model. 
-% Cite some of olga's work. what can you do with these models? cite other work with social networks. 
-Thus, with CTMC models we can examine assumptions made about social networks. %For example, we may assume that teenagers who drink heavily are more likely to be friends with other teenagers who drink heavily.  We can assess our assumptions on shared interests into the modeling process through a particular subfamily of CTMC models known as stochastic actor-oriented models (SAOMs) \citep{saompaper}.
+\par We are particularly interested in one truly dynamic family of network models: continuous time Markov chain (CTMC) models, first introduced in \citet{ctmcorig}. We chose these models because they correspond to our intuition about how social networks are formed, and they are very flexible and widely applicable. In these models, network changes are modeled hierarchically at the node level: nodes are given opportunities to change via a rate function, then the node chooses which edge to change according to its utility function. 
+In each step of the hierarchy, many possible effects can be implemented to capture the change mechanism. For example,  the rate function could be a simple waiting-time model, or it could depend on a node's indegree or outdegree: we may have reason to believe that the more popular nodes change their ties more frequently. In addition, we can incorporate node covariate information into the hierarchy, such as gender or education level of people in a social network. For instance, the genders of two people could affect whether and how quickly they establish a relationship. People also will likely form more relationships with those who share their education level. Thus, the transition probabilities between two states of a network depend on the network's structure, the characteristics of its nodes, or both \citep{saompaper}.  For example, \citet{depression} use a CTMC model to learn about the tendency of depressed adolescents to form friendships and found that depressed students tended to avoid creating new friendships over time. The CTMC model family can also be expanded to model node behavior, as in \citet{chyzh2016}, who apply CTMC models to show that more indirect trade relationships in a country decrease its overall respect for human rights. 
+Thus, with CTMC models we can examine assumptions made about social networks. 
 
-\par With the flexibility of CTMC models comes increased complexity and estimation difficulty \citep{saomreview}. Likelihood functions quickly become very complex due to the inherent dependency structure in the data, and therefore computational methods, such as Markov chain Monte Carlo (MCMC), are used to fit models. Methods for maximum likelihood estimation (MLE) for these models were not introduced until \citet{saomsml2010}, and method of moments (MM) estimation is frequently used \citep{RSiena}. %SAOMs are typically fit to dynamic social network data using a series of MCMC phases for finding method of moments (MoM) estimates of model parameters. 
+%For example, we may assume that teenagers who drink heavily are more likely to be friends with other teenagers who drink heavily.  We can assess our assumptions on shared interests into the modeling process through a particular subfamily of CTMC models known as stochastic actor-oriented models (SAOMs) \citep{saompaper}.
+
+\par With the flexibility of CTMC models comes increased complexity and estimation difficulty \citep{saomreview}. Likelihood functions quickly become very complex due to the inherent dependency structure in the data, and therefore computational methods, such as Markov chain Monte Carlo (MCMC), are used to fit models. Methods for maximum likelihood estimation (MLE) for these models were not introduced until \citet{saomsml2010}, and method of moments (MM) estimation is frequently used \citep{RSiena}. 
 For CTMC parameter estimation, we use the software SIENA, and its \texttt{R} implementation \texttt{RSiena} \citep{rstats, RSiena}. This software is a considerable contribution to the field of social network analysis, allowing for estimation of structural effects, node covariate effects, as well as modeling both network and node changes in a wide variety of CTMC models. This extensive parameter estimation process is largely hidden from the user, and the primary outputs are parameter estimates. Direct simulation from a given network model with fixed parameter values is also made easy with \texttt{RSiena}. This software opens up a great deal of possibilities for network modeling and simulation.% need to emphasize the need for visualization. 
 
 % ok. we know why ctmcs but WHY visualize them? where is the motivation?? who cares and why? 
@@ -124,18 +119,16 @@ Since we chose the CTMC models for dynamic social networks, we would like to det
 
 We propose new methods for goodness-of-fit and other diagnostics that use visualization as a supplement to computational methods. Network visualization, also called graph drawing, is a prominent subfield of network analysis with a rich history: early drawings of complete graphs date back to 1280 CE \citep{knuth2000}. We use this visualization foundation to combine modeling with visualization. Note that we do not propose new methods of visualizing networks, and for a complete review of the field of graph drawing we direct the reader to \citet{graphdrawing}. What is novel in our work is the use of existing visualization methods to diagnose network models with model visualization.
 
-\emph{Model visualization} complements traditional model diagnostic tools such as $R^2$ values and residual plots to enrich our understanding and interpretation of statistical models \citep{modelvis}. We apply the three principles of model-vis: view the model in the data space, visualize collections of models, and explore the process of fitting the model, to the models and data introduced in Section~\ref{sec:exdatamods}.  By translating the model visualization work of \citet{modelvis} to the dynamic network model space, we provide network researchers with a new suite of tools for visualizing and diagnosing performance of their network models. Though we apply the tools to CTMCs because we find the models intuitive, the methods we use can be applied to any network model, static or dynamic.% do something awesome :)
+Model visualization or model-vis complements traditional model diagnostic tools such as $R^2$ values and residual plots to enrich our understanding and interpretation of statistical models \citep{modelvis}. We apply the three principles of model-vis: view the model in the data space, visualize collections of models, and explore the process of fitting the model, to the models and data introduced in Section~\ref{sec:exdatamods}.  By translating the model visualization work of \citet{modelvis} to the dynamic network model space, we provide network researchers with a new suite of tools for visualizing and diagnosing performance of their network models. Though we apply the tools to CTMCs because we find the models intuitive, the methods we use can be applied to any network model, static or dynamic.
+
+The rest of this paper is structured as follows. In Section~\ref{sec:netintro}, we provide an overview of network data and visualization and give a more detailed description of CTMC models and how we fit them with \texttt{RSiena} \citep{RSiena}. In Section \ref{sec:exdatamods}, we introduce the motivating data and CTMC models we assess using model-vis. Then, in Section~\ref{sec:minds}, we explore the first step in model-vis by placing the models in the data space to determine how well the models fit the data. Section~\ref{sec:collectmodels} follows, in which we visualize collections of models to explore their behavior. Finally, in Section~\ref{sec:algorithms}, we visualize the underlying algorithms in the CTMC fitting process to gain insight into the fitting process. We conclude with a discussion in Section~\ref{sec:discussion}.
 
 
-In the remainder of this section, we provide an overview of the structure of network data and discuss two common network visualization (net-vis) techniques. Then, we detail the hierarchical model structure of a CTMC following the definition in \citet{saompaper} and ouline the CTMC model fitting process in \texttt{RSiena} \citep{SienaAlgs}.
-
-
-\subsection{Networks and their Visualizations} \label{sec:netintro}
+\section{Network Models and Visualizations} \label{sec:netintro}
 
 %We provide a brief introduction to the structure of network data and common network visualization methods. \\
 
-%\noindent \textbf{Network Data Structure:} 
-Network data across fields have similar structure: they consist of units of observation and connections between those units. In a social network, the units of observations, called \textit{nodes} or \textit{actors}, are people, while the connections, called \textit{edges} or \textit{ties}, are their relationships with each other. %Networks change over time, like when new relationships are formed in a social network. 
+Network data across fields have similar structure: they consist of units of observation and connections between those units. In a social network, the units of observations, called \textit{nodes} or \textit{actors}, are people, while the connections, called \textit{edges} or \textit{ties}, are their relationships with each other. 
 Other network data include inherent variables of interest on the nodes, such as age or gender, and the type of relationship (friends, coworkers, etc) that an edge represents. Dynamic networks are observed at many discrete points in time, where each observation of a network is often called a ``wave" of data.
 %These two network data structures pose unique problems to analysts, such as, ``How does the strength of a tie between two nodes affect the overall structure of the network?" or ``Do differences in node variables affect the formation of edges?" We propose to answer these questions and more through visual exploration of network data and models. \\
 
@@ -172,12 +165,12 @@ ggplot(data = toynet$edges) +
   labs(title = "Adjacency Matrix Visualization", x = "\nto (alter)", y = "from (ego)\n")
 @
 
-The lack of a native coordinate system has given rise two primary net-vis methods: the node-link diagram and the adjacency matrix visualization \citep{adjmatpro}. We demonstrate these with a simpe example. Consider the network with five nodes, $\{1,2,3,4,5\}$, connected by five directed edges:  $\{2 \to 4, 3 \to 4, 1 \to 5, 3 \to 5, 5 \to 4\}$ shown in Figure~\ref{fig:toyplots}.
+The lack of a native coordinate system has given rise two primary net-vis methods: the node-link diagram and the adjacency matrix visualization \citep{adjmatpro}. We demonstrate these with a simple example. Consider the network with five nodes, $\{1,2,3,4,5\}$, connected by five directed edges:  $\{2 \to 4, 3 \to 4, 1 \to 5, 3 \to 5, 5 \to 4\}$ shown in Figure~\ref{fig:toyplots}.
 
-The first net-vis method, the node-link diagram, represents nodes with points in two dimensions and then represents edges by connecting the points with lines. These lines can also have arrows on them indicating the direction of the edge for directed networks, as shown in Figure~\ref{fig:toyplots}. Because there is often no natural placement of the nodes, they are placed in 2D at random, then adjusted with a layout algorithm.  Some commonly used algorithms, such as the Kamada-Kawai (KK) layout \citep{kamadakawai} and the Fruchterman-Reingold (FR) layout \citep{fruchterman-reingold}, are designed to mimic physical systems, drawing the graphs based on the ``forces" connecting them. For a full discussion of available node-link layout algorithms, we direct the reader to \citet{drawingalgs}. %Other algorithms use multi-dimensional scaling or properties of the adjacency matrix (e.g. its eigenstructure), to place the nodes \citep{drawingalgs}. 
+The first net-vis method, the node-link diagram, represents nodes with points in two dimensions and then represents edges by connecting the points with lines. These lines can also have arrows on them indicating the direction of the edge for directed networks, as shown in Figure~\ref{fig:toyplots}. Because there is often no natural placement of the nodes, they are placed in 2D at random, then adjusted with a layout algorithm.  Some commonly used algorithms, such as the Kamada-Kawai (KK) layout \citep{kamadakawai} and the Fruchterman-Reingold (FR) layout \citep{fruchterman-reingold}, are designed to mimic physical systems, drawing the graphs based on the ``forces" connecting them. For a full discussion of available node-link layout algorithms, we direct the reader to \citet{drawingalgs}.
 In Figure~\ref{fig:toyplots}, we use the KK algorithm, and unless otherwise stated, all other node-link diagrams in this paper are laid out using the KK algorithm \citep{kamadakawai}. 
 
-\par The second method for net-vis uses the adjacency matrix of the network. The adjaceny matrix of a network, $\mathbf{A}(x)$ is defined as:
+\par The second method for net-vis uses the adjacency matrix of the network. The adjacency matrix of a network, $\mathbf{A}(x)$ is defined as:
 \begin{equation}\label{eq:adjmat}
   A_{ij}(x) =
   \begin{cases}
@@ -185,15 +178,14 @@ In Figure~\ref{fig:toyplots}, we use the KK algorithm, and unless otherwise stat
              0 & \quad \text{otherwise}
   \end{cases}
 \end{equation}
-%In this paper, we only consider the presence or absence of an edge, but if the network has weighted edges, $A_{ij}$ is the weight of the edge from $i \to j$. 
 The adjacency matrix visualization for our toy example is also shown in Figure~\ref{fig:toyplots}. This visualization shows the network as a grid, with each row representing the ``from" or ``ego" node and each column representing the ``to" or ``alter" node of an edge. The grid space for $x_{ij}$ (the edge $i\rightarrow j$) is filled in if $A_{ij} = 1$ and is empty if $A_{ij} = 0$. For undirected networks $\mathbf{A}$ is symmetric, so the adjacency matrix visualization is also symmetric, with each edge drawn twice. 
 
-\par Each net-vis method has its own advantages and disadvantages. For instance, paths between two nodes in a network are easier to determine with node-link diagrams than with adjacency matrix visualizations \citep{adjmatviz}. Furthermore, in node-link diagrams, node information can be incorporated into the visualization by coloring or changing the shape of the points, and edge-level information can be incorporated by coloring the lines or changing their thickness. Visualizing a node variable in an adjacency matrix visualization is not as simple, because this type of net-vis features the edges. An adjacency matrix visualization can, however, be useful when the network is very complex, dense, or large \citep{adjmatviz}. % Experimental studies have shown adjacency matrix visualization to be superior to node-link diagrams for large networks. For example, for basic perceptual tasks on networks, including node and edge count, adjacency matrix visualizations outperform node-link diagrams as the size and density of the network increases \citep{adjmatviz}. One drawback of the adjacency matrix visualization that \citeauthor{adjmatviz} found was that edges are overrepresented for undirected graphs, due to the symmetry of $\mathbf{A}$: the edge $i \rightarrow j$ for $i \neq j$ appears in $\mathbf{A}$ twice: in $A_{ij}$ and $A_{ji}$, and so it also appears twice in the adjacency matrix visualization. This is an advantage, however, for \emph{directed} graphs, where exactly the correct number of edges is represented in a matrix visualization. A node-link diagram, however, may underrepresent the edge count if the edges $x_{ij}$ and $x_{ji}$ both exist and are drawn on top of one another. 
+\par Each net-vis method has its own advantages and disadvantages. For instance, paths between two nodes in a network are easier to determine with node-link diagrams than with adjacency matrix visualizations \citep{adjmatviz}. Furthermore, in node-link diagrams, node information can be incorporated into the visualization by coloring or changing the shape of the points, and edge-level information can be incorporated by coloring the lines or changing their thickness. Visualizing a node variable in an adjacency matrix visualization is not as simple, because this type of net-vis features the edges. An adjacency matrix visualization can, however, be useful when the network is very complex, dense, or large \citep{adjmatviz}.  
 Ultimately, there is no one ``correct" way to visualize network information, and we will be using both the node-link and adjacency matrix net-vis methods throughout this paper to visualize our example data and CTMC models.
 
 \subsection{Defining CTMC Network Models} \label{sec:saoms}
 
-The continuous-time Markov chain (CTMC) model family is for analyzing dynamic networks, so we can use them to study the change of a network in time while also examining the structural and node covariate efects. To define CTMCs for our purposes, we follow the general hierarchical definition outlined in \citet{saomreview} and elsewhere (see e.g.\ \citet{snijders01} and \citet{snijdersetal2010}). CTMC models reflect our intution about social networks: most social networks, even holding constant the set of actors over time, are ever-changing as relationships form or dissolve. Actors in social networks also have properties that could change their role within the network, and existing ties may affect formation or dissolution of other ties. In this section, we define the data structure, the hierarchal model, and intensity matrix of the CTMC. 
+The continuous-time Markov chain (CTMC) model family is for analyzing dynamic networks, so we can use them to study the change of a network in time while also examining the structural and node covariate effects. To define CTMCs for our purposes, we follow the general hierarchical definition outlined in \citet{saomreview} and elsewhere (see e.g.\ \citet{snijders01} and \citet{snijdersetal2010}). CTMC models reflect our intuition about social networks: most social networks, even holding constant the set of actors over time, are ever-changing as relationships form or dissolve. Actors in social networks also have properties that could change their role within the network, and existing ties may affect formation or dissolution of other ties. In this section, we define the data structure, the hierarchical model, and intensity matrix of the CTMC. 
 
 \subsubsection{Definitions, Terminology, and Notation}
 
@@ -215,7 +207,7 @@ which is the total number of edge differences between $x(t_m)$ and $x(t_{m+1})$.
 \begin{equation} \label{eq:of1}
 f_i(\boldsymbol{\beta}, x, \mathbf{Z}) = \sum_{k=1}^K \beta_k s_{ik}(x, \mathbf{Z}),
 \end{equation}
-where $x$ is the current network state, $\mathbf{Z}$ is a matrix of node covariates, and $K$ is the total number of parameters in the objective function. The parameters of the model, $\beta_1, \dots, \beta_K$ correspond to network statistics, $s_{ik}(x, \mathbf{Z})$, for $k = 1,\dots, K$. To maximize $f_i$, $i$ will either destroy a tie, create a tie, or make no change.% if all changes will result in lower $f_i$. 
+where $x$ is the current network state, $\mathbf{Z}$ is a matrix of node covariates, and $K$ is the total number of parameters in the objective function. The parameters of the model, $\beta_1, \dots, \beta_K$ correspond to network statistics, $s_{ik}(x, \mathbf{Z})$, for $k = 1,\dots, K$. To maximize $f_i$, $i$ will either destroy a tie, create a tie, or make no change.
 
 The parameters of $f_i(\boldsymbol{\beta}, x, \mathbf{Z})$ are either structure or covariate parameters. The structure parameters correspond to statistics that are \emph{only} functions of the current network state, $x$, while the covariate parameters are also functions of the covariates, $\mathbf{Z}$. According to \citet[p. 371]{snijders01}, there should be at least two parameters in the objective function: $\beta_1$ for the outdegree of nodes, and $\beta_2$ for the reciprocity of nodes. The former measures the propensity of nodes with a lot of outgoing ties to form more outgoing ties (the ``rich get richer" effect), while the latter measures the tendency of outgoing ties to be returned within a network. The statistics corresponding to these two parameters, $s_{i1}(x)$ and $s_{i2}(x)$ are given in Figure~\ref{fig:structures} with visualizations of the corresponding effects. In the \texttt{RSiena} software, there are over 80 possible $\boldsymbol{\beta}$ parameters with corresponding statistics $s_{ik}(x, \mathbf{Z})$ to add to the model. The definition of the statistics for all possible parameters are provided in \citet{RSienamanual}, and two additional parameters and their corresponding statistics are discussed in Section~\ref{sec:exdatamods} and shown in Figure~\ref{fig:structures}.
 
@@ -244,11 +236,10 @@ The parameters of $f_i(\boldsymbol{\beta}, x, \mathbf{Z})$ are either structure 
 In the CTMC, when actor $i$ can make a change, it chooses which tie $x_{i1}, \dots, x_{in}$ to change at random according to the probability $p_{ij}(\boldsymbol{\beta}, x, \mathbf{Z})$. Let $x(i \leadsto j)$ be the network identical to network $x$ with the exception of tie $x_{ij}$, which is equal to $1-x_{ij}$; i.e.\ the presence or absence of node $x_{ij}$ is flipped in the new network. The probability that the tie $x_{ij}$ changes is defined as:
 \begin{equation}\label{eq:pij}
 p_{ij}(\boldsymbol{\beta}, x, \mathbf{Z}) = \dfrac{\exp\left\{f_i(\boldsymbol{\beta}, x(i\leadsto j), \mathbf{Z})\right\}}{\sum_{h \neq i} \exp\left\{f_i(\boldsymbol{\beta}, x(i \leadsto h), \mathbf{Z})\right\}}
-\end{equation}%When $i = j$, the numerator represents the exponential of the value of the objective function when evaluated at the current network state. 
-%When the value of the objective function is high at the current state, the probability of not making a change is also high.
+\end{equation}
 We explore these probabilities further in Section~\ref{sec:algorithms}. 
 
-\par \noindent \textbf{Intensity Matrix:} The probabilities $p_{ij}$ combined with the rate parameters $\alpha_m$ fully characterize the underlying CTMC that models network change. In the CTMC literature, see for instance \citet{ctmc}, chains are characterized by their  \textit{intensity matrix} $\mathbf{Q}$. This matrix describes the rate of change between two states of the CTMC process, and the rows of this matrix always add to zero. The state space for a network, denoted $\mathcal{X}$, contains $2^{n(n-1)}$ states: there are two possible states for an edge, $\{0,1\}$, and $n(n-1)$ possible edge relationships, as the network is directed and we exclude self-ties.  The intensity matrix is then a square matrix of dimension $2^{n(n-1)}$. Only one tie changes at a time in the CTMC, resulting in $n(n-1)$ reachable states from the current network state. Thus, the intensity matrix $\mathbf{Q}$ is very sparse, with only $n(n-1) + 1$ non-zero entries in each row. Note that $n(n-1)$ of these entries represent the possible states that are one edge different from a given state, while the additional non-zero entry is the diagonal entry for the current state.% All other entries in a row are structural zeroes because those network states cannot be reached from the current state in a single change.
+\par \noindent \textbf{Intensity Matrix:} The probabilities $p_{ij}$ combined with the rate parameters $\alpha_m$ fully characterize the underlying CTMC that models network change. In the CTMC literature, see for instance \citet{ctmc}, chains are characterized by their  \textit{intensity matrix} $\mathbf{Q}$. This matrix describes the rate of change between two states of the CTMC process, and the rows of this matrix always add to zero. The state space for a network, denoted $\mathcal{X}$, contains $2^{n(n-1)}$ states: there are two possible states for an edge, $\{0,1\}$, and $n(n-1)$ possible edge relationships, as the network is directed and we exclude self-ties.  The intensity matrix is then a square matrix of dimension $2^{n(n-1)}$. Only one tie changes at a time in the CTMC, resulting in $n(n-1)$ reachable states from the current network state. Thus, the intensity matrix $\mathbf{Q}$ is very sparse, with only $n(n-1) + 1$ non-zero entries in each row. Note that $n(n-1)$ of these entries represent the possible states that are one edge different from a given state, while the additional non-zero entry is the diagonal entry for the current state.
 
 The two pieces of the model hierarchy each contribute to the intensity matrix to describe the rate of change between two network states. The entries of $\mathbf{Q}$ are defined as follows: let $b \neq c \in \{1, 2, \dots, 2^{n(n-1)} \}$ be indices of two different possible states of the network, $x^b, x^c \in \mathcal{X}$.  Then the $bc^{th}$ entry of $\mathbf{Q}$ is:
 \[ q_{bc} = \begin{cases}
@@ -257,7 +248,7 @@ The two pieces of the model hierarchy each contribute to the intensity matrix to
       0 & \text{ otherwise} 
    \end{cases}
 \]
-Thus, the rate of change between any two states, $x^b$ and $x^c$, that differ by only one tie $x_{ij}$, is the product of the rate at which actor $i$ gets to change a tie and the probability that the tie that will change is the tie to node $j$. The intensity matrix $\mathbf{Q}$ fully defines the CTMC model for network change. %, and is the foundation required for parameter estimation. %Estimating the parameters in these models is difficult, but thanks to the SIENA software \citep{RSiena}, we have an accessible way to fit SAOMs to network observations.
+Thus, the rate of change between any two states, $x^b$ and $x^c$, that differ by only one tie $x_{ij}$, is the product of the rate at which actor $i$ gets to change a tie and the probability that the tie that will change is the tie to node $j$. The intensity matrix $\mathbf{Q}$ fully defines the CTMC model for network change. 
 
 \subsubsection{Fitting Models to Data}\label{subsec:fitting}
 
@@ -267,10 +258,7 @@ The underlying SIENA software uses a Robbins-Monro algorithm (see \citet[see][]{
 E_{\theta}S = s_{obs}
 \end{equation}
 where $\theta = (\boldsymbol{\alpha}, \boldsymbol{\beta})$ is the vector of rate and objective function parameters, and $s_{obs}$ is the observed vector of the corresponding statistics summed over all network observations. Estimation conditions on the first observed network, $x(t_1)$, then proceeds to estimate model parameters for all future observations. % awkward. fix it. 
-The full SIENA MoM estimation algorithm operates in three phases, as described in \citet{RSienamanual} and \citet{SienaAlgs}, which we briefly summarize here. The first phase obtains initial estimates of the score functions for use in the second phase. The second phase is the Robbins-Monro algorithm, and results in parameter estimates through iterative updates and simulation from the CTMC at the iterations of the parameter values. The third phase uses the parameters from phase two to estimate the score functions and covariance matrix of the parameter estimates and carries out convergence checks. In Section~\ref{sec:algorithms}, we further explore these phases in the SIENA MoM algorithm through visualization. For a more detailed description of the fitting process, we direct the reader to \citet{RSienamanual, SienaAlgs}%, bringing them out of their ``black box" and into the light.
-
-The rest of this paper is strucured as follows. In Section \ref{sec:exdatamods}, we introduce the motivating data and CTMC models we assess using model-vis. Then, in Section~\ref{sec:minds}, we explore the first step in model-vis by placing the models in the data space to determine how well the models fit the data. Section~\ref{sec:collectmodels} follows, in which we visualize collections of models to explore their behavior. Finally, in Section~\ref{sec:algorithms}, we visualize the underlying algorithms in the CTMC fitting process to gain insight into the fitting process. We conclude with a discussion in Section~\ref{sec:discussion}.
-
+The full SIENA MoM estimation algorithm operates in three phases, as described in \citet{RSienamanual} and \citet{SienaAlgs}, which we briefly summarize here. The first phase obtains initial estimates of the score functions for use in the second phase. The second phase is the Robbins-Monro algorithm, and results in parameter estimates through iterative updates and simulation from the CTMC at the iterations of the parameter values. The third phase uses the parameters from phase two to estimate the score functions and covariance matrix of the parameter estimates and carries out convergence checks. In Section~\ref{sec:algorithms}, we further explore these phases in the SIENA MoM algorithm through visualization. For a more detailed description of the fitting process, we direct the reader to \citet{RSienamanual, SienaAlgs}.
 
 \section{Example Data and Models}\label{sec:exdatamods}
 
@@ -316,47 +304,9 @@ alldataviz <- ggplot(data = alldat,
 alldataviz
 @
 
-\noindent \textbf{Example Data:} To guide our visual exploration of CTMC models for dynamic networks, we use a canonical example in the social network literature: a subset of the 50 actor dataset from the ``Teenage Friends and Lifestyle Study"  \citep{friendsdata}. We chose this data because it is a well-known and easy to understand example. We were all teenagers once, and we know the volatility and fragility of those relationships, as well as why they might change. We chose to only work with a subset of the data to make node-link diagrams easier to see and to make any changes in the network more noticeable. 
-\hh{HH: ground the figure - this is the first time you are showing this example. A node is ... an edge is ... , colour is ...}
-We visualize this data with a node-link diagram in Figure~\ref{fig:alldataviz}, where %For model fitting, we condition on wave 1 and estimate the parameters of the models for the second and third waves. 
-nodes are colored according to the girl's reported drinking behavior: does not drink, drinks once or twice a year, drinks once a month, and drinks once a week. We can see that, as time passes, the students seem to drink more and become increasingly isolated into smaller groups. An analysis of this type of data with a CTMC model should capture these dynamics in a way that allows the researcher to draw conclusions about the nature of the network and the behavioral forces at play.
-
-%The second data example we use is a much more recent dataset on collaboration in the United States Senate during the $111^{th}$ through $114^{th}$ Congresses, shown in Figure~\ref{fig:senateplot}. These sessions of congress correspond to the years of Barack Obama's presidency, from 2009-2016. (Details of how this data can be downloaded are provided by François Briatte at \url{https://github.com/briatte/congress}.) In this network, ties are directed from senator $i$ to senator $j$ when senator $i$ cosponsors the bill that senator $j$ authored. There are hundreds of ties between senators when they are connected in this way, so we simplify the network by computing a single value for each pair of senators called the \textit{weighted propensity to cosponsor} (WPC). This value is defined in \citet{senate} as the total number of times senator $i$ cosponsors senator $j$'s bill, weighted by the number of total cosponsors:  
-% \begin{equation}\label{eq:sen1}
-% WPC_{ij} = \dfrac{\sum\limits_{k=1}^{n_j} \frac{Y_{ij(k)}}{c_{j(k)}}}{\sum\limits_{k=1}^{n_j} \frac{1}{c_{j(k)}}}
-% \end{equation}
-%where $n_j$ is the number of bills in a congressional session authored by senator $j$, $c_{j(k)}$ is the number of cosponsors on senator $j$'s $k^{th}$ bill, where $k \in \{1,\dots, n_j\}$, and $Y_{ij(k)}$ is a binary variable that is 1 if senator $i$ cosponsored senator $j$'s $k^{th}$ bill, and is 0 otherwise. This measure ranges in value from 0 to 1, where $WPC_{ij} = 1$ if senator $i$ is a cosponsor on every one of senator $j$'s bills and $WPC_{ij} = 0$ if senator $i$ is never a cosponsor any of senator $j$'s bills.
-<<senateplot, fig.cap='The collaboration network in the four senates during the Obama years, 2009-2016. Edges are shown only if the WPC between two senators is greater than 0.25. We use the FR layout algorithm here.', fig.width=8, fig.height=8, out.width='\\textwidth', eval = FALSE>>=
-seobama <- read_csv("data/congress/senateobamapres_gsw_25.csv")
-to_label <- c("Joseph R. Biden Jr.", "John S. McCain", "Ted Cruz","Marco Rubio",
-  "Lindsey O. Graham","Rand Paul", "Bernard Sanders", "Jim Webb", "Mitch McConnell",
-  "Harry M. Reid", "Hillary Rodham Clinton", "Amy Jean Klobuchar")
-seobama$label <- as.factor(ifelse(seobama$source %in% to_label, seobama$source, ""))
-levels(seobama$label) <- c("", "Amy Klobuchar", "Bernie Sanders", "Harry Reid",
-                           "Hillary Clinton", "Jim Webb", "John McCain", "Joe Biden",
-                           "Lindsey Graham", "Marco Rubio", "Mitch McConnell",
-                           "Rand Paul", "Ted Cruz")
-set.seed(56049382)
-ggplot(data = seobama) +
-  geom_net(directed = T, labelon=T, arrowsize = .25, singletons= T, fiteach = T, linewidth = .25, layout.alg = 'fruchtermanreingold', fontsize = 3, repel=T,
-           aes(from_id = source, to_id = target, color = party, label = label),
-           size = 1) +
-  ThemeNet +
-  scale_color_manual(values = c("black", "grey30","#ef3b2c")) +
-  theme(legend.position = 'bottom', strip.text = element_text(size = 20)) +
-  facet_wrap(~senate, nrow = 2, labeller = "label_both") +
-  xlim(c(0,1.05)) +
-  ylim(c(0,1.05))
-@
-% Because CTMC models require binary edges, we focus only on strong collaborations, where $WPC$ is high. For a senate collaboration network $x$, edges are defined as
-% \begin{equation}\label{eq:wpc2}
-%   x_{ij} =
-%   \begin{cases}
-%                                    1 &  \text{if } WPC_{ij} > 0.25 \\
-%                                    0 & \text{if } WPC_{ij} \leq 0.25.
-%   \end{cases}
-% \end{equation}
-% The node-link diagram for the four senates during the Obama administration are shown in Figure~\ref{fig:senateplot}. We can see that Senate 111 is much more densely connected than the other three, which have one large, sparsely connected component with a few smaller connected groups throughout. Some prominent names are shown to demonstrate their place in the network.  As with the friendship example, analyzing the senate data with a CTMC model should capture the underlying dynamics, giving insight into the impact that the actor covairates have on the senate's collaboration structure. By using data sets from very different contexts, we hope to assess some differences in model performance. 
+\noindent \textbf{Example Data:} To guide our visual exploration of CTMC models for dynamic networks, we use a canonical example in the social network literature: a subset of the 50 actor data set from the ``Teenage Friends and Lifestyle Study"  \citep{friendsdata}. We chose this data because it is a well-known and easy to understand example. We were all teenagers once, and we know the volatility and fragility of those relationships, as well as why they might change. We chose to only work with a subset of the data to make node-link diagrams easier to see and to make any changes in the network more noticeable. In the small data set, there are 16 teenage girls sampled over three years, who were asked about their friends and their behaviors, such as how often they smoke cigarettes or drink alcohol  \citep{friendsdata}.  Each girl was asked to identify her friends in the school to form a directed network. We visualize this data with a node-link diagram in Figure~\ref{fig:alldataviz}. Each girl is represented by a node and an arrow is drawn from her to each of the friends she has reported. Sometimes, two girls identify each other as friends, as shown by nodes 8 and 9 in the first sample on the left in Figure~\ref{fig:alldataviz}. Often, the ties are not reciprocated, as shown by the edges from node 5 to nodes 2 and 3 in the first sample.
+%\hh{HH: ground the figure - this is the first time you are showing this example. A node is ... an edge is ... , colour is ...}
+We also color nodes in Figure~\ref{fig:alldataviz} according to each girl's reported drinking behavior: does not drink, drinks once or twice a year, drinks once a month, and drinks once a week. We can see that, as time passes, the students seem to drink more and become increasingly isolated into smaller groups. An analysis of this type of data with a CTMC model should capture these dynamics in a way that allows the researcher to draw conclusions about the nature of the network and the behavioral forces at play.
 
 \noindent \textbf{Models:} To our example data, we fit three different models. Each model uses a simple rate function, $\alpha_m$, and an objective function with two or three parameters. Though our models are very simple, the model-vis techniques we present can easily be applied to much more complex models. The first model of interest, M1, contains the absolute minimum number of parameters in the objective function $f_i(x)$: 
 \begin{equation}\label{eq:m1}
@@ -442,15 +392,16 @@ ggplot(data = dad, aes(from_id = from, to_id = to)) +
   theme(legend.position = "none") + 
   labs(title = expression(paste(s[i4], "(x)")))
 @
-\caption{\label{fig:dad}Demonstracting a N22 between actors $i$ and $j$. The dotted tie is encouraged if $\beta_4$ has a positive value. $s_{i4}(x) =  |\{j : x_{ij} = 0, \sum\limits_h x_{ih}x_{hj} \geq 2\}|$}
+\caption{\label{fig:dad}Demonstrating a N22 between actors $i$ and $j$. The dotted tie is encouraged if $\beta_4$ has a positive value. $s_{i4}(x) =  |\{j : x_{ij} = 0, \sum\limits_h x_{ih}x_{hj} \geq 2\}|$}
 \end{subfigure}
 \caption{\label{fig:structures} The network statistics whose corresponding effects are included in the models we fit to the friends data.}
 \end{figure}
 
-\noindent where $s_{i3}(x,z)$ and $s_{i4}(x)$ are defined in Figure~\ref{fig:structures}. These statistics are known as the \emph{number of jumping transitive triplets} (JTT) and the \emph{number of doubly achieved distances two effect} \hh{HH do you need the `two` in there?} (N22), respectively. The JTT effect emphasizes triads formed between actors with \emph{different} covariate values, while the N22 effect emphasizes \emph{indirect} ties between actors. %The covariate for the friendship data is the drinking behavior, and is the number of bills authored for the senate data. 
+\noindent where $s_{i3}(x,z)$ and $s_{i4}(x)$ are defined in Figure~\ref{fig:structures}. These statistics are called the "number of jumping transitive triplets" (JTT) and the"number of doubly achieved distances two effect" %\hh{HH do you need the `two` in there? ST: Yes its in the documentation}
+(N22), respectively in \citet{RSienamanual}. The JTT effect emphasizes triads formed between actors with \emph{different} covariate values, while the N22 effect emphasizes \emph{indirect} ties between actors.  
 All model effects are visualized in Figures~\ref{fig:beta1}-\ref{fig:dad}, where the ties affected by the parameter value are represented by dotted lines. If the estimates of these parameters $\hat{\beta}_1, \dots, \hat{\beta}_4$ are positive, the model encourages the tie represented by the dotted line to form, while the opposite is true if the parameter estimate is negative. Mean estimates from 1,000 repeated fittings are given in Table~\ref{tab:meanests}. Any time we simulate from a network model, these are the parameters we use. 
 
-\hh{HH: include the names of the effects in the table -- otherwise it's really hard to make any sense of the numbers. }
+%\hh{HH: include the names of the effects in the table -- otherwise it's really hard to make any sense of the numbers. ST: done. }
 % table of fitted M1 M2 M3
 <<parammeans>>=
 simu2 <- read.csv("data/simulation-1000-M1-M2-M3.csv")
@@ -463,30 +414,29 @@ SFE <- simu2 %>% group_by(Model, parameter) %>%
 @
 \begin{table}
 \centering
-\begin{tabular}{lccc}
+\begin{tabular}{llccc}
   \toprule
-  & M1 & M2 & M3 \\
+  Effect Name & Parameter & M1 & M2 & M3 \\
   \midrule
-  $\alpha_1$ & \Sexpr{SFE$M1[1]} & \Sexpr{SFE$M2[1]} & \Sexpr{SFE$M3[1]}  \\
-  $\alpha_2$ & \Sexpr{SFE$M1[2]} & \Sexpr{SFE$M2[2]} & \Sexpr{SFE$M3[2]}   \\
-  \midrule
-  $\beta_1$ & \Sexpr{SFE$M1[3]} & \Sexpr{SFE$M2[3]} & \Sexpr{SFE$M3[3]}  \\
-  $\beta_2$ & \Sexpr{SFE$M1[4]} & \Sexpr{SFE$M2[4]} & \Sexpr{SFE$M3[4]} \\
-$\beta_3$ & -- & \Sexpr{SFE$M2[5]} & --  \\
-  $\beta_4$ & -- & --  & \Sexpr{SFE$M3[6]} \\
+  Rate (time 1 $\rightarrow$ 2) & $\alpha_1$ & \Sexpr{SFE$M1[1]} & \Sexpr{SFE$M2[1]} & \Sexpr{SFE$M3[1]}  \\
+   Rate (time 2 $\rightarrow$ 3) & $\alpha_2$ & \Sexpr{SFE$M1[2]} & \Sexpr{SFE$M2[2]} & \Sexpr{SFE$M3[2]}   \\
+  Outdegree & $\beta_1$ & \Sexpr{SFE$M1[3]} & \Sexpr{SFE$M2[3]} & \Sexpr{SFE$M3[3]}  \\
+  Reciprocity & $\beta_2$ & \Sexpr{SFE$M1[4]} & \Sexpr{SFE$M2[4]} & \Sexpr{SFE$M3[4]} \\
+  JTT & $\beta_3$ & -- & \Sexpr{SFE$M2[5]} & --  \\
+  N22 & $\beta_4$ & -- & --  & \Sexpr{SFE$M3[6]} \\
   \bottomrule
 \end{tabular}
 
 \caption{\label{tab:meanests} The means (std.\ dev.)\ of parameter values estimated from 1,000 repeated fittings of M1, M2, and M3 to the example data.}
 \end{table}
 
-\hh{The values in the table show us that all effects are very significant and relatively stable across the different models. }
-\hh{HH: sentence of discussion - do we see the expected increase/decrease in the parameters?}
-\hh{What we do not learn from the values in the table is anything about the goodness of fit of each of the models, or dependencies between the parameters and their estimates. }
+The values in Table~\ref{tab:meanests} show us that all effects are very significant and relatively stable across the different models.
+\hh{HH: sentence of discussion - do we see the expected increase/decrease in the parameters?} \st{I do not understand.}
+What we do not learn from the values in Table~\ref{tab:meanests} is anything about the goodness of fit of each of the models, or dependencies between the parameters and their estimates.
 
 %We encourage interested readers to consult the \texttt{RSiena} manual for a complete definition and description of these and all other possible effects available to use in CTMC models \citep{RSienamanual}. 
-\hh{HH The next paragraph could be shortened some more to emphasize what we (want to) do.}
-Our goal here is to assess the fit of these models to our data, not to find the best model for this data, which is why we have kept both the data and the models very small. A true analysis of these data would include all of the available data, including additional covariates related to smoking and other behaviors, and would use sociological research to select and test the most pertinent effects at each step in the model hierarchy. The exact model structure and effects we choose are not as important to us as our ability to assess their impact on model fit. We keep the data and model simple in order to apply the more complicated model visualization tools that we discuss in Sections~\ref{sec:minds}-\ref{sec:algorithms}. 
+% \hh{HH The next paragraph could be shortened some more to emphasize what we (want to) do. ST Done. I think!}
+Our goal here is to assess the fit of these models to our data, not to find the best model for this data, which is why we have kept both the data and the models very small. A true analysis of these data would include all of the available data, including additional covariates related to smoking and other behaviors. The exact model structure and effects we choose are not as important to us as our goal of assessing their impact on model fit. We keep the data and model simple in order to apply the more complicated model visualization tools that we discuss in Sections~\ref{sec:minds}-\ref{sec:algorithms}. 
 
 % need a way better transition here. 
 
@@ -496,31 +446,9 @@ Our goal here is to assess the fit of these models to our data, not to find the 
 
 
 Placing the model in the data space is crucial to understanding how well the model represents the observed data. %First, we put models in the data space to assess the model fit. %In \citeauthor{modelvis}, they chose define the \textit{data space} as ``the region over which we can reliably make inferences, usually a hypercube containing the data" \citep[p.~206]{modelvis}. But what does this definition mean for dynamic network models?
-We define the \emph{data space} for our models as the combined data structures of the network: the node, edge, and time information. We use the \texttt{R} package \texttt{geomnet} to visualize the three data spaces together  \citep{geomnet}. The package draws the network using node-link diagrams, and the network's node or edge data are then mapped to different visual features.  The color, size, and shape of the points can be used to represent variables in the node data, while the color, linewidth, and linetype of the edges between nodes can be used to represent variables in the edge data. Finally, the networks observed at each time point are placed side-by-side, showing the network's evolution in time. Bringing all network information together in \texttt{geomnet} allows us to show the entire data space at once. %To view temporal changes, we place the network at different timepoints side-by-side to see the evolution. By pulling all of this information together using \texttt{geomnet}, we can show the entire data space at once.
+We define the \emph{data space} for our models as the combined data structures of the network: the node, edge, and time information. We use the \texttt{R} package \texttt{geomnet} to visualize the three data spaces together  \citep{geomnet}. The package draws the network using node-link diagrams, and the network's node or edge data are then mapped to different visual features.  The color, size, and shape of the points can be used to represent variables in the node data, while the color, linewidth, and line type of the edges between nodes can be used to represent variables in the edge data. Finally, the networks observed at each time point are placed side-by-side, showing the network's evolution in time. Bringing all network information together in \texttt{geomnet} allows us to show the entire data space at once. %To view temporal changes, we place the network at different timepoints side-by-side to see the evolution. By pulling all of this information together using \texttt{geomnet}, we can show the entire data space at once.
 
-\subsection{\hh{Expectation Networks}}
-<<funsenatevis, fig.height=3, fig.cap='The 111$^{th}$ Senate at two times: while Clinton was in the senate in 2009 (left) and after she departed (right). We map sex, party, and bills authored to the shape, color, and size of the nodes, respectively. We also map $WPC$ to the edge width.', eval = FALSE>>=
-se111clint <- filter(seobama, senate == 111)
-se111noclint <- filter(seobama, senate == 111)
-se111noclint$target[which(se111noclint$target == "Hillary Rodham Clinton")] <- NA
-se111clint$Clinton <- 'Yes'
-se111noclint$Clinton <- 'No'
-clintonSenate <- rbind(se111clint, se111noclint)
-clintonSenate$Clinton <- as.factor(clintonSenate$Clinton)
-clintonSenate$Clinton <- ordered(clintonSenate$Clinton, levels = c("Yes", "No"))
-
-set.seed(12981120)
-clintonSenate %>% filter(!(source %in% c("Roland Burris", "Bernard Sanders", "Frank R. Lautenberg", "Mary L. Landrieu") & is.na(target))) %>%
-ggplot() +
-  geom_net(directed = T, labelon=F, arrowsize = .3, singletons= F, fiteach = T, arrowgap = .01, layout.alg = 'fruchtermanreingold', ecolour = "grey70",
-           aes(from_id = source, to_id = target, color = party, linewidth = gsw, shape = sex,size = n_au/30)) +
-  scale_size_continuous(name="# bills\nauthored" , guide = guide_legend(nrow= 2), breaks = c(0,1,2,3), labels = c(0,30, 60, 90), range = c(.5,3)) +
-  ThemeNet +
-  scale_shape_manual(values = c(17,16), guide = guide_legend(nrow= 2)) +
-  scale_color_manual(values = c("black", "grey80","#ef3b2c"), guide = guide_legend(nrow=2)) +
-  facet_wrap(~Clinton, nrow = 1, labeller = 'label_both')  +
-  theme(legend.position = "bottom")
-@
+\subsection{Expectation Networks}
 
 <<summnetM1, message=FALSE,results='hide'>>=
 friendshipData <- array(c(fd2.w1, fd2.w2, fd2.w3), dim = c(16, 16, 3))
@@ -644,12 +572,14 @@ combinedavgs %>% filter(!is.na(to)) %>%
   scale_size_continuous(name = "Edge frequency", range = c(0,1)) + 
   ThemeNet -> forlineleg  
 legendlines <- cowplot::get_legend(forlineleg)
-set.seed(35291)
+#set.seed(1356)
+#set.seed(5)
+set.seed(10) # this was my favorite seed
 allp <- ggplot(data = combinedavgs) +
   geom_net(aes(from_id = from, to_id = to, linewidth= linewidth),
-           directed = T, curvature = .2, labelon=T, size = 3,
-           arrow = arrow(angle = 20, type = "open", length = unit(.2, "cm")), ecolour = "#969696", fiteach = T,
-           color = "#252525", hjust = .5, vjust = .5, labelcolour = 'white', fontsize = 2, arrowgap = .02,
+           directed = T, curvature = .2, labelon=T, size = 3, layout.alg = "fruchtermanreingold", 
+           arrow = arrow(angle = 20, type = "open", length = unit(.2, "cm")), ecolour = "black", fiteach = F,
+           color = "grey60", hjust = .5, vjust = .5, labelcolour = 'white', fontsize = 2, arrowgap = .02,
            singletons = T) +
   ThemeNet + theme(panel.background = element_rect(color = 'black')) +
   facet_wrap(~cat)
@@ -666,19 +596,19 @@ To view our models in the data space, we first simulate from the fitted model. N
 \item Create the \textit{expected network} by including only the edges that appeared in more than 5\% of the simulations. i.e.\ $\bar{x}_{ij}(t_m) := \bar{x}_{ij}(t_m) \cdot \mathbb{I}(\bar{x}_{ij}(t_m) > 0.05)$. We write the expected networks as $\bar{x}(t_2)$ and $\bar{x}(t_3)$.
 \end{enumerate}
 
-\hh{HH: we inconvenient question - could we use the same layout for all the networks (by using facetting instead of drawing individual plots). That would highlight the structure and changes to the structure better. I think, highliting the edges by making them darker and downweighing the nodes by making them lighter would also help. Something like (code in comment):
-% ggplot(data = combinedavgs) +
-%   geom_net(aes(from_id = from, to_id = to, linewidth= linewidth/3),
-%            directed = T, curvature = .2, labelon=T, size = 3,
-%            arrow = arrow(angle = 20, type = "open", length = unit(.2, "cm")), ecolour = "black",
-%            color = "grey60", hjust = .5, vjust = .5, labelcolour = 'white', fontsize = 2, arrowgap = .03,
-%            singletons = T) +
-%   labs(title = "Time 1") + ThemeNet +
-%   theme(plot.background = element_rect(color = 'black')) + facet_wrap(~cat)
-Hopefully this helps with the description below, because it's quite hard to read with all the numbers of nodes.
-}
+% \hh{HH: we inconvenient question - could we use the same layout for all the networks (by using facetting instead of drawing individual plots). That would highlight the structure and changes to the structure better. I think, highliting the edges by making them darker and downweighing the nodes by making them lighter would also help. Something like (code in comment):
+% % ggplot(data = combinedavgs) +
+% %   geom_net(aes(from_id = from, to_id = to, linewidth= linewidth/3),
+% %            directed = T, curvature = .2, labelon=T, size = 3,
+% %            arrow = arrow(angle = 20, type = "open", length = unit(.2, "cm")), ecolour = "black",
+% %            color = "grey60", hjust = .5, vjust = .5, labelcolour = 'white', fontsize = 2, arrowgap = .03,
+% %            singletons = T) +
+% %   labs(title = "Time 1") + ThemeNet +
+% %   theme(plot.background = element_rect(color = 'black')) + facet_wrap(~cat)
+% Hopefully this helps with the description below, because it's quite hard to read with all the numbers of nodes.
+% }
 
-\noindent The above method can be generalized and applied to any network model, static or dynamic, from which we can simulate, for any number of simulations from the network. The expected networks from our three models of interest are shown in the top row of Figure~\ref{fig:averagenet}. Edges that appear with higher frequency are drawn with thicker lines. \hh{HH Give a definition of how edge frequency is defined in the plot - frequency of 1 means that this edge was present in all of the simulations, right?}
+\noindent The above method can be generalized and applied to any network model, static or dynamic, from which we can simulate, for any number of simulations from the network. The expected networks from our three models of interest are shown in the top row of Figure~\ref{fig:averagenet}. Edges that appear with higher frequency are drawn with thicker lines. An edge frequency value of one indicates that the edge was present in all simulations used to create the expected network. %\hh{HH Give a definition of how edge frequency is defined in the plot - frequency of 1 means that this edge was present in all of the simulations, right?ST DONE. }
 On the bottom row of Figure~\ref{fig:averagenet}, we show the data for comparison: $x(t_1)$ on the left, and $x(t_2)$ on the right. Visualizing the expected network in this way places models M1, M2, and M3, in the data space, and helps assess model fit.  For model M1 we can see that the overall structure of the average network is much more similar to $x(t_1)$  than to $x(t_2)$ . In both $x(t_1)$ and $\bar{x}(t_2)$, there are two clusters of nodes: $\{2,3,4,5,6,12,13,15\}$ and $\{7,8,9,10,11,14\}$. The expected network, however, does not resemble  $x(t_2)$, which it is supposed to represent. In $x(t_2)$, there is one small, strongly connected cluster and one larger, sparsely connected cluster, with four unconnected nodes. Because the expected network $\bar{x(t_1)}$ more closely resembles $x(t_1)$ than $x(t_2)$, we take this as evidence that the simple model, M1, is not a good fit to the data.
 Comparing the three expected networks to $x(t_1)$ and $x(t_2)$, we see that they all have nodes that are connected in the same groups as $x(t_1)$. Model M2, which included the transitive triplet parameter, results in more strongly connected components, as shown by the increased number of edges and the thicker lines between nodes. The lack of fit in all models is clear:  not one of the three model expectations show node 16 gaining ties as it does in $x(t_2)$, nor do they show nodes 4 and 7 becoming isolated. In model M2, however, the ties to node 7 appear much weaker than in model M1 or model M3, and the nodes $\{10,11,14\}$ are also more strongly connected, as they are in wave 2 of data. This suggests that, despite the fact that neither of the three models is a good fit, M2 may be the best fitting model of the three. In a complete data analysis, we can use this information to select more models for analysis that utilize transitivity and covariate effects, as opposed to structural and indirect effects.  
 % We can use the average network to help determine model goodness-of-fit. Because the the expected  network looks more like the first wave than the second wave, we can use the visualization in Figure~\ref{fig:summnetM1} as evidence of poor model fit.  
@@ -748,7 +678,7 @@ ggdraw() + draw_plot(p1, width = .4) +  draw_plot(p2, width = .4, x=.4) +
   draw_grob(legendsumm,x=.8, y=.25, width = .2, height = .4)
 @
 
-\subsection{\hh{Difference Networks}}
+\subsection{Difference Networks}
 
 Another way to view our models in the data space is with \textit{difference networks} between the expected network and the data, as shown in Figure~\ref{fig:summary2}. We created these networks by computing the difference between $\bar{x}(t_2)$ and $x(t_1)$, $\mathbf{A}(\bar{x}(t_2)) - \mathbf{A}(x(t_1))$, and the difference between $\bar{x}(t_2)$ and $\bar{x}(t_2)$, $\mathbf{A}(x(t_2)) - \mathbf{A}(\bar{x}(t_2))$ for model M1. The lack of model fit is also apparent in Figure~\ref{fig:summary2}, where the dashed edges represent ties that only show up in the expected network, and the solid edges representing ties in the data that the model fails to capture.  Dotted edges are in both the expectation and the data and represent where the model is correct.  On the left in Figure~\ref{fig:summary2}, we see the difference between $x(t_1)$ and the expected network. We see mostly dotted edges, meaning that the simulated networks consist primarily of edges in $x(t_1)$, plus some new edges represented by the dashed lines that are not in the data. The unobserved ties are all reciprocating ties in the data, so the model is predicting more reciprocity between actors than there actually is. On the right in Figure~\ref{fig:summary2}, we see the difference between $x(t_2)$ and the expected network. Because the model is simulating  $x(t_2)$, we would hope to see very few differences between the expected network and the data. However, there are six solid edges, which are in the data but do not appear at all in the expected network, and there are many dashed edges that appear in the expected network but are not in $x(t_2)$. Although there are some edges that appear in both the expected network and $x(t_2)$, the majority of edges in the expected network are not in the observed data, and there are several edges in the data missing from the expectation. We therefore conclude that the model M1 is a poor fit to our example data, which we have seen very clearly by viewing the model in the data space. As with the expected network, we can apply the difference network computation other network models to determine how closely the model fits the data. 
 
@@ -770,7 +700,7 @@ Using this one-at-a-time testing method results in many possible significant par
 
 %\subsection{Varying model settings}
 
-\noindent \textbf{Varying model settings:} The second method for obtaining collections of models is to vary model settings. We have done this already by choosing three different models M1, M2, M3 to fit to our example data sets. CTMC models, however, are much more flexible than the three simple models we have chosen. Other models could have included different rate functions for each node, where for example the rate of change could depend on drinking behavior if we have reason to believe that girls who drink more change friends more frequently. We could also model the behavior changes, not just the network changes, if we believe that friends influence behavior via peer pressure.  And as before, this method of gathering a collection of models can be used for any network model, such as the hierarchichal Bayesian network estimation model in the \texttt{R} package \texttt{sna}, which allows the user to vary hyperparameters in the prior and model parameters \citep{sna}.
+\noindent \textbf{Varying model settings:} The second method for obtaining collections of models is to vary model settings. We have done this already by choosing three different models M1, M2, M3 to fit to our example data sets. CTMC models, however, are much more flexible than the three simple models we have chosen. Other models could have included different rate functions for each node, where for example the rate of change could depend on drinking behavior if we have reason to believe that girls who drink more change friends more frequently. We could also model the behavior changes, not just the network changes, if we believe that friends influence behavior via peer pressure.  And as before, this method of gathering a collection of models can be used for any network model, such as the hierarchical Bayesian network estimation model in the \texttt{R} package \texttt{sna}, which allows the user to vary hyperparameters in the prior and model parameters \citep{sna}.
 % took out this next bit just because it doesn't really add much and we can just put the appendix figure into the previous section. % add more later.
 
 %To explore the behavior of these three models, we simulate from them. Using the estimated parameter values in Table~\ref{tab:meanests}, we simulated 1,000 observations of $x(t_2)$ and $x(t_3)$ of the friendship data from each of the three models. From the simulations, we created an expected network for $x(t_2)$ from models M1, M2, and M3 using the same method described in Section~\ref{sec:minds}. These expected networks are presented in the Supporting Information, and we see that all models are failing to capture the structure of $x(t_2)$, even though the individual parameters were all significant according to the statistical tests. %In Section~\ref{sec:samemodsamedat}, we fit these three models to the data 1,000 times, and examine the parameter densities. Here, . For simulation, we used the mean parameter values from the 1,000 fits of the corresponding model. 
@@ -805,12 +735,12 @@ corM3 <- cor(simsM3[, 3:7])
 knitr::include_graphics("img/plot-matrix.png")
 
 @
-\caption{\label{fig:corplots} Relationships between parameters common to all models. Densities and scatterplots are colored by model. \nocite{ggally}}
+\caption{\label{fig:corplots} Relationships between parameters common to all models. Densities and scatter plots are colored by model. \nocite{ggally}}
 \end{subfigure}
 \caption{\label{fig:distests} Distribution of fitted parameter values for our three models. The inclusion of $\beta_3$ or $\beta_4$ clearly has an effect on the distributions of the rate parameters, $\alpha_1$ and $\alpha_2$, and on the other objective function parameters $\beta_1, \beta_2$.}
 \end{figure}
 
-\noindent \textbf{Fitting the model repeatedly:} The simulations required to fit the CTMC network models lead to inherent variability in the fitted values. To examine this variability, we fit models M1, M2, and M3 to the friendship network 1,000 times each. The resulting means and standard deviations of the estimates are given in Table~\ref{tab:meanests}, and the distributions of all parameter estimates are shown in Figure~\ref{fig:distests}. In Figure~\ref{fig:corplots}, we can see that the addition of $\beta_3$ to the model results in very different estimates the of the other four parameters, $\alpha_1$, $\alpha_2$, $\beta_1$, and $\beta_2$. In fact, the distributions of $\alpha_1$ and $\beta_1$ for M2 do not overlap at all with the distribution of the same parameters from model M1. When $\beta_3$ is included, its estimate is postitive, meaning that friendships between two girls with different drinking behaviors tend to form when there is third girl who is already friends with the other two. The inclusion of $\beta_3$ also leads to increases in the estimates of $\alpha_1, \alpha_2$. Thus, when modeling the transitive triplet behavior in this way, the model concludes that girls change friends more frequently. It is not clear, however, that the addition of a parameter to the objective function should affect the estimates of the rate parameters. 
+\noindent \textbf{Fitting the model repeatedly:} The simulations required to fit the CTMC network models lead to inherent variability in the fitted values. To examine this variability, we fit models M1, M2, and M3 to the friendship network 1,000 times each. The resulting means and standard deviations of the estimates are given in Table~\ref{tab:meanests}, and the distributions of all parameter estimates are shown in Figure~\ref{fig:distests}. In Figure~\ref{fig:corplots}, we can see that the addition of $\beta_3$ to the model results in very different estimates the of the other four parameters, $\alpha_1$, $\alpha_2$, $\beta_1$, and $\beta_2$. In fact, the distributions of $\alpha_1$ and $\beta_1$ for M2 do not overlap at all with the distribution of the same parameters from model M1. When $\beta_3$ is included, its estimate is positive, meaning that friendships between two girls with different drinking behaviors tend to form when there is third girl who is already friends with the other two. The inclusion of $\beta_3$ also leads to increases in the estimates of $\alpha_1, \alpha_2$. Thus, when modeling the transitive triplet behavior in this way, the model concludes that girls change friends more frequently. It is not clear, however, that the addition of a parameter to the objective function should affect the estimates of the rate parameters. 
 
 On the other hand, the inclusion of the indirect tie parameter, $\beta_4$, does not lead to such drastically different estimates of other model parameters.  The mean estimate of $\beta_4$ is large and negative, which suggests that indirect ties are strongly discouraged from forming. This is fairly intuitive given the context: teenage girls likely want to have direct friendships in tightly knit groups, so indirect relationships are not common.
 %This strong and possibly problematic relationship between rate parameter estimates and objective function parameters is further explored in the Supporting Information. When visualizing the results of the same models fit many times to the same data, we can to see potential model behavior problems right away.   
@@ -1093,7 +1023,7 @@ ggdraw() + draw_plot(p1, width = .4) +  draw_plot(p2a, width = .4, x=.4) +
 @
 
 We continue to use animation to view the changing structure of the network via adjacency matrix visualizations. In the first adjacency matrix visualization in Figure~\ref{fig:adjmatorder}, we use the node ID to order the rows and columns. This arbitrary ordering does not easily convey the underlying structure of the network. We use \textit{matrix seriation} to reorder the rows and columns of the adjacency matrix visualization so that the structure of the network is apparent \citep{seriation}. %This lack of perceived structure would contribute to further confusion as the network chages, so we adjust the ordering so that the viewer can better perceive the structure of the network. This process is known as matrix seriation 
-To seriate the matrix, we first construct a cumulative adjaceny matrix, $\mathbf{A}^{cum}$, for the series of microsteps in the CTMC simulated from $x(t_m)$ to $x(t_{m+1})$. A single entry in the cumulative adjacency matrix, $\mathbf{A}^{cum}_{ij}$, is the total number of times the edge $x_{ij}$ appears in the network from the initial observation, $x(t_m) \equiv X(0)$ to the last microstep, $X(R)$, where $R$ is the total number of microsteps taken:
+To seriate the matrix, we first construct a cumulative adjacency matrix, $\mathbf{A}^{cum}$, for the series of microsteps in the CTMC simulated from $x(t_m)$ to $x(t_{m+1})$. A single entry in the cumulative adjacency matrix, $\mathbf{A}^{cum}_{ij}$, is the total number of times the edge $x_{ij}$ appears in the network from the initial observation, $x(t_m) \equiv X(0)$ to the last microstep, $X(R)$, where $R$ is the total number of microsteps taken:
 \begin{equation}\label{eq:acum}
 \mathbf{A}^{cum}_{ij} = \sum_{r = 0}^R X_{ij}(r). 
 \end{equation}
@@ -1461,7 +1391,7 @@ Visualization of network models should become second nature, similar to linear m
 
 We have used several visualization methods, some old and some new, to diagnose and understand network models in new ways. Though we have applied these methods to CTMC models for dynamic social networks, all of our visualizations can be applied to other dynamic network models and most can also be applied to any static network model. We gained insight into and appreciation for complicated and flexible network models by following the guiding principles of model visualization: viewing the model in the data space, visualizing collections of models, and looking at the underlying algorithms \citep{modelvis}. When we look at the model in the data space by viewing the expected network simulated from a model, we are able to easily see the lack of model fit. Computing and visualizing the difference network between the data and the expected network also helps assess model fit by showing us where the model is completely missing the data.  When exploring collections of models, we learn more about the large number of parameters possible in network models, and we can also uncover relationships between these parameters. Finally, when we explore the algorithms fitting the models, we have a better understanding of the model and its stochastic behavior. All in all, this three-pronged model-vis attack has uncovered many properties of CTMC models for social networks and shows great potential for application to other network models. 
 
-We have only just begun to scratch the surface of these multi-layered models for social networks. The \texttt{RSiena} software is incredibly powerful, and we can fit much more flexible hierarchical models than we have examined here. If, for example, we think the network structure or an actor covariate affects the rate of change of the network, we can incorporate that belief into the rate function. In addition, more than one actor-level covariate can be included in the model, and many more than three parameters can be included in the objective function. As we have shown, the rate and objective function parameters are often highly correlated, so researchers can now use model-vis techniques to gain a better understanding of these correlations and hopefully find ways to account for their effects in the model. In addition, some extensions of the CTMC model can aslo model behavior change of the actors in the network, which we have just treated as covariates. The CTMC family of models for dynamic networks has immense potential for additional model visualization applications.
+We have only just begun to scratch the surface of these multilayered models for social networks. The \texttt{RSiena} software is incredibly powerful, and we can fit much more flexible hierarchical models than we have examined here. If, for example, we think the network structure or an actor covariate affects the rate of change of the network, we can incorporate that belief into the rate function. In addition, more than one actor-level covariate can be included in the model, and many more than three parameters can be included in the objective function. As we have shown, the rate and objective function parameters are often highly correlated, so researchers can now use model-vis techniques to gain a better understanding of these correlations and hopefully find ways to account for their effects in the model. In addition, some extensions of the CTMC model can also model behavior change of the actors in the network, which we have just treated as covariates. The CTMC family of models for dynamic networks has immense potential for additional model visualization applications.
 
 Furthermore, the data we have used are quite small by network data standards, with only 16 nodes. Thus, some of the visualizations we have presented, such as the small node-link diagram animation, may not scale up to larger networks. Future network model-vis research could also include interactive and/or three-dimensional graphics, which we did not explore here. Interactivity is the state-of-the-art in data visualization, and network visualization is just starting to catch on \citep[see e.g.\ ][]{refinery}. \citet{modelvis} also relied on interactive tools like GGobi \citep{STLBC03} for interactivity, and for networks, there is some interactive support with the package \texttt{plotly}  built into \texttt{geomnet} \citep{plotly, geomnet}. 
 
