@@ -1,10 +1,10 @@
 # New model with a smaller collection of girls from the friendship data
 #deciding how to subset the girls:
-library(ggplot2)
-library(tidyr)
-library(dplyr)
+#library(ggplot2)
+#library(tidyr)
+#library(dplyr)
 
-library(RSiena) # or RSienaTest
+#library(RSiena) # or RSienaTest
 # read in network data
 friend.data.w1 <- as.matrix(read.table("data/s50_data/s50-network1.dat"))
 friend.data.w2 <- as.matrix(read.table("data/s50_data/s50-network2.dat"))
